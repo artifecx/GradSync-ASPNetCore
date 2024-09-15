@@ -20,6 +20,7 @@ namespace Data.Models
         public string RoleId { get; set; }
         public DateTime JoinDate { get; set; }
         public DateTime? LastLoginDate { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual Avatar Avatar { get; set; }
         public virtual Role Role { get; set; }

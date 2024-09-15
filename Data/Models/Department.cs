@@ -14,6 +14,7 @@ namespace Data.Models
         public string Name { get; set; }
         public string ShortName { get; set; }
         public string CollegeId { get; set; }
+        public bool IsDeleted { get; set; }
 
         public virtual College College { get; set; }
         public virtual ICollection<Job> Jobs { get; set; }
