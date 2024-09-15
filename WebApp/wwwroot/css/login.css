@@ -1,0 +1,76 @@
+.gradient-custom-2 {
+    /* fallback for old browsers */
+    background: #ff0000; /* Red */
+    /* Chrome 10-25, Safari 5.1-6 */
+    background: -webkit-linear-gradient(to right, #ff0000, #000000); /* Red, Black */
+    /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+    background: linear-gradient(to right, #ff0000, #000000); /* Red, Black */
+}
+
+body {
+    background: linear-gradient(-90deg, #FC9F32 0%, rgba(206, 81, 38, 87%) 25%, rgba(174, 27, 30, 73%) 50%, rgba(93, 34, 70, 93%) 73%, #1A2766 100%);
+}
+
+.btn-primary {
+    background: linear-gradient(180deg, #052542 0%, #0D5EA8 100%) !important;
+    border-color: var(--primary-color) !important;
+    border-radius: 20px;
+}
+
+    .btn-primary:active, .btn-primary:focus {
+        box-shadow: 0 0 10px 4px rgba(5, 37, 66, 0.2) !important
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(180deg, #063354 0%, #1281d1 100%) !important;
+        border-color: var(--secondary-color) !important;
+        box-shadow: 0 0 10px 4px rgba(5, 37, 66, 0.2) !important;
+    }
+
+.login-btn {
+    width: 120px;
+    height: 50px
+}
+
+.request-btn {
+    width: 140px;
+    height: 50px
+}
+
+h2 {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 500;
+   
+} /*to be determined font size*/
+
+b {
+
+    font-family: 'Poppins', sans-serif;
+    font-weight: 700;
+    font-style: italic;
+}
+
+.register-box {
+    width: 600px;
+}
+
+@media (min-width: 768px) {
+    .gradient-form {
+        height: 100vh !important;
+    }
+}
+
+@media (min-width: 769px) {
+    .gradient-custom-2 {
+        border-top-right-radius: .3rem;
+        border-bottom-right-radius: .3rem;
+    }
+}
+
+.has-error input {
+    border-color: #dc3545; /* Bootstrap's danger color */
+}
+
+.text-danger {
+    color: #dc3545;
+}
