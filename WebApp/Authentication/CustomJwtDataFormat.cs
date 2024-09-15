@@ -107,7 +107,7 @@ namespace WebApp.Authentication
         public string Protect(AuthenticationTicket ticket, string purpose)
         {
             var token = _configuration.GetTokenAuthentication();
-            var signingKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(token.SecretKey));
+            var signingKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(token.SecretKey));
 
             var claimsPrincipal = ticket.Principal;
             var identity = (ClaimsIdentity)claimsPrincipal.Identity;

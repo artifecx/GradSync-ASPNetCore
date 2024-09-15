@@ -28,11 +28,11 @@
         /// <summary>
         /// authentication scheme Name
         /// </summary>
-        public const string AuthenticationScheme = "Grad_Sync";
+        public const string AuthenticationScheme = "GradSync-Auth";
 
         /// <summary>
         /// authentication Issuer
         /// </summary>
-        public const string Issuer = "asi.gradsync";
+        public const string Issuer = "citu.gradsync";
     }
 }
