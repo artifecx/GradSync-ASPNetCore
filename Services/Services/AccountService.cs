@@ -49,10 +49,15 @@ namespace Services.Services
         {
             user = new User();
             var passwordKey = PasswordManager.EncryptPassword(password);
-            var allUsers = _repository.GetAllUsersAsync().Result;
             user = _repository.GetAllUsersAsync().Result.Find(x => x.Email == email && x.Password == passwordKey);
-
-            return user != null ? LoginResult.Success : LoginResult.Failed;
+            
+            if(user != null)
+            {
+                user.LastLoginDate = DateTime.Now;
+                _repository.UpdateAsync(user).Wait();
+                return LoginResult.Success;
+            }
+            return LoginResult.Failed;
         }
 
         public bool UserExists(string Email) =>
