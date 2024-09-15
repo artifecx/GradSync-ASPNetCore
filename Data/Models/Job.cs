@@ -28,6 +28,7 @@ namespace Data.Models
         public string IndustryFieldId { get; set; }
         public string ScheduleId { get; set; }
         public string PostedById { get; set; }
+        public bool IsArchived { get; set; }
 
         public virtual CategoryType CategoryType { get; set; }
         public virtual Department Department { get; set; }

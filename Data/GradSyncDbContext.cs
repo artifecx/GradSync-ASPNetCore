@@ -140,6 +140,8 @@ namespace Data
             {
                 entity.ToTable("Application");
 
+                entity.HasIndex(e => e.IsArchived, "IX_Application_IsArchived");
+
                 entity.HasIndex(e => e.JobId, "IX_Application_JobId");
 
                 entity.HasIndex(e => e.UserId, "IX_Application_UserId");
@@ -238,6 +240,8 @@ namespace Data
             {
                 entity.ToTable("College");
 
+                entity.HasIndex(e => e.IsDeleted, "IX_College_IsDeleted");
+
                 entity.HasIndex(e => e.Name, "IX_College_Name");
 
                 entity.HasIndex(e => e.ShortName, "IX_College_ShortName");
@@ -257,9 +261,13 @@ namespace Data
             {
                 entity.ToTable("Company");
 
+                entity.HasIndex(e => e.IsArchived, "IX_Company_IsArchived");
+
                 entity.HasIndex(e => e.CompanyId, "IX_Recruiter_CompanyId");
 
                 entity.Property(e => e.CompanyId).HasMaxLength(256);
+
+                entity.Property(e => e.Address).HasMaxLength(500);
 
                 entity.Property(e => e.CompanyLogoId).HasMaxLength(256);
 
@@ -323,6 +331,8 @@ namespace Data
                 entity.ToTable("Department");
 
                 entity.HasIndex(e => e.CollegeId, "IX_Department_CollegeId");
+
+                entity.HasIndex(e => e.IsDeleted, "IX_Department_IsDeleted");
 
                 entity.HasIndex(e => e.Name, "IX_Department_Name");
 
@@ -407,6 +417,8 @@ namespace Data
                 entity.HasIndex(e => e.EmploymentTypeId, "IX_Job_EmploymentTypeId");
 
                 entity.HasIndex(e => e.IndustryFieldId, "IX_Job_IndustryFieldId");
+
+                entity.HasIndex(e => e.IsArchived, "IX_Job_IsArchived");
 
                 entity.HasIndex(e => e.Location, "IX_Job_Location");
 
@@ -719,6 +731,8 @@ namespace Data
                 entity.HasIndex(e => e.AvatarId, "IX_User_AvatarId");
 
                 entity.HasIndex(e => e.Email, "IX_User_Email");
+
+                entity.HasIndex(e => e.IsDeleted, "IX_User_IsDeleted");
 
                 entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 

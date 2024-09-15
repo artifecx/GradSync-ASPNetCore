@@ -12,6 +12,7 @@ namespace Data.Models
         public DateTime CreatedDate { get; set; }
         public DateTime? UpdatedDate { get; set; }
         public string AdditionalInformationId { get; set; }
+        public bool IsArchived { get; set; }
 
         public virtual ApplicationStatusType ApplicationStatusType { get; set; }
         public virtual Job Job { get; set; }

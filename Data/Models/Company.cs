@@ -16,6 +16,8 @@ namespace Data.Models
         public string IndustryFieldId { get; set; }
         public string CompanyLogoId { get; set; }
         public string MemorandumOfAgreementId { get; set; }
+        public bool IsArchived { get; set; }
+        public string Address { get; set; }
 
         public virtual CompanyLogo CompanyLogo { get; set; }
         public virtual IndustryField IndustryField { get; set; }
