@@ -1,0 +1,73 @@
+﻿@using static Resources.Views.Screen
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"]</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/main.css" />
+    <link rel="stylesheet" href="~/css/style.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" rel="stylesheet" />
+    @RenderSection("Styles", required: false)
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+</head>
+<body>
+    @if (User.IsInRole("Applicant"))
+    {
+        @Html.Partial("_Header")
+    }
+    <div class="layout">
+        @if (!User.IsInRole("Applicant"))
+        {
+            @Html.Partial("_Sidebar")
+        }
+        <main role="main" class="content">
+            @RenderBody()
+            @if(ViewBag.loginView == true)
+			{
+                <footer class="footer d-flex justify-content-between align-items-center p-0 mb-3" style="color:white;">
+                    <div>
+                        <img src="~/img/logoBW.png" style="width: 150px;" alt="login-logo" class="ml-5" />
+                    </div>
+                    <div class="mr-5 ">
+                        &copy; @DateTime.Now.Year GradSync
+                    </div>
+                </footer>
+
+            }
+            else
+            {
+                <footer class="footer" style="border-top: 1px solid var(--border-color); ">
+                    @Copyright
+                </footer>
+            }
+           
+        </main>
+    </div>
+
+    <script src="~/js/site.js" asp-append-version="true"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
+    <script src="https://kit.fontawesome.com/7a7c645416.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script>
+        toastr.options = {
+            positionClass: "toast-top-center",
+            timeOut: 3000,
+            closeButton: true,
+            progressBar: true
+        };
+    </script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>
