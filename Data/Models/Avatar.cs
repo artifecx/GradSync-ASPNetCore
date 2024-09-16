@@ -1,21 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Data.Models
+namespace Data.Models;
+
+public partial class Avatar
 {
-    public partial class Avatar
-    {
-        public Avatar()
-        {
-            Users = new HashSet<User>();
-        }
+    public string AvatarId { get; set; }
 
-        public string AvatarId { get; set; }
-        public string FileName { get; set; }
-        public byte[] FileContent { get; set; }
-        public string FileType { get; set; }
-        public DateTime UploadedDate { get; set; }
+    public string FileName { get; set; }
 
-        public virtual ICollection<User> Users { get; set; }
-    }
+    public byte[] FileContent { get; set; }
+
+    public string FileType { get; set; }
+
+    public DateTime UploadedDate { get; set; }
+
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }
