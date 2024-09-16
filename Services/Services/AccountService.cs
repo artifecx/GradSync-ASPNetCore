@@ -44,6 +44,27 @@ namespace Services.Services
                 JoinDate = DateTime.Now
             };
             _repository.AddUser(user);
+
+            if (model.AsRecruiter)
+                AddRecruiter(user);
+            else
+                AddApplicant(user);
+        }
+
+        private void AddApplicant(User user)
+        {
+            _repository.AddApplicant(new Applicant
+            {
+                UserId = user.UserId,
+            });
+        }
+
+        private void AddRecruiter(User user)
+        {
+            _repository.AddRecruiter(new Recruiter
+            {
+                UserId = user.UserId,
+            });
         }
 
         public LoginResult AuthenticateUser(string email, string password, ref User user)

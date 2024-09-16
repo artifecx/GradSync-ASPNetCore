@@ -26,6 +26,18 @@ namespace Data.Repositories
             UnitOfWork.SaveChanges();
         }
 
+        public void AddApplicant(Applicant applicant)
+        {
+            this.GetDbSet<Applicant>().Add(applicant);
+            UnitOfWork.SaveChanges();
+        }
+
+        public void AddRecruiter(Recruiter recruiter)
+        {
+            this.GetDbSet<Recruiter>().Add(recruiter);
+            UnitOfWork.SaveChanges();
+        }
+
         public async Task UpdateAsync(User user)
         {
             this.GetDbSet<User>().Update(user);
