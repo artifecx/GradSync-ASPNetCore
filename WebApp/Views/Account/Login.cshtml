@@ -63,20 +63,4 @@
 @section scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/account.js"></script>
-    <script>
-        function togglePasswordVisibility() {
-            var passwordInput = document.getElementById("passwordInput");
-            var eyeOpenIcon = document.getElementById("eyeOpenIcon");
-            var eyeClosedIcon = document.getElementById("eyeClosedIcon");
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                eyeOpenIcon.classList.add('hidden');
-                eyeClosedIcon.classList.remove('hidden');
-            } else {
-                passwordInput.type = "password";
-                eyeOpenIcon.classList.remove('hidden');
-                eyeClosedIcon.classList.add('hidden');
-            }
-        }
-    </script>
 }

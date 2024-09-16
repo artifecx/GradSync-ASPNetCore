@@ -1,4 +1,19 @@
-﻿document.addEventListener('DOMContentLoaded', function () {
+﻿function togglePasswordVisibility() {
+    var passwordInput = document.getElementById("passwordInput");
+    var eyeOpenIcon = document.getElementById("eyeOpenIcon");
+    var eyeClosedIcon = document.getElementById("eyeClosedIcon");
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeOpenIcon.classList.add('hidden');
+        eyeClosedIcon.classList.remove('hidden');
+    } else {
+        passwordInput.type = "password";
+        eyeOpenIcon.classList.remove('hidden');
+        eyeClosedIcon.classList.add('hidden');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
     const emailInput = document.getElementById('emailInput');
     const passwordInput = document.getElementById('passwordInput');
     const loginButton = document.getElementById('loginButton');
@@ -8,7 +23,7 @@
     const nameInput = document.getElementById('name');
     const passwordInputRegister = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmpassword');
-    const registerError = document.getElementById('registerError');
+    const registerError = document.getElementById('registerError');    
 
     function toggleLoginButton() {
         if (emailInput.value.trim() && passwordInput.value.trim()) {
