@@ -10,7 +10,6 @@ namespace Services.ServiceModels
         /// <summary>
         /// Gets or sets the user identifier.
         /// </summary>
-        [Required(ErrorMessage = "Email is required.")]
         public string UserId { get; set; }
         /// <summary>
         /// Gets or sets the name.
@@ -31,10 +30,6 @@ namespace Services.ServiceModels
         [Required(ErrorMessage = "Password is required.")]
         [StringLength(20, ErrorMessage = "Password must be 5 characters minimum", MinimumLength = 5)]
         public string Password { get; set; }
-
-        [Required(ErrorMessage = "Confirmation Password is required.")]
-        [Compare("Password", ErrorMessage = "Password and Confirmation Password must match.")]
-        public string ConfirmPassword { get; set; }
 
         /// <summary>
         /// Gets or sets the role identifier.
