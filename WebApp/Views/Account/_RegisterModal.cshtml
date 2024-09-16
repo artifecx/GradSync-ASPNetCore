@@ -1,47 +1,60 @@
-﻿@model Services.ServiceModels.UserViewModel
+﻿@model Services.ServiceModels.AccountServiceModel
 
 <div class="modal fade" id="registerUserModal" tabindex="-1" role="dialog" aria-labelledby="registerUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
+            <!-- Modal Header -->
             <div class="modal-header">
-                <h5 class="modal-title font-weight-bold" id="registerUserModalLabel">Register User</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <h5 class="modal-title font-bold text-2xl text-[#7A1515]" id="registerUserModalLabel">Register User</h5>
+                <button type="button" class="close text-gray-500 hover:text-gray-700" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <form id="registerUserForm" enctype="multipart/form-data">
+            <!-- Registration Form -->
+            <form id="registerUserForm" method="post" action="/Account/Register">
                 <div class="modal-body">
-                
-                        <div class="form-outline mb-4">
-                            <label class="form-label" for="userId">Email</label>
-                            <input type="text" id="userId" class="form-control" asp-for="UserId" placeholder="Enter email" />
-                            <span asp-validation-for="UserId" class="text-danger"></span>
-                        </div>
-                        <div class="form-outline mb-4">
-                            <label class="form-label" for="name">Name</label>
-                            <input type="text" id="name" class="form-control" asp-for="Name" placeholder="Enter name" />
-                            <span asp-validation-for="Name" class="text-danger"></span>
-                        </div>
-                        <div class="form-outline mb-4">
-                            <label class="form-label" for="password">Password</label>
-                            <input type="password" id="password" class="form-control" asp-for="Password" placeholder="Enter password" />
-                            <span asp-validation-for="Password" class="text-danger"></span>
-                        </div>
-                        <div class="form-outline mb-4">
-                            <label class="form-label" for="confirmpassword">Confirm Password</label>
-                            <input type="password" id="confirmpassword" class="form-control" asp-for="ConfirmPassword" placeholder="Confirm Password" />
-                            <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
-                        </div>
-                        <div class="form-outline mb-4">
-                            <span id="registerError" class="text-danger"></span>
-                        </div>
-                
+                    @Html.AntiForgeryToken()
+                    <div class="mb-4">
+                        <label class="block font-normal mb-1" for="email">Email <span class="text-red-500">*</span></label>
+                        <input type="text" id="email" asp-for="Email" placeholder="juandelacruz@gradsync.com"
+                               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] hover:border-[#991b1b]" />
+                        <span asp-validation-for="Email" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-normal mb-1" for="name">Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="name" asp-for="Name" placeholder="Juan Dela Cruz"
+                               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] hover:border-[#991b1b]" />
+                        <span asp-validation-for="Name" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-normal mb-1" for="password">Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="password" asp-for="Password" placeholder="******"
+                               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] hover:border-[#991b1b]" />
+                        <span asp-validation-for="Password" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="block font-normal mb-1" for="confirmpassword">Confirm Password <span class="text-red-500">*</span></label>
+                        <input type="password" id="confirmpassword" asp-for="ConfirmPassword" placeholder="******"
+                               class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] hover:border-[#991b1b]" />
+                        <span asp-validation-for="ConfirmPassword" class="text-red-500 text-sm mt-1 block"></span>
+                    </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="submit" class="btn btn-primary" id="registerButton" disabled>Create</button>
-                    <a href="" data-dismiss="modal">&#8592 Back</a>
+                <!-- Modal Footer -->
+                <div class="modal-footer flex justify-between items-center">
+                    <button type="submit" id="registerButton" disabled
+                            class="bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded flex items-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        Create
+                    </button>
                 </div>
             </form>
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <!-- Include jQuery Validation and Unobtrusive Validation scripts -->
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+    <!-- Include the account.js script -->
+    <script src="~/js/account.js"></script>
+}

@@ -4,7 +4,7 @@
     const loginButton = document.getElementById('loginButton');
     const registerUserForm = document.getElementById('registerUserForm');
     const registerButton = document.getElementById('registerButton');
-    const userIdInput = document.getElementById('userId');
+    const userIdInput = document.getElementById('email');
     const nameInput = document.getElementById('name');
     const passwordInputRegister = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmpassword');
@@ -40,38 +40,12 @@
     confirmPasswordInput.addEventListener('input', toggleRegisterButton);
 
     function validateForm() {
-        let isValid = true;
-        registerError.textContent = '';
-
-        if (!userIdInput.value.trim()) {
-            isValid = false;
-            registerError.textContent = 'Email is required. ';
-        }
-
-        if (!nameInput.value.trim()) {
-            isValid = false;
-            registerError.textContent += 'Name is required. ';
-        }
-
-        if (!passwordInputRegister.value.trim()) {
-            isValid = false;
-            registerError.textContent += 'Password is required. ';
-        }
-
-        if (!confirmPasswordInput.value.trim()) {
-            isValid = false;
-            registerError.textContent += 'Confirm Password is required. ';
-        } else if (passwordInputRegister.value.trim() !== confirmPasswordInput.value.trim()) {
-            isValid = false;
-            registerError.textContent += 'Passwords do not match. ';
-        }
-
-        return isValid;
+        return $(registerUserForm).valid();
     }
 
     function registerUser() {
         if (!validateForm()) {
-            return; // Do not proceed if form is invalid
+            return;
         }
         
         var formData = new FormData(registerUserForm);
@@ -97,9 +71,8 @@
         });
     }
 
-    // Attach the submit event to the form
     $('#registerUserForm').on('submit', function (e) {
-        e.preventDefault(); // Prevent the default form submission
-        registerUser(); // Call the registerUser function
+        e.preventDefault();
+        registerUser();
     });
 });
