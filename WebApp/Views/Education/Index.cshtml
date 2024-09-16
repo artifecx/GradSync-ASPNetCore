@@ -1,0 +1,81 @@
+﻿@model Services.ServiceModels.EducationViewModel
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<p>
+    <a href="#" id="new-college-link" class="text-blue-500 hover:underline">
+        Add College
+    </a>
+</p>
+
+<table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+        <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+            <th class="px-6 py-3"></th>
+        </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+        @foreach (var college in Model.Colleges)
+        {
+            <tr class="cursor-pointer" onclick="toggleDepartments('@college.CollegeId')">
+                <td class="px-6 py-4 whitespace-nowrap">
+                    @Html.DisplayFor(modelItem => college.CollegeId)
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    @Html.DisplayFor(modelItem => college.Name)
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                    @Html.ActionLink("", "Edit", new { id = college.CollegeId }, new { @class = "fas fa-edit text-blue-500 hover:text-blue-700 mr-2" }) |
+                    <a href="javascript:void(0);" onclick="displayDeleteModal('@college.CollegeId')" class="fas fa-trash-alt text-red-500 hover:text-red-700 ml-2"></a>
+                </td>
+            </tr>
+
+            <tr id="departments-row-@college.CollegeId" class="hidden">
+                <td colspan="3" class="px-6 py-4">
+                    <p>
+                        <a href="#" id="new-department-link" class="text-blue-500 hover:underline">
+                            Add Department
+                        </a>
+                    </p>
+                    <table class="min-w-full divide-y divide-gray-200 mt-2">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+                                <th class="px-6 py-3"></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+                            @foreach (var department in Model.Departments.Where(d => d.CollegeId == college.CollegeId))
+                            {
+                                <tr class="odd:bg-white even:bg-gray-50">
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @Html.DisplayFor(modelItem => department.DepartmentId)
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @Html.DisplayFor(modelItem => department.Name)
+                                    </td>
+                                    <td class="px-6 py-4 whitespace-nowrap">
+                                        @Html.ActionLink("", "Edit", new { id = department.DepartmentId }, new { @class = "fas fa-edit text-blue-500 hover:text-blue-700 mr-2" }) |
+                                        <a href="javascript:void(0);" onclick="displayDeleteModal('@department.DepartmentId')" class="fas fa-trash-alt text-red-500 hover:text-red-700 ml-2"></a>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+<script>
+    function toggleDepartments(collegeId) {
+            var row = document.getElementById('departments-row-' + collegeId);
+            row.classList.toggle('hidden');
+        }
+</script>
