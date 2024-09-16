@@ -100,7 +100,7 @@ namespace WebApp.Controllers
                 if (model != null || string.IsNullOrEmpty(UserId))
                 {
                     _userService.RegisterUser(model);
-                    TempData["SuccessMessage"] = "User Registered Successfully!";
+                    TempData["SuccessMessage"] = "User registered successfully!";
                     return Json(new { success = true });
                 }
                 TempData["ErrorMessage"] = "An has error occurred while registering user.";
@@ -127,7 +127,7 @@ namespace WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
             this._session.SetString("HasSession", "Exist");
 
