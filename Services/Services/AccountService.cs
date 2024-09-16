@@ -31,14 +31,14 @@ namespace Services.Services
 
         public void RegisterUser(AccountServiceModel model)
         {
-            if (UserExists(model.UserId))
+            if (UserExists(model.Email))
                 throw new UserException("User already exists!"); // TODO: Change to custom exception
 
             User user = new User{
                 UserId = Guid.NewGuid().ToString(),
-                Email = model.UserId,
+                Email = model.Email,
                 Password = PasswordManager.EncryptPassword(model.Password),
-                RoleId = "Applicant",
+                RoleId = "Applicant", // TODO: allow user to select role
                 Name = model.Name,
                 JoinDate = DateTime.Now
             };
