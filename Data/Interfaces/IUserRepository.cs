@@ -11,6 +11,8 @@ namespace Data.Interfaces
     {
         Task<List<User>> GetAllUsersAsync();
         void AddUser(User user);
+        void AddApplicant(Applicant applicant);
+        void AddRecruiter(Recruiter recruiter);
         Task UpdateAsync(User user);
         Task DeleteAsync(string UserId);
         Task<bool> UserExistsAsync(string UserId);
