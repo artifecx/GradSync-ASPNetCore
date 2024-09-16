@@ -69,12 +69,12 @@
                     <p>Are you sure you want to log out?</p>
                 </div>
                 <div class="modal-footer">
+                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded" data-dismiss="modal">Cancel</button>
                     <form asp-action="SignOutUser" asp-controller="Account" method="post">
                         <button type="submit" class="bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded">
                             Confirm
                         </button>
                     </form>
-                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
         </div>
@@ -90,7 +90,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
     <script>
         toastr.options = {
-            positionClass: "toast-top-center",
+            positionClass: "toast-bottom-center",
             timeOut: 3000,
             closeButton: true,
             progressBar: true

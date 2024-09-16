@@ -28,6 +28,6 @@ namespace Services.ServiceModels
         [Compare("Password", ErrorMessage = "Password and confirmation password must match.")]
         public string ConfirmPassword { get; set; }
 
-        public string RoleId { get; set; }
+        public bool AsRecruiter { get; set; }
     }
 }
