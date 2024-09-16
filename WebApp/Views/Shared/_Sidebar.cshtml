@@ -11,25 +11,26 @@
     bool isSuper = User.HasClaim("IsSuperAdmin", "true");
 }
 
-<div class="@((ViewBag.LoginView == true || ViewBag.create == true) ? "hide-navbar" : "sidebar") ">
-    <div class="logosec hover-pointer">
+<div class="@((ViewBag.LoginView == true || ViewBag.create == true) ? "hide-navbar" : "sidebar")">
+    <div class="cursor-pointer">
         <img src="~/img/logo1.png"
-             style="width: 185px;" alt="logo"
+             class="w-48"
+             alt="logo"
              onclick="window.location.href = '@(User.IsInRole("Employee") ? Url.Action("GetAll", "Ticket") : Url.Action("Index", "Home"))';">
     </div>
-    <div class="sidebar-header mt-5 mb-2">Navigation</div>
-    <ul class="list-unstyled flex-grow-1">
+    <div class="mt-5 mb-2 text-gray-700 font-semibold">Navigation</div>
+    <ul class="list-none flex-grow">
         @if (isSuper || isAdmin)
         {
             <li class="py-2">
-                <a asp-action="Index" asp-controller="Home" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")">
-                    <i class="fa fa-area-chart px-1"></i>
+                <a asp-action="Index" asp-controller="Home" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "bg-gray-200" : "")">
+                    <i class="fa fa-area-chart mr-2"></i>
                     Dashboard
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="Index" asp-controller="User" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "active" : "")">
-                    <i class="fa fa-users px-1"></i>
+                <a asp-action="Index" asp-controller="User" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "bg-gray-200" : "")">
+                    <i class="fa fa-users mr-2"></i>
                     Users
                 </a>
             </li>
@@ -37,110 +38,62 @@
         @if (isAdmin && !isSuper)
         {
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "JobManagement" ? "active" : "")">
-                    <i class="fa fa-suitcase px-1"></i>
+                <a asp-action="" asp-controller="" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "JobManagement" ? "bg-gray-200" : "")">
+                    <i class="fa fa-suitcase mr-2"></i>
                     Jobs
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "active" : "")">
-                    <i class="fa fa-building px-1"></i>
+                <a asp-action="" asp-controller="" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
+                    <i class="fa fa-building mr-2"></i>
                     Companies
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "active" : "")">
-                    <i class="fa fa-check-circle-o px-1"></i>
+                <a asp-action="" asp-controller="" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "bg-gray-200" : "")">
+                    <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Education" ? "active" : "")">
-                    <i class="fa fa-university px-1"></i>
+                <a asp-action="GetAll" asp-controller="Education" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Education" ? "bg-gray-200" : "")">
+                    <i class="fa fa-university mr-2"></i>
                     Education
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "SnIManagement" ? "active" : "")">
-                    <i class="fa fa-industry"></i>
+                <a asp-action="" asp-controller="" class="flex items-center px-2 py-1 rounded hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "SnIManagement" ? "bg-gray-200" : "")">
+                    <i class="fa fa-industry mr-2"></i>
                     Skills & Industry
                 </a>
             </li>
         }
-        @*@if (!isSuper)
-        {
-            <li class="py-2">
-                <a asp-action="GetAll" asp-controller="Ticket" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "Ticket" ? "active" : "")">
-                    <i class="fa fa-ticket px-1"></i>
-                    Ticket Screen
-                </a>
-            </li>
-            <li class="py-2">
-                <a asp-controller="KnowledgeBase" asp-action="Index" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "KnowledgeBase" ? "active" : "")">
-                    <i class="fa fa-book px-1"></i>
-                    Articles
-                </a>
-            </li>
-
-            <li class="py-2">
-                <a asp-controller="UserPreferences" asp-action="GetUserPreferences" class="@(ViewContext.RouteData.Values["Controller"].ToString() == "UserPreferences" ? "active" : "")">
-                    <i class="fa fa-cog px-1"></i>
-                    Settings
-                </a>
-            </li>
-        }*@
         <li>
-            <hr />
+            <hr class="my-2 border-gray-300" />
         </li>
         <li class="py-2">
-            <a href="#" data-toggle="modal" data-target="#logoutModal">
-                <i class="fa fa-sign-out px-1"></i>
+            <a href="#" data-toggle="modal" data-target="#logoutModal" class="flex items-center px-2 py-1 rounded hover:bg-gray-200">
+                <i class="fa fa-sign-out mr-2"></i>
                 Log out
             </a>
         </li>
     </ul>
-    <div class="user-info">
-        <i class="fa fa-user-circle icon"></i>
-        <div class="text">
+    <div class="flex items-center p-4 bg-gray-100 rounded mt-4">
+        <i class="fa fa-user-circle text-4xl mr-3"></i>
+        <div>
             <span>@HttpContextAccessor.HttpContext.User.Identity.Name</span>
             @if (isSuper)
             {
-                <small class="text-muted">
+                <div class="text-sm text-gray-500">
                     (Super Admin)
-                </small>
+                </div>
             }
             else
             {
-                <small class="text-muted">
+                <div class="text-sm text-gray-500">
                     (@role)
-                </small>
+                </div>
             }
-        </div>
-    </div>
-</div>
-
-<!-- Logout Modal -->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="logoutModalLabel">
-                    <i class="fa fa-hourglass-half px-1"></i>
-                    Log out
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
-                </button>
-            </div>
-            <div class="modal-body pl-4 py-1">
-                <p>Are you sure you want to log out?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form asp-action="SignOutUser" asp-controller="Account" method="post">
-                    <button type="submit" class="btn btn-primary">Confirm</button>
-                </form>
-            </div>
         </div>
     </div>
 </div>
@@ -151,9 +104,9 @@
         links.forEach(function (link) {
             link.addEventListener('click', function () {
                 links.forEach(function (link) {
-                    link.classList.remove('active');
+                    link.classList.remove('bg-gray-200');
                 });
-                this.classList.add('active');
+                this.classList.add('bg-gray-200');
             });
         });
     });

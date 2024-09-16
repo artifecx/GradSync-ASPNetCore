@@ -4,98 +4,161 @@
 @{
     bool isAdmin = HttpContextAccessor.HttpContext.User.IsInRole("Admin");
     var userId = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    bool hasUnreadNotifications = false;
-    int notificationCount = 0;
     var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     bool isSuper = User.HasClaim("IsSuperAdmin", "true");
+    var userName = HttpContextAccessor.HttpContext.User.Identity.Name;
+    bool isLoggedIn = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 }
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="@(User.IsInRole("Employee") ? Url.Action("GetAll", "Ticket") : Url.Action("Index", "Home"))">
-        <img src="~/img/logo1.png" style="width: 150px;" alt="logo">
-    </a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-
-    <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav mr-auto">
-            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "active" : "")">
-                <a class="nav-link" asp-action="Index" asp-controller="Home">
-                    Home
-                </a>
-            </li>
-            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "active" : "")">
-                <a class="nav-link" asp-action="" asp-controller="">
-                    Jobs
-                </a>
-            </li>
-            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "Contact" ? "active" : "")">
-                <a class="nav-link" asp-action="" asp-controller="">
-                    Contact
-                </a>
-            </li>
-            <li class="nav-item @(ViewContext.RouteData.Values["Controller"].ToString() == "About" ? "active" : "")">
-                <a class="nav-link" asp-action="" asp-controller="">
-                    About
-                </a>
-            </li>
-        </ul>
-
-        <!-- Right side user info and logout -->
-        <ul class="navbar-nav">
-            <li class="nav-item dropdown">
-                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                    <i class="fa fa-user-circle"></i> @HttpContextAccessor.HttpContext.User.Identity.Name
-                </a>
-                <div class="dropdown-menu dropdown-menu-right" aria-labelledby="userDropdown">
-                    <a class="dropdown-item" asp-action="GetUserPreferences" asp-controller="UserPreferences">
-                        <i class="fa fa-cog"></i> Settings
-                    </a>
-                    <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
-                        <i class="fa fa-sign-out"></i> Log out
+<nav class="fixed w-full bg-white text-[#743030] z-50">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between h-16">
+            <div class="flex">
+                <div class="flex-shrink-0 flex items-center">
+                    <a href="@(User.IsInRole("Employee") ? Url.Action("GetAll", "Ticket") : Url.Action("Index", "Home"))" class="flex items-center">
+                        <img src="~/img/logo1.png" alt="Logo" class="h-8 w-auto mr-3">
                     </a>
                 </div>
-            </li>
-        </ul>
-    </div>
-</nav>
-
-<!-- Logout Modal -->
-<div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-header border-0">
-                <h5 class="modal-title" id="logoutModalLabel">
-                    <i class="fa fa-hourglass-half"></i> Log out
-                </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                    <span aria-hidden="true">&times;</span>
+                <div class="hidden md:ml-6 md:flex md:space-x-8">
+                    <a href="@Url.Action("Index", "Home")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                        Home
+                    </a>
+                    @* Conditionally render 'Jobs' link based on user role *@
+                    @if (!isAdmin)
+                    {
+                        <a href="@Url.Action("Index", "Job")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                            Find Job
+                        </a>
+                    }
+                    <a href="@Url.Action("Index", "Contact")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                        Contact
+                    </a>
+                    <a href="@Url.Action("Index", "About")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                        About
+                    </a>
+                </div>
+            </div>
+            <div class="hidden md:ml-6 md:flex md:items-center">
+                @if (isLoggedIn)
+                {
+                    <!-- Profile dropdown -->
+                    <div class="ml-3 relative">
+                        <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown()">
+                            <span class="sr-only">Open user menu</span>
+                            <i class="fa fa-user-circle fa-2x"></i>
+                        </button>
+                        <!-- Dropdown menu -->
+                        <div id="dropdown-menu" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                            <a href="@Url.Action("GetUserPreferences", "UserPreferences")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                <i class="fa fa-cog mr-2"></i> Settings
+                            </a>
+                            <a href="#" data-toggle="modal" data-target="#logoutModal" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                <i class="fa fa-sign-out mr-2"></i> Log out
+                            </a>
+                        </div>
+                    </div>
+                }
+                else
+                {
+                    <div class="flex space-x-4">
+                        <a href="/Account/Login" class="font-semibold text-sm px-5 py-2 rounded bg-[#743030] text-white">Sign In</a>
+                        <a href="/Account/Register" class="font-semibold text-sm px-5 py-2 rounded bg-[#FFBF03] text-[#743030]">Register</a>
+                    </div>
+                }
+            </div>
+            <div class="-mr-2 flex items-center md:hidden">
+                <!-- Mobile menu button -->
+                <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-[#743030] hover:bg-gray-100 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu()">
+                    <span class="sr-only">Open main menu</span>
+                    <svg id="menu-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Menu icon -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8h16M4 16h16" />
+                    </svg>
+                    <svg id="close-icon" class="hidden h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <!-- Close icon -->
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
                 </button>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to log out?</p>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <form asp-action="SignOutUser" asp-controller="Account" method="post">
-                    <button type="submit" class="btn btn-primary">Confirm</button>
-                </form>
             </div>
         </div>
     </div>
-</div>
+
+    <!-- Mobile menu -->
+    <div class="md:hidden hidden" id="mobile-menu">
+        <div class="pt-2 pb-3 space-y-1">
+            <a href="@Url.Action("Index", "Home")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                Home
+            </a>
+            @if (!isAdmin)
+            {
+                <a href="@Url.Action("Index", "Job")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                    Find Job
+                </a>
+            }
+            <a href="@Url.Action("Index", "Contact")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                Contact
+            </a>
+            <a href="@Url.Action("Index", "About")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                About
+            </a>
+        </div>
+        <div class="pt-4 pb-3 border-t border-gray-200">
+            @if (isLoggedIn)
+            {
+                <div class="flex items-center px-5">
+                    <div class="flex-shrink-0">
+                        <i class="fa fa-user-circle fa-2x"></i>
+                    </div>
+                    <div class="ml-3">
+                        <div class="text-base font-medium text-[#743030]">@userName</div>
+                        <div class="text-sm font-medium text-gray-500">@role</div>
+                    </div>
+                </div>
+                <div class="mt-3 space-y-1">
+                    <a href="@Url.Action("GetUserPreferences", "UserPreferences")" class="block px-5 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                        <i class="fa fa-cog mr-2"></i> Settings
+                    </a>
+                    <a href="#" data-toggle="modal" data-target="#logoutModal" class="block px-5 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                        <i class="fa fa-sign-out mr-2"></i> Log out
+                    </a>
+                </div>
+            }
+            else
+            {
+                <div class="mt-3 space-y-1 px-5">
+                    <a href="/Account/Login" class="block px-4 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                        Sign In
+                    </a>
+                    <a href="/Account/Register" class="block px-4 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
+                        Register
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</nav>
 
 <script>
-    document.addEventListener("DOMContentLoaded", function () {
-        var links = document.querySelectorAll('.navbar-nav .nav-link');
-        links.forEach(function (link) {
-            link.addEventListener('click', function () {
-                links.forEach(function (link) {
-                    link.classList.remove('active');
-                });
-                this.classList.add('active');
-            });
-        });
+    function toggleDropdown() {
+        var menu = document.getElementById('dropdown-menu');
+        menu.classList.toggle('hidden');
+    }
+
+    function toggleMobileMenu() {
+        var menu = document.getElementById('mobile-menu');
+        var menuIcon = document.getElementById('menu-icon');
+        var closeIcon = document.getElementById('close-icon');
+        menu.classList.toggle('hidden');
+        menuIcon.classList.toggle('hidden');
+        closeIcon.classList.toggle('hidden');
+    }
+
+    // Close dropdown when clicking outside
+    document.addEventListener('click', function (event) {
+        var dropdownButton = document.getElementById('user-menu-button');
+        var dropdownMenu = document.getElementById('dropdown-menu');
+        if (!dropdownButton.contains(event.target) && !dropdownMenu.contains(event.target)) {
+            dropdownMenu.classList.add('hidden');
+        }
     });
 </script>

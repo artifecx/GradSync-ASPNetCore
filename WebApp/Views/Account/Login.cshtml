@@ -1,68 +1,82 @@
 ﻿@model LoginViewModel
-@using static Resources.Views.Screen
-@section styles {
-    <link rel="stylesheet" href="~/css/login.css" />
-    <style>
-        .has-error input {
-            border-color: #dc3545;
-        }
-
-        .text-danger {
-            color: #dc3545;
-            font-size: 0.875em;
-            margin-top: 0.25em;
-            display: block;
-        }
-    </style>
-}
 @{
     ViewBag.LoginView = true;
     ViewData["Title"] = "Login Page";
 
-    await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.UserViewModel());
+    await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.AccountServiceModel());
 }
 <div>
     @Html.AntiForgeryToken()
 </div>
-<div class="container d-flex justify-content-center align-items-center" style="height:calc(100vh - 100px);">
-    <div class="row w-100 justify-content-center align-items-center">
-        <div class="col-5">
-            <div class="text-center text-color-white">
-                <h2>How can <b>we</b> help <b>you</b>?</h2>
-                <p class="mb-5">Welcome to GradSync</p>
+<div class="flex items-center justify-center h-screen bg-cover bg-center bg-login-bg">
+    <div class="bg-white min-h-screen pt-14 text-[#7A1515] flex items-center w-full bg-opacity-0">
+        <form method="post" action="/Account/Login" id="loginForm" class="ml-28 flex flex-col p-8 bg-white rounded-md" style="max-width: 500px; width: 100%;">
+            <div class="text-left mb-3">
+                <p class="text-4xl font-bold">Sign In</p>
             </div>
-            <div class="card rounded-3 text-color">
-                <div class="card-body p-md-5 mx-md-4">
-                    <form method="post" action="/Account/Login" id="loginForm">
-                        <div class="form-outline mb-4 @(ViewData.ModelState["Email"] != null ? "has-error" : "")">
-                            <label class="form-label poppins-medium" for="emailInput">Email Address <span>*</span></label>
-                            <input type="text" class="form-control" asp-for="Email" id="emailInput" placeholder="" />
-                        </div>
-                        <div class="form-outline mb-4 @(ViewData.ModelState["Password"] != null ? "has-error" : "")">
-                            <label class="form-label poppins-medium" for="passwordInput">Password <span>*</span></label>
-                            <input type="password" class="form-control" asp-for="Password" id="passwordInput" placeholder="" />
-                            @if (TempData["ErrorMessageLogin"] != null)
-                            {
-                                <span class="text-danger">@(TempData["ErrorMessageLogin"])</span>
-                            }
-                        </div>
-                        <div class="text-center pt-1 pb-1 d-flex flex-column align-items-center">
-                            <button class="btn btn-primary btn-block login-btn font-weight-bold mb-2" type="submit" id="loginButton" disabled>
-                                Sign in
-                            </button>
-                            <div>
-                                <a href="" class="text-muted" data-toggle="modal" data-target="#registerUserModal">Register</a>
-                            </div>
-                        </div>
-                    </form>
+            <div class="text-left text-black text-sm pb-6">
+                <p>Don't have an account? <a href="" class="text-[#7A1515] underline" data-toggle="modal" data-target="#registerUserModal">Create Account</a></p>
+            </div>
+            <div class="mb-4">
+                <label class="block font-normal mb-1" for="emailInput">Email Address <span class="text-red-500">*</span></label>
+                <input type="email" asp-for="Email" id="emailInput" placeholder="juandelacruz@gradsync.com" required
+                       class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
+                @if (ViewData.ModelState["Email"] != null)
+                {
+                    <span class="text-red-500 text-sm mt-1 block">Please enter a valid email.</span>
+                }
+            </div>
+            <div class="mb-4">
+                <label class="block font-normal mb-1" for="passwordInput">Password <span class="text-red-500">*</span></label>
+                <div class="relative">
+                    <input type="password" asp-for="Password" id="passwordInput" placeholder="******" required
+                           class="w-full border border-gray-300 rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
+                    <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
+                        <!-- Eye Open Icon -->
+                        <svg id="eyeOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7"/>
+                        </svg>
+                        <!-- Eye Closed Icon -->
+                        <svg id="eyeClosedIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                d="m9.75 14.25 4.5-4.5m-4.5 0 4.5 4.5M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7"/>
+                        </svg>
+                    </button>
                 </div>
+                @if (TempData["ErrorMessageLogin"] != null)
+                {
+                    <span class="text-red-500 text-sm mt-1 block">@(TempData["ErrorMessageLogin"])</span>
+                }
             </div>
-        </div>
+            <div>
+                <button type="submit" id="loginButton" disabled
+                        class="mt-4 bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded w-full flex justify-center items-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+                    Sign in
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
-
 @section scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/account.js"></script>
+    <script>
+        function togglePasswordVisibility() {
+            var passwordInput = document.getElementById("passwordInput");
+            var eyeOpenIcon = document.getElementById("eyeOpenIcon");
+            var eyeClosedIcon = document.getElementById("eyeClosedIcon");
+            if (passwordInput.type === "password") {
+                passwordInput.type = "text";
+                eyeOpenIcon.classList.add('hidden');
+                eyeClosedIcon.classList.remove('hidden');
+            } else {
+                passwordInput.type = "password";
+                eyeOpenIcon.classList.remove('hidden');
+                eyeClosedIcon.classList.add('hidden');
+            }
+        }
+    </script>
 }
