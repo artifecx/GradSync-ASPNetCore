@@ -10,6 +10,7 @@ using System.Linq;
 using static Resources.Constants.Enums;
 using static Services.Exceptions.UserExceptions;
 using System.Threading.Tasks;
+using Microsoft.IdentityModel.Tokens;
 
 namespace Services.Services
 {
@@ -32,13 +33,13 @@ namespace Services.Services
         public void RegisterUser(AccountServiceModel model)
         {
             if (UserExists(model.Email))
-                throw new UserException("User already exists!"); // TODO: Change to custom exception
+                throw new UserException("User already exists!");
 
             User user = new User{
                 UserId = Guid.NewGuid().ToString(),
                 Email = model.Email,
                 Password = PasswordManager.EncryptPassword(model.Password),
-                RoleId = "Applicant", // TODO: allow user to select role
+                RoleId = model.AsRecruiter ? "Recruiter" : "Applicant",
                 Name = model.Name,
                 JoinDate = DateTime.Now
             };

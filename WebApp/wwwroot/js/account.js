@@ -23,7 +23,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const nameInput = document.getElementById('name');
     const passwordInputRegister = document.getElementById('password');
     const confirmPasswordInput = document.getElementById('confirmpassword');
-    const registerError = document.getElementById('registerError');    
 
     function toggleLoginButton() {
         if (emailInput.value.trim() && passwordInput.value.trim()) {
@@ -53,6 +52,12 @@ document.addEventListener('DOMContentLoaded', function () {
     nameInput.addEventListener('input', toggleRegisterButton);
     passwordInputRegister.addEventListener('input', toggleRegisterButton);
     confirmPasswordInput.addEventListener('input', toggleRegisterButton);
+
+    $('#registerUserModal').on('hidden.bs.modal', function () {
+        registerUserForm.reset();
+        $(".text-red-500").text('');
+        registerButton.setAttribute('disabled', 'true');
+    });
 
     function validateForm() {
         return $(registerUserForm).valid();
