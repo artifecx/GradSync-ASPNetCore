@@ -41,6 +41,10 @@ namespace Services.Services
 
         public async Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, int pageIndex, int pageSize)
         {
+            var claimsPrincipal = _httpContextAccessor.HttpContext.User;
+            var currentUserIsSuper = claimsPrincipal.FindFirst("IsSuperAdmin")?.Value;
+            var currentUserId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
             var users = await _userRepository.GetAllUsersAsync();
             var data = users.Select(s => new UserViewModel
             {
@@ -51,8 +55,10 @@ namespace Services.Services
                 RoleId = s.RoleId,
             }).ToList();
 
-            // TODO: only show when superadmin
-            data = data.Where(u => u.RoleId != "Admin").ToList();
+            if(currentUserIsSuper != "true")
+                data = data.Where(u => u.RoleId != "Admin").ToList();
+            else
+                data = data.Where(u => u.UserId != currentUserId).ToList();
 
             if (!string.IsNullOrEmpty(filterBy))
             {
@@ -103,19 +109,19 @@ namespace Services.Services
                 AsRecruiter = model.RoleId == "Recruiter",
             };
 
-            if(model.RoleId == "NLO")
+            if(model.RoleId == "NLO" || model.RoleId == "Admin")
             {
                 if (_accountService.UserExists(userModel.Email))
                     throw new UserException("User already exists!");
 
                 var user = _mapper.Map<User>(userModel);
                 user.UserId = Guid.NewGuid().ToString();
-                user.RoleId = "NLO";
+                user.RoleId = model.RoleId;
                 user.JoinDate = DateTime.Now;
                 user.Password = PasswordManager.EncryptPassword(userModel.Password);
 
                 _userRepository.AddUser(user);
-                AddNLO(user);
+                AddAdmin(user);
             }
             else
             {
@@ -123,12 +129,12 @@ namespace Services.Services
             }
         }
 
-        private void AddNLO(User user)
+        private void AddAdmin(User user)
         {
-            _userRepository.AddNLO(new Admin
+            _userRepository.AddAdmin(new Admin
             {
                 UserId = user.UserId,
-                IsSuper = false,
+                IsSuper = user.RoleId == "Admin",
             });
         }
 

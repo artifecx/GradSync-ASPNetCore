@@ -2,7 +2,7 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    bool isAdmin = User.IsInRole("Admin");
+    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("NLO");
     bool isSuper = User.HasClaim("IsSuperAdmin", "true");
     bool isRecruiter = User.IsInRole("Recruiter");
     var userId = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
@@ -20,7 +20,7 @@
     </div>
     <div class="mb-2 mt-5 font-semibold text-gray-700">Navigation</div>
     <ul class="flex-grow list-none">
-        @if (isSuper || isAdmin)
+        @if (isSuper)
         {
             <li class="py-2">
                 <a asp-action="Index" asp-controller="Home" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "bg-gray-200" : "")">
@@ -86,7 +86,7 @@
         <li>
             <hr class="my-2 border-gray-300" />
         </li>
-        @if (isRecruiter)
+        @if (!isSuper)
         {
             <li class="py-2">
                 <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200">
