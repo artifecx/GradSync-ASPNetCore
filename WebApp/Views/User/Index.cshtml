@@ -1,0 +1,183 @@
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.UserViewModel>
+@using Humanizer
+
+@{
+    ViewData["Title"] = "All Users";
+    await Html.RenderPartialAsync("_AddUserModal", new Services.ServiceModels.UserViewModel());
+    await Html.RenderPartialAsync("_ResetPasswordModal");
+    await Html.RenderPartialAsync("_DeleteModal");
+
+    string filterBy = ViewData["FilterBy"] as string;
+    string sortBy = ViewData["SortBy"] as string;
+    string role = ViewData["Role"] as string;
+    int pageIndex = Model.PageIndex;
+
+    string sortByName = string.IsNullOrEmpty(sortBy) ? "name_desc" : null;
+    string sortByEmail = sortBy == "email" ? "email_desc" : "email";
+}
+
+<div class="nav-header flex items-center justify-between">
+    <h1 class="display-6 text-3xl font-semibold">User Management</h1>
+    <div class="flex items-center">
+        <form method="get" asp-action="Index" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" class="flex items-center">
+            <div class="flex">
+                <input type="text" name="filterBy" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Name or role" value="@filterBy" />
+                <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+            <input type="hidden" name="sortBy" value="@sortBy" />
+        </form>
+        <div class="mx-3">
+            @if (User.IsInRole("Admin"))
+            {
+                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#addUserModal">
+                    <i class="fa fa-plus"></i>
+                    New User
+                </button>
+            }
+        </div>
+        <div class="mr-3">
+            <button type="button" class="btn notif-bell" id="notifBellBtn">
+                <i class="fa fa-bell px-1 text-gray-500 hover:text-blue-500"></i>
+            </button>
+        </div>
+        <div id="notificationModal" class="modal fixed-right fade" tabindex="-2" role="dialog">
+            <div class="modal-dialog modal-dialog-aside" role="document">
+                <div class="modal-content">
+                    <!-- Notification Modal -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+    <table class="table-white table min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <a asp-action="Index" asp-route-sortBy="@sortByName" asp-route-filterBy="@filterBy" asp-route-pageIndex="@pageIndex" asp-route-role="@role" class="text-black hover:text-blue-500">
+                        @Html.DisplayNameFor(model => model.First().Name)
+                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                    </a>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <a asp-action="Index" asp-route-sortBy="@sortByEmail" asp-route-filterBy="@filterBy" asp-route-pageIndex="@pageIndex" asp-route-role="@role" class="text-black hover:text-blue-500">
+                        @Html.DisplayNameFor(model => model.First().Email)
+                        @(sortBy == "email" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "email_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                    </a>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="roleDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @Html.DisplayNameFor(model => model.First().Roles)
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="roleDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="Index" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" asp-route-role="">All</a>
+                            @foreach (var r in ViewBag.Roles)
+                            {
+                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="Index" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" asp-route-role="@r.Name">@r.Name</a>
+                            }
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+                        @(string.IsNullOrEmpty(filterBy) ? Html.Raw("No users found") : Html.Raw("No users found matching the criteria"))
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    await Html.RenderPartialAsync("_EditUserModal", item);
+                    <tr>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Email)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.RoleId)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                            <a href="javascript:void(0);" onclick="displayEditModal('@item.UserId','@item.Name', '@item.Email', '@item.RoleId')" class="fas fa-edit action-icon mx-2"></a> |
+                            <button type="button" onclick="displayResetPasswordModal('@item.UserId', '@item.Name')" class="action-icon mx-1">
+                                <i class="fa fa-key" aria-hidden="true"></i>
+                                <span class="sr-only">Reset Password</span>
+                            </button> |
+                            <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.Name')" class="action-icon mx-1 text-red-500 hover:text-red-700">
+                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
+                                <span class="sr-only">Delete</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <nav class="mt-4 flex justify-end">
+        <ul class="pagination flex items-center">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="Index" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="Index" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Values passed to the js files -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action("Index", "User")" />
+<input type="hidden" id="resetUrl" value="@Url.Action("ResetPassword", "User")" />
+<input type="hidden" id="deleteUrl" value="@Url.Action("Delete", "User")" />
+
+@section Scripts {
+    <script src="~/js/delete.js"></script>
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/user.js"></script>
+    <script>
+        $(document).ready(function () {
+            $('#notifBellBtn').click(function () {
+                $.ajax({
+                    url: '@Url.Action("Index", "Notification")',
+                    success: function (result) {
+                        $('#notificationModal .modal-content').html(result);
+                        $('#notificationModal').modal('show');
+                    }
+                });
+            });
+
+            $('#roleDropdown').on('click', function (e) {
+                e.preventDefault();
+                $(this).next('.dropdown-menu').toggleClass('hidden');
+            });
+        });
+    </script>
+}
+

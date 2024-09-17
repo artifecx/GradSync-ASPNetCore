@@ -18,7 +18,7 @@ namespace Data.Repositories
         public UserRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
         public async Task<List<User>> GetAllUsersAsync() =>
-            await this.GetDbSet<User>().Include(u => u.Role).ToListAsync();
+            await this.GetDbSet<User>().Where(u => !u.IsDeleted).Include(u => u.Role).ToListAsync();
 
         public void AddUser(User user)
         {
@@ -38,6 +38,12 @@ namespace Data.Repositories
             UnitOfWork.SaveChanges();
         }
 
+        public void AddNLO(Admin nlo)
+        {
+            this.GetDbSet<Admin>().Add(nlo);
+            UnitOfWork.SaveChanges();
+        }
+
         public async Task UpdateAsync(User user)
         {
             this.GetDbSet<User>().Update(user);
@@ -49,8 +55,8 @@ namespace Data.Repositories
             var userToDelete = await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.UserId == UserId);
             if (userToDelete != null)
             {
-                // TODO: Soft delete, and if last admin, return error
-                this.GetDbSet<User>().Remove(userToDelete);
+                userToDelete.IsDeleted = true;
+                this.GetDbSet<User>().Update(userToDelete);
                 await UnitOfWork.SaveChangesAsync();
             }
         }
