@@ -11,12 +11,14 @@ namespace Services.ServiceModels
         /// Gets or sets the user identifier.
         /// </summary>
         public string UserId { get; set; }
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
         [Required(ErrorMessage = "Name is required.")]
         [StringLength(50, ErrorMessage = "Maximum Length of a name is 50")]
         public string Name { get; set; }
+
         /// <summary>
         /// Gets or sets the email.
         /// </summary>
@@ -24,6 +26,7 @@ namespace Services.ServiceModels
         [EmailAddress(ErrorMessage = "Invalid Email Address.")]
         [StringLength(50, ErrorMessage ="Maximum Length of an email is 50")]
         public string Email { get; set; }
+
         /// <summary>
         /// Gets or sets the password.
         /// </summary>
@@ -35,32 +38,9 @@ namespace Services.ServiceModels
         /// Gets or sets the role identifier.
         /// </summary>
         [Required(ErrorMessage = "RoleId is required.")]
+        [Display(Name = "Role")]
         public string RoleId { get; set; }
-        /// <summary>
-        /// Gets or sets the created by.
-        /// </summary>
-        public string CreatedBy { get; set; }
-        /// <summary>
-        /// Gets or sets the created time.
-        /// </summary>
-        public DateTime CreatedTime { get; set; }
-        /// <summary>
-        /// Gets or sets the updated by.
-        /// </summary>
-        public string? UpdatedBy { get; set; }
-        /// <summary>
-        /// Gets or sets the updated time.
-        /// </summary>
-        public DateTime? UpdatedTime { get; set; }
-        /// <summary>
-        /// Gets or sets the name of the created by.
-        /// </summary>
-        public string CreatedByName { get; set; }
-        /// <summary>
-        /// Gets or sets the name of the updated by.
-        /// </summary>
-        public string? UpdatedByName { get; set; }
- 
+
         /// <summary>
         /// Gets or sets the roles.
         /// </summary>

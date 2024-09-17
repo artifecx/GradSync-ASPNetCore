@@ -11,13 +11,16 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Data.Repositories;
 using System.Threading.Tasks;
+using Resources.Messages;
+using static Services.Exceptions.TeamExceptions;
+using static Services.Exceptions.UserExceptions;
 
 namespace Services.Services
 {
     public class UserService : IUserService
     {
         private readonly IUserRepository _userRepository;
-        private readonly IAdminRepository _adminRepository;
+        private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -25,21 +28,20 @@ namespace Services.Services
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
         /// <param name="userRepository">The user repository.</param>
-        /// <param name="adminRepository">The admin repository.</param>
+        /// <param name="accountService">The account service.</param>
         /// <param name="mapper">The mapper.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        public UserService(IUserRepository userRepository, IAdminRepository adminRepository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository userRepository, IAccountService accountService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _userRepository = userRepository;
-            _adminRepository = adminRepository;
+            _accountService = accountService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<List<UserViewModel>> GetAllAsync()
+        public async Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, int pageIndex, int pageSize)
         {
-            var users = await _userRepository.GetAllUsersAsync(); 
-
+            var users = await _userRepository.GetAllUsersAsync();
             var data = users.Select(s => new UserViewModel
             {
                 UserId = s.UserId,
@@ -49,7 +51,33 @@ namespace Services.Services
                 RoleId = s.RoleId,
             }).ToList();
 
-            return data;
+            // TODO: only show when superadmin
+            data = data.Where(u => u.RoleId != "Admin").ToList();
+
+            if (!string.IsNullOrEmpty(filterBy))
+            {
+                data = data.Where(d => d.Name.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                                   (d.RoleId.Contains(filterBy, StringComparison.OrdinalIgnoreCase)))
+                             .ToList();
+            }
+
+            if (!string.IsNullOrEmpty(role))
+            {
+                data = data.Where(d => d.RoleId.Contains(role, StringComparison.OrdinalIgnoreCase)).ToList();
+            }
+
+            data = sortBy switch
+            {
+                "name_desc" => data.OrderByDescending(t => t.Name).ToList(),
+                "email_desc" => data.OrderByDescending(t => t.Email).ToList(),
+                "email" => data.OrderBy(t => t.Email).ToList(),
+                _ => data.OrderBy(t => t.Name).ToList(),
+            };
+
+            var count = data.Count;
+            var items = data.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return new PaginatedList<UserViewModel>(items, count, pageIndex, pageSize);
         }
 
         public async Task<UserViewModel> GetUserAsync(string userId)
@@ -65,6 +93,45 @@ namespace Services.Services
             };
         }
 
+        public async Task AddAsync(UserViewModel model)
+        {
+            var userModel = new AccountServiceModel
+            {
+                Name = model.Name,
+                Email = model.Email,
+                Password = "defpass", //Default password
+                AsRecruiter = model.RoleId == "Recruiter",
+            };
+
+            if(model.RoleId == "NLO")
+            {
+                if (_accountService.UserExists(userModel.Email))
+                    throw new UserException("User already exists!");
+
+                var user = _mapper.Map<User>(userModel);
+                user.UserId = Guid.NewGuid().ToString();
+                user.RoleId = "NLO";
+                user.JoinDate = DateTime.Now;
+                user.Password = PasswordManager.EncryptPassword(userModel.Password);
+
+                _userRepository.AddUser(user);
+                AddNLO(user);
+            }
+            else
+            {
+                _accountService.RegisterUser(userModel);
+            }
+        }
+
+        private void AddNLO(User user)
+        {
+            _userRepository.AddNLO(new Admin
+            {
+                UserId = user.UserId,
+                IsSuper = false,
+            });
+        }
+
         public async Task UpdateAsync(UserViewModel model)
         {
             var updatedUser = await _userRepository.FindByIdAsync(model.UserId);
@@ -74,12 +141,18 @@ namespace Services.Services
             await _userRepository.UpdateAsync(updatedUser);
         }
 
+        public async Task ResetPasswordAsync(string id)
+        {
+            var user = await _userRepository.FindByIdAsync(id);
+            user.Password = PasswordManager.EncryptPassword("defpass"); //TODO: randomize and send via email
+
+            await _userRepository.UpdateAsync(user);
+        }
+
         public async Task DeleteAsync(string userId) => 
             await _userRepository.DeleteAsync(userId);
 
-        #region Get Methods
-        public async Task<List<Role>> GetRoles() =>
+        public async Task<List<Role>> GetRolesAsync() =>
             await _userRepository.GetAllRolesAsync();
-        #endregion
     }
 }

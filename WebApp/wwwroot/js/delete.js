@@ -6,10 +6,6 @@ function displayDeleteModal(id, name) {
     $('#deleteModal').modal('show');
 }
 
-$('#deleteModal').on('hidden.bs.modal', function () {
-    toastr.info("Deletion cancelled, no changes were made");
-});
-
 $('#confirmDeleteBtn').on('click', function () {
     var deleteUrl = $('#deleteUrl').val();
     var baseUrl = $('#baseUrl').val();
