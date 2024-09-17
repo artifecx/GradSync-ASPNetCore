@@ -13,7 +13,7 @@ namespace Data.Interfaces
         void AddUser(User user);
         void AddApplicant(Applicant applicant);
         void AddRecruiter(Recruiter recruiter);
-        void AddNLO(Admin nlo);
+        void AddAdmin(Admin nlo);
         Task UpdateAsync(User user);
         Task DeleteAsync(string UserId);
         Task<bool> UserExistsAsync(string UserId);

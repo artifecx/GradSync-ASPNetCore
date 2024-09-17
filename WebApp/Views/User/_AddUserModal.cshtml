@@ -2,6 +2,7 @@
 
 @{
     var Roles = ViewBag.Roles;
+    bool isSuper = User.HasClaim("IsSuperAdmin", "true");
 }
 
 <div class="modal fade" id="addUserModal" tabindex="-1" role="dialog" aria-labelledby="addUserModalLabel" aria-hidden="true">
@@ -31,7 +32,7 @@
                         <select asp-for="RoleId" class="form-control">
                             @foreach (var item in Roles)
                             {
-                                if (item.Name == "Admin") continue;
+                                if (item.Name == "Admin" && !isSuper) continue;
                                 <option value="@item.RoleId">@item.Name</option>
                             }
                         </select>

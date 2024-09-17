@@ -38,7 +38,7 @@ namespace Data.Repositories
             UnitOfWork.SaveChanges();
         }
 
-        public void AddNLO(Admin nlo)
+        public void AddAdmin(Admin nlo)
         {
             this.GetDbSet<Admin>().Add(nlo);
             UnitOfWork.SaveChanges();
