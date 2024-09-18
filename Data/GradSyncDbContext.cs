@@ -110,6 +110,8 @@ public partial class GradSyncDbContext : DbContext
 
             entity.ToTable("Applicant");
 
+            entity.HasIndex(e => e.ResumeId, "UQ__Applican__D7D7A0F6E73AC99B").IsUnique();
+
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.EducationalDetailsId).HasMaxLength(256);
@@ -121,8 +123,8 @@ public partial class GradSyncDbContext : DbContext
                 .HasForeignKey(d => d.EducationalDetailsId)
                 .HasConstraintName("FK_Applicant_EducationalDetails");
 
-            entity.HasOne(d => d.Resume).WithMany(p => p.Applicants)
-                .HasForeignKey(d => d.ResumeId)
+            entity.HasOne(d => d.Resume).WithOne(p => p.Applicant)
+                .HasForeignKey<Applicant>(d => d.ResumeId)
                 .HasConstraintName("FK_Applicant_Resume");
 
             entity.HasOne(d => d.Skills).WithMany(p => p.Applicants)
@@ -495,12 +497,14 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.CompanyId, "IX_Recruiter_CompanyId");
 
+            entity.HasIndex(e => e.CompanyId, "UQ__Recruite__2D971CAD10DAEF6E").IsUnique();
+
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.CompanyId).HasMaxLength(256);
             entity.Property(e => e.Title).HasMaxLength(256);
 
-            entity.HasOne(d => d.Company).WithMany(p => p.Recruiters)
-                .HasForeignKey(d => d.CompanyId)
+            entity.HasOne(d => d.Company).WithOne(p => p.Recruiter)
+                .HasForeignKey<Recruiter>(d => d.CompanyId)
                 .HasConstraintName("FK_Recruiter_Company");
 
             entity.HasOne(d => d.User).WithOne(p => p.Recruiter)
@@ -628,6 +632,8 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 
+            entity.HasIndex(e => e.AvatarId, "UQ__User__4811D66BAE64DB61").IsUnique();
+
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.AvatarId).HasMaxLength(256);
             entity.Property(e => e.Email)
@@ -652,8 +658,8 @@ public partial class GradSyncDbContext : DbContext
                 .HasMaxLength(256);
             entity.Property(e => e.Suffix).HasMaxLength(100);
 
-            entity.HasOne(d => d.Avatar).WithMany(p => p.Users)
-                .HasForeignKey(d => d.AvatarId)
+            entity.HasOne(d => d.Avatar).WithOne(p => p.User)
+                .HasForeignKey<User>(d => d.AvatarId)
                 .HasConstraintName("FK_User_Avatar");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
