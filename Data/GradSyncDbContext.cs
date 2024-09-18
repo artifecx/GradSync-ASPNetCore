@@ -110,31 +110,47 @@ public partial class GradSyncDbContext : DbContext
 
             entity.ToTable("Applicant");
 
-            entity.HasIndex(e => e.ResumeId, "UQ__Applican__D7D7A0F6E73AC99B").IsUnique();
+            entity.HasIndex(e => e.EducationalDetailsId, "UQ__Applican__CFAA09A77EF517AE").IsUnique();
+
+            entity.HasIndex(e => e.ResumeId, "UQ__Applican__D7D7A0F65622CE6A").IsUnique();
 
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.EducationalDetailsId).HasMaxLength(256);
             entity.Property(e => e.IdNumber).HasMaxLength(256);
             entity.Property(e => e.ResumeId).HasMaxLength(256);
-            entity.Property(e => e.SkillsId).HasMaxLength(256);
 
-            entity.HasOne(d => d.EducationalDetails).WithMany(p => p.Applicants)
-                .HasForeignKey(d => d.EducationalDetailsId)
+            entity.HasOne(d => d.EducationalDetails).WithOne(p => p.Applicant)
+                .HasForeignKey<Applicant>(d => d.EducationalDetailsId)
                 .HasConstraintName("FK_Applicant_EducationalDetails");
 
             entity.HasOne(d => d.Resume).WithOne(p => p.Applicant)
                 .HasForeignKey<Applicant>(d => d.ResumeId)
                 .HasConstraintName("FK_Applicant_Resume");
 
-            entity.HasOne(d => d.Skills).WithMany(p => p.Applicants)
-                .HasForeignKey(d => d.SkillsId)
-                .HasConstraintName("FK_Applicant_Skills");
-
             entity.HasOne(d => d.User).WithOne(p => p.Applicant)
                 .HasForeignKey<Applicant>(d => d.UserId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Applicant_User");
+
+            entity.HasMany(d => d.Skills).WithMany(p => p.Users)
+                .UsingEntity<Dictionary<string, object>>(
+                    "ApplicantSkill",
+                    r => r.HasOne<Skill>().WithMany()
+                        .HasForeignKey("SkillsId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ApplicantSkills_Skills"),
+                    l => l.HasOne<Applicant>().WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_ApplicantSkills_Applicant"),
+                    j =>
+                    {
+                        j.HasKey("UserId", "SkillsId");
+                        j.ToTable("ApplicantSkills");
+                        j.IndexerProperty<string>("UserId").HasMaxLength(256);
+                        j.IndexerProperty<string>("SkillsId").HasMaxLength(256);
+                    });
         });
 
         modelBuilder.Entity<Application>(entity =>
@@ -373,8 +389,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ScheduleId, "IX_Job_ScheduleId");
 
-            entity.HasIndex(e => e.SkillsId, "IX_Job_SkillsId");
-
             entity.HasIndex(e => e.StatusTypeId, "IX_Job_StatusTypeId");
 
             entity.HasIndex(e => e.Title, "IX_Job_Title");
@@ -407,9 +421,6 @@ public partial class GradSyncDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.ScheduleId)
-                .IsRequired()
-                .HasMaxLength(256);
-            entity.Property(e => e.SkillsId)
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.StatusTypeId)
@@ -448,11 +459,6 @@ public partial class GradSyncDbContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_Schedule");
 
-            entity.HasOne(d => d.Skills).WithMany(p => p.Jobs)
-                .HasForeignKey(d => d.SkillsId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Job_Skills");
-
             entity.HasOne(d => d.StatusType).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.StatusTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -462,6 +468,25 @@ public partial class GradSyncDbContext : DbContext
                 .HasForeignKey(d => d.YearLevelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_YearLevel");
+
+            entity.HasMany(d => d.Skills).WithMany(p => p.Jobs)
+                .UsingEntity<Dictionary<string, object>>(
+                    "JobSkill",
+                    r => r.HasOne<Skill>().WithMany()
+                        .HasForeignKey("SkillsId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_JobSkills_Skills"),
+                    l => l.HasOne<Job>().WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_JobSkills_Job"),
+                    j =>
+                    {
+                        j.HasKey("JobId", "SkillsId");
+                        j.ToTable("JobSkills");
+                        j.IndexerProperty<string>("JobId").HasMaxLength(256);
+                        j.IndexerProperty<string>("SkillsId").HasMaxLength(256);
+                    });
         });
 
         modelBuilder.Entity<MemorandumOfAgreement>(entity =>
@@ -497,7 +522,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.CompanyId, "IX_Recruiter_CompanyId");
 
-            entity.HasIndex(e => e.CompanyId, "UQ__Recruite__2D971CAD10DAEF6E").IsUnique();
+            entity.HasIndex(e => e.CompanyId, "UQ__Recruite__2D971CAD11E7CB6A").IsUnique();
 
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.CompanyId).HasMaxLength(256);
@@ -632,7 +657,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 
-            entity.HasIndex(e => e.AvatarId, "UQ__User__4811D66BAE64DB61").IsUnique();
+            entity.HasIndex(e => e.AvatarId, "UQ__User__4811D66B40514DEC").IsUnique();
 
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.AvatarId).HasMaxLength(256);
