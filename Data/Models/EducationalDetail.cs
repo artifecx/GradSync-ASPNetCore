@@ -15,5 +15,5 @@ public partial class EducationalDetail
 
     public bool IsGraduate { get; set; }
 
-    public virtual ICollection<Applicant> Applicants { get; set; } = new List<Applicant>();
+    public virtual Applicant Applicant { get; set; }
 }
