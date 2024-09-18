@@ -136,7 +136,7 @@ namespace WebApp.Controllers
             if (loginResult == LoginResult.Success)
             {
                 await this._signInManager.SignInAsync(user);
-                this._session.SetString("UserName", user.Name);
+                this._session.SetString("Email", user.Email);
                 this._session.SetString("UserId", user.UserId);
                 return RedirectToAction("Index", "Home");
             }

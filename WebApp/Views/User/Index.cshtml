@@ -58,8 +58,11 @@
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    Name
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
                     <a asp-action="Index" asp-route-sortBy="@sortByName" asp-route-filterBy="@filterBy" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
-                        @Html.DisplayNameFor(model => model.First().Name)
+                        @Html.DisplayNameFor(model => model.First().LastName)
                         @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                     </a>
                 </th>
@@ -143,7 +146,10 @@
                     await Html.RenderPartialAsync("_EditUserModal", item);
                     <tr>
                         <td class="whitespace-nowrap px-6 py-4">
-                            @Html.DisplayFor(modelItem => item.Name)
+                            @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.MiddleName)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.LastName) @Html.DisplayFor(modelItem => item.Suffix)
                         </td>
                         <td class="whitespace-nowrap px-6 py-4">
                             @Html.DisplayFor(modelItem => item.Email)
@@ -162,12 +168,18 @@
                             }
                         </td>
                         <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                            <a href="javascript:void(0);" onclick="displayEditModal('@item.UserId','@item.Name', '@item.Email', '@item.RoleId')" class="fas fa-edit action-icon mx-2"></a> |
-                            <button type="button" onclick="displayResetPasswordModal('@item.UserId', '@item.Name')" class="action-icon mx-1">
+                            <a href="javascript:void(0);" 
+                                onclick="displayEditModal(
+                                        '@item.UserId','@item.FirstName'
+                                        ,'@item.LastName','@item.MiddleName'
+                                        ,'@item.Suffix','@item.Email'
+                                        ,'@item.RoleId','@item.IsVerified')" 
+                                class="fas fa-edit action-icon mx-2"></a> |
+                            <button type="button" onclick="displayResetPasswordModal('@item.UserId', '@item.FirstName')" class="action-icon mx-1">
                                 <i class="fa fa-key" aria-hidden="true"></i>
                                 <span class="sr-only">Reset Password</span>
                             </button> |
-                            <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.Name')" class="action-icon mx-1 text-red-500 hover:text-red-700">
+                            <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.FirstName')" class="action-icon mx-1 text-red-500 hover:text-red-700">
                                 <i class="fas fa-trash-alt" aria-hidden="true"></i>
                                 <span class="sr-only">Delete</span>
                             </button>

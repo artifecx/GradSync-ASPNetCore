@@ -15,16 +15,32 @@ namespace Services.ServiceModels
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
-        [Required(ErrorMessage = "Name is required.")]
-        [StringLength(50, ErrorMessage = "Maximum Length of a name is 50")]
-        public string Name { get; set; }
+        [Required(ErrorMessage = "First name is required.")]
+        [StringLength(100, ErrorMessage = "Maximum Length of first name is 100")]
+        [Display(Name = "First Name")]
+        public string FirstName { get; set; }
+
+        /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        [Required(ErrorMessage = "Last name is required.")]
+        [StringLength(100, ErrorMessage = "Maximum Length of last name is 100")]
+        [Display(Name = "Last Name")]
+        public string LastName { get; set; }
+
+        [StringLength(100, ErrorMessage = "Maximum Length of middle name is 100")]
+        [Display(Name = "Middle Name")]
+        public string MiddleName { get; set; }
+
+        [StringLength(100, ErrorMessage = "Maximum Length of a suffix is 100")]
+        public string Suffix { get; set; }
 
         /// <summary>
         /// Gets or sets the email.
         /// </summary>
         [Required(ErrorMessage = "Email is required.")]
         [EmailAddress(ErrorMessage = "Invalid Email Address.")]
-        [StringLength(50, ErrorMessage ="Maximum Length of an email is 50")]
+        [StringLength(100, ErrorMessage ="Maximum Length of an email is 100")]
         public string Email { get; set; }
 
         /// <summary>
