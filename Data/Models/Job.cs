@@ -13,8 +13,6 @@ public partial class Job
 
     public string Location { get; set; }
 
-    public string SkillsId { get; set; }
-
     public string YearLevelId { get; set; }
 
     public string DepartmentId { get; set; }
@@ -53,9 +51,9 @@ public partial class Job
 
     public virtual Schedule Schedule { get; set; }
 
-    public virtual Skill Skills { get; set; }
-
     public virtual StatusType StatusType { get; set; }
 
     public virtual YearLevel YearLevel { get; set; }
+
+    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 }
