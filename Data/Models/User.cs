@@ -23,6 +23,8 @@ public partial class User
 
     public bool IsDeleted { get; set; }
 
+    public bool IsVerified { get; set; }
+
     public virtual Admin Admin { get; set; }
 
     public virtual Applicant Applicant { get; set; }

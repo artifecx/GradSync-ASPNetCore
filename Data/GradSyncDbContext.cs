@@ -42,8 +42,6 @@ public partial class GradSyncDbContext : DbContext
 
     public virtual DbSet<EmploymentType> EmploymentTypes { get; set; }
 
-    public virtual DbSet<IndustryField> IndustryFields { get; set; }
-
     public virtual DbSet<Job> Jobs { get; set; }
 
     public virtual DbSet<MemorandumOfAgreement> MemorandumOfAgreements { get; set; }
@@ -65,9 +63,6 @@ public partial class GradSyncDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<YearLevel> YearLevels { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-        => optionsBuilder.UseSqlServer("Addr=localhost;database=GradSyncDb;Integrated Security=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -116,6 +111,7 @@ public partial class GradSyncDbContext : DbContext
             entity.ToTable("Applicant");
 
             entity.Property(e => e.UserId).HasMaxLength(256);
+            entity.Property(e => e.Address).HasMaxLength(500);
             entity.Property(e => e.EducationalDetailsId).HasMaxLength(256);
             entity.Property(e => e.IdNumber).HasMaxLength(256);
             entity.Property(e => e.ResumeId).HasMaxLength(256);
@@ -261,9 +257,6 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.Description)
                 .IsRequired()
                 .HasMaxLength(500);
-            entity.Property(e => e.IndustryFieldId)
-                .IsRequired()
-                .HasMaxLength(256);
             entity.Property(e => e.MemorandumOfAgreementId)
                 .IsRequired()
                 .HasMaxLength(256);
@@ -274,11 +267,6 @@ public partial class GradSyncDbContext : DbContext
             entity.HasOne(d => d.CompanyLogo).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.CompanyLogoId)
                 .HasConstraintName("FK_Company_CompanyLogo");
-
-            entity.HasOne(d => d.IndustryField).WithMany(p => p.Companies)
-                .HasForeignKey(d => d.IndustryFieldId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Company_IndustryField");
 
             entity.HasOne(d => d.MemorandumOfAgreement).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.MemorandumOfAgreementId)
@@ -363,16 +351,6 @@ public partial class GradSyncDbContext : DbContext
                 .HasMaxLength(100);
         });
 
-        modelBuilder.Entity<IndustryField>(entity =>
-        {
-            entity.ToTable("IndustryField");
-
-            entity.Property(e => e.IndustryFieldId).HasMaxLength(256);
-            entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(256);
-        });
-
         modelBuilder.Entity<Job>(entity =>
         {
             entity.ToTable("Job");
@@ -382,8 +360,6 @@ public partial class GradSyncDbContext : DbContext
             entity.HasIndex(e => e.DepartmentId, "IX_Job_Department");
 
             entity.HasIndex(e => e.EmploymentTypeId, "IX_Job_EmploymentTypeId");
-
-            entity.HasIndex(e => e.IndustryFieldId, "IX_Job_IndustryFieldId");
 
             entity.HasIndex(e => e.IsArchived, "IX_Job_IsArchived");
 
@@ -417,9 +393,6 @@ public partial class GradSyncDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(800);
             entity.Property(e => e.EmploymentTypeId)
-                .IsRequired()
-                .HasMaxLength(256);
-            entity.Property(e => e.IndustryFieldId)
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.Location)
@@ -462,11 +435,6 @@ public partial class GradSyncDbContext : DbContext
                 .HasForeignKey(d => d.EmploymentTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_EmploymentType");
-
-            entity.HasOne(d => d.IndustryField).WithMany(p => p.Jobs)
-                .HasForeignKey(d => d.IndustryFieldId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Job_IndustryField");
 
             entity.HasOne(d => d.PostedBy).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.PostedById)
@@ -526,8 +494,6 @@ public partial class GradSyncDbContext : DbContext
             entity.ToTable("Recruiter");
 
             entity.HasIndex(e => e.CompanyId, "IX_Recruiter_CompanyId");
-
-            entity.HasIndex(e => e.IsVerified, "IX_Recruiter_IsVerified");
 
             entity.Property(e => e.UserId).HasMaxLength(256);
             entity.Property(e => e.CompanyId).HasMaxLength(256);
@@ -653,6 +619,8 @@ public partial class GradSyncDbContext : DbContext
             entity.HasIndex(e => e.Email, "IX_User_Email");
 
             entity.HasIndex(e => e.IsDeleted, "IX_User_IsDeleted");
+
+            entity.HasIndex(e => e.IsVerified, "IX_User_IsVerified");
 
             entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 

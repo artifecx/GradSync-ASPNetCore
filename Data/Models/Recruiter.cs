@@ -11,8 +11,6 @@ public partial class Recruiter
 
     public string CompanyId { get; set; }
 
-    public bool IsVerified { get; set; }
-
     public virtual Company Company { get; set; }
 
     public virtual User User { get; set; }
