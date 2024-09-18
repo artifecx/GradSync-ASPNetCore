@@ -17,8 +17,6 @@ public partial class Company
 
     public string ContactNumber { get; set; }
 
-    public string IndustryFieldId { get; set; }
-
     public string CompanyLogoId { get; set; }
 
     public string MemorandumOfAgreementId { get; set; }
@@ -28,8 +26,6 @@ public partial class Company
     public bool IsVerified { get; set; }
 
     public virtual CompanyLogo CompanyLogo { get; set; }
-
-    public virtual IndustryField IndustryField { get; set; }
 
     public virtual MemorandumOfAgreement MemorandumOfAgreement { get; set; }
 

@@ -17,6 +17,8 @@ public partial class Applicant
 
     public string JobPreferences { get; set; }
 
+    public string Address { get; set; }
+
     public virtual EducationalDetail EducationalDetails { get; set; }
 
     public virtual Resume Resume { get; set; }

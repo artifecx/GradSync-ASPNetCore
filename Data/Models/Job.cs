@@ -33,8 +33,6 @@ public partial class Job
 
     public string Salary { get; set; }
 
-    public string IndustryFieldId { get; set; }
-
     public string ScheduleId { get; set; }
 
     public string PostedById { get; set; }
@@ -48,8 +46,6 @@ public partial class Job
     public virtual Department Department { get; set; }
 
     public virtual EmploymentType EmploymentType { get; set; }
-
-    public virtual IndustryField IndustryField { get; set; }
 
     public virtual User PostedBy { get; set; }
 
