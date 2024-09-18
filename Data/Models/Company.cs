@@ -29,5 +29,5 @@ public partial class Company
 
     public virtual MemorandumOfAgreement MemorandumOfAgreement { get; set; }
 
-    public virtual ICollection<Recruiter> Recruiters { get; set; } = new List<Recruiter>();
+    public virtual Recruiter Recruiter { get; set; }
 }
