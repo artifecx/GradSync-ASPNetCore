@@ -35,14 +35,12 @@ namespace Services.Services
             if (UserExists(model.Email))
                 throw new UserException("User already exists!");
 
-            User user = new User{
-                UserId = Guid.NewGuid().ToString(),
-                Email = model.Email,
-                Password = PasswordManager.EncryptPassword(model.Password),
-                RoleId = model.AsRecruiter ? "Recruiter" : "Applicant",
-                Name = model.Name,
-                JoinDate = DateTime.Now
-            };
+            var user = _mapper.Map<User>(model);
+            user.UserId = Guid.NewGuid().ToString();
+            user.Password = PasswordManager.EncryptPassword(model.Password);
+            user.RoleId = model.AsRecruiter ? "Recruiter" : "Applicant";
+            user.JoinDate = DateTime.Now;
+
             _repository.AddUser(user);
 
             if (model.AsRecruiter)

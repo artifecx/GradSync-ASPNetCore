@@ -618,9 +618,13 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Email, "IX_User_Email");
 
+            entity.HasIndex(e => e.FirstName, "IX_User_FirstName");
+
             entity.HasIndex(e => e.IsDeleted, "IX_User_IsDeleted");
 
             entity.HasIndex(e => e.IsVerified, "IX_User_IsVerified");
+
+            entity.HasIndex(e => e.LastName, "IX_User_LastName");
 
             entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 
@@ -629,19 +633,24 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
+            entity.Property(e => e.FirstName)
+                .IsRequired()
+                .HasMaxLength(100);
             entity.Property(e => e.JoinDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.LastLoginDate).HasColumnType("datetime");
-            entity.Property(e => e.Name)
+            entity.Property(e => e.LastName)
                 .IsRequired()
                 .HasMaxLength(100);
+            entity.Property(e => e.MiddleName).HasMaxLength(100);
             entity.Property(e => e.Password)
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.RoleId)
                 .IsRequired()
                 .HasMaxLength(256);
+            entity.Property(e => e.Suffix).HasMaxLength(100);
 
             entity.HasOne(d => d.Avatar).WithMany(p => p.Users)
                 .HasForeignKey(d => d.AvatarId)

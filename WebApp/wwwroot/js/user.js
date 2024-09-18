@@ -53,11 +53,15 @@ function submitAddUser() {
     });
 }
 
-function displayEditModal(userId, name, email, roleId) {
+function displayEditModal(userId, firstname, lastname, middlename, suffix, email, roleId, isverified) {
     $('#editUserId').val(userId);
-    $('#editUserName').val(name);
+    $('#editUserFirstName').val(firstname);
+    $('#editUserLastName').val(lastname);
+    $('#editUserMiddleName').val(middlename);
+    $('#editUserSuffix').val(suffix);
     $('#editUserEmail').val(email);
     $('#editUserRole').val(roleId);
+    $('#editIsVerified').val(isverified);
     $('#editUserModal').modal('show');
 }
 
@@ -68,6 +72,8 @@ function submitEditUser() {
     if (!form.valid()) {
         return;
     }
+
+    console.log("valid result: " + form.valid());
 
     var formData = form.serialize();
 

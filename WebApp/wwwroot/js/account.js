@@ -17,12 +17,6 @@ document.addEventListener('DOMContentLoaded', function () {
     const emailInput = document.getElementById('emailInput');
     const passwordInput = document.getElementById('passwordInput');
     const loginButton = document.getElementById('loginButton');
-    const registerUserForm = document.getElementById('registerUserForm');
-    const registerButton = document.getElementById('registerButton');
-    const userIdInput = document.getElementById('email');
-    const nameInput = document.getElementById('name');
-    const passwordInputRegister = document.getElementById('password');
-    const confirmPasswordInput = document.getElementById('confirmpassword');
 
     function toggleLoginButton() {
         if (emailInput.value.trim() && passwordInput.value.trim()) {
@@ -32,10 +26,19 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
+    const registerUserForm = document.getElementById('registerUserForm');
+    const registerButton = document.getElementById('registerButton');
+    const userIdInput = document.getElementById('email');
+    const firstNameInput = document.getElementById('firstName');
+    const lastNameInput = document.getElementById('lastName');
+    const passwordInputRegister = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmpassword');
+
     function toggleRegisterButton() {
         if (
             userIdInput.value.trim() &&
-            nameInput.value.trim() &&
+            firstNameInput.value.trim() &&
+            lastNameInput.value.trim() &&
             passwordInputRegister.value.trim() &&
             confirmPasswordInput.value.trim()
         ) {
@@ -49,7 +52,8 @@ document.addEventListener('DOMContentLoaded', function () {
     passwordInput.addEventListener('input', toggleLoginButton);
 
     userIdInput.addEventListener('input', toggleRegisterButton);
-    nameInput.addEventListener('input', toggleRegisterButton);
+    firstNameInput.addEventListener('input', toggleRegisterButton);
+    lastNameInput.addEventListener('input', toggleRegisterButton);
     passwordInputRegister.addEventListener('input', toggleRegisterButton);
     confirmPasswordInput.addEventListener('input', toggleRegisterButton);
 

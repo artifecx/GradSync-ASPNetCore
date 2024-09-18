@@ -54,7 +54,8 @@ namespace Services.Services
 
             if (!string.IsNullOrEmpty(filterBy))
             {
-                users = users.Where(d => d.Name.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                users = users.Where(d => d.FirstName.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                                   (d.LastName.Contains(filterBy, StringComparison.OrdinalIgnoreCase)) ||
                                    (d.Email.Contains(filterBy, StringComparison.OrdinalIgnoreCase)))
                              .ToList();
             }
@@ -71,10 +72,10 @@ namespace Services.Services
 
             users = sortBy switch
             {
-                "name_desc" => users.OrderByDescending(t => t.Name).ToList(),
+                "name_desc" => users.OrderByDescending(t => t.LastName).ToList(),
                 "email_desc" => users.OrderByDescending(t => t.Email).ToList(),
                 "email" => users.OrderBy(t => t.Email).ToList(),
-                _ => users.OrderBy(t => t.Name).ToList(),
+                _ => users.OrderBy(t => t.LastName).ToList(),
             };
 
             var count = users.Count;
@@ -87,15 +88,11 @@ namespace Services.Services
             _mapper.Map<UserViewModel>(await _userRepository.FindByIdAsync(userId));
         public async Task AddAsync(UserViewModel model)
         {
-            var userModel = new AccountServiceModel
-            {
-                Name = model.Name,
-                Email = model.Email,
-                Password = "defpass", //Default password
-                AsRecruiter = model.RoleId == "Recruiter",
-            };
+            var userModel = _mapper.Map<AccountServiceModel>(model);
+            userModel.Password = "defpass"; //Default password
+            userModel.AsRecruiter = model.RoleId == "Recruiter";
 
-            if(model.RoleId == "NLO" || model.RoleId == "Admin")
+            if (model.RoleId == "NLO" || model.RoleId == "Admin")
             {
                 if (_accountService.UserExists(userModel.Email))
                     throw new UserException("User already exists!");
@@ -128,9 +125,9 @@ namespace Services.Services
         public async Task UpdateAsync(UserViewModel model)
         {
             var updatedUser = await _userRepository.FindByIdAsync(model.UserId);
+            model.IsVerified = updatedUser.IsVerified && model.Email == updatedUser.Email; //TODO: send verification email when changed
             _mapper.Map(model, updatedUser);
 
-            updatedUser.Password = PasswordManager.EncryptPassword(updatedUser.Password);
             await _userRepository.UpdateAsync(updatedUser);
         }
 

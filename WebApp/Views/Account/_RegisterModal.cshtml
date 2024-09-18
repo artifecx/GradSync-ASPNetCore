@@ -22,10 +22,28 @@
                         <span asp-validation-for="Email" class="mt-1 block text-sm text-red-500"></span>
                     </div>
                     <div class="mb-4">
-                        <label class="mb-1 block font-normal" for="name">Full Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="name" asp-for="Name" placeholder="Juan Dela Cruz"
+                        <label class="mb-1 block font-normal" for="firstName">First Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="firstName" asp-for="FirstName" placeholder="Charlotte"
                                class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
-                        <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                        <span asp-validation-for="FirstName" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="mb-1 block font-normal" for="middleName">Middle Name</label>
+                        <input type="text" id="middleName" asp-for="MiddleName" placeholder="Gemal"
+                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                        <span asp-validation-for="MiddleName" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="mb-1 block font-normal" for="lastName">Last Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="lastName" asp-for="LastName" placeholder="Taboada"
+                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                        <span asp-validation-for="LastName" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label class="mb-1 block font-normal" for="suffix">Suffix</label>
+                        <input type="text" id="suffix" asp-for="Suffix" placeholder="Jr., Sr., III..."
+                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                        <span asp-validation-for="Suffix" class="mt-1 block text-sm text-red-500"></span>
                     </div>
                     <div class="mb-4">
                         <label class="mb-1 block font-normal" for="password">Password <span class="text-red-500">*</span></label>

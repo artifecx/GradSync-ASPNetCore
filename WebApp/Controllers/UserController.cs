@@ -88,7 +88,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (!model.Name.IsNullOrEmpty() && !model.Email.IsNullOrEmpty())
+                if (ModelState.IsValid)
                 {
                     await _userService.AddAsync(model);
                     TempData["SuccessMessage"] = "Successfully added user!";
@@ -111,7 +111,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (!model.Name.IsNullOrEmpty() && !model.Email.IsNullOrEmpty())
+                if (ModelState.IsValid)
                 {
                     await _userService.UpdateAsync(model);
                     TempData["SuccessMessage"] = "User updated successfully!";
