@@ -58,15 +58,16 @@ namespace WebApp.Controllers
         [Authorize(Policy = "Admin")]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> Index(string sortBy, string filterBy, string role, int pageIndex = 1)
+        public async Task<IActionResult> Index(string sortBy, string filterBy, string role, bool? verified, int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var users = await _userService.GetAllAsync(sortBy, filterBy, role, pageIndex, 5);
+                var users = await _userService.GetAllAsync(sortBy, filterBy, role, verified, pageIndex, 5);
 
                 ViewData["FilterBy"] = filterBy;
                 ViewData["SortBy"] = sortBy;
                 ViewData["Role"] = role;
+                ViewData["Verified"] = verified;
                 ViewBag.Roles = (await _userService.GetRolesAsync());
 
                 return View("Index", users);

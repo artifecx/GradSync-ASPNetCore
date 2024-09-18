@@ -28,18 +28,14 @@ namespace Services.ServiceModels
         public string Email { get; set; }
 
         /// <summary>
-        /// Gets or sets the password.
-        /// </summary>
-        [Required(ErrorMessage = "Password is required.")]
-        [StringLength(20, ErrorMessage = "Password must be 5 characters minimum", MinimumLength = 5)]
-        public string Password { get; set; }
-
-        /// <summary>
         /// Gets or sets the role identifier.
         /// </summary>
         [Required(ErrorMessage = "RoleId is required.")]
         [Display(Name = "Role")]
         public string RoleId { get; set; }
+
+        [Display(Name = "Is Verified")]
+        public bool IsVerified { get; set; }
 
         /// <summary>
         /// Gets or sets the roles.

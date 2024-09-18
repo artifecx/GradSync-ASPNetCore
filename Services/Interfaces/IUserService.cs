@@ -10,7 +10,7 @@ namespace Services.Interfaces
 {
     public interface IUserService
     {
-        Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, int pageIndex, int pageSize);
+        Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, bool? verified, int pageIndex, int pageSize);
         Task<UserViewModel> GetUserAsync(string userId);
         Task AddAsync(UserViewModel model);
         Task UpdateAsync(UserViewModel model);
