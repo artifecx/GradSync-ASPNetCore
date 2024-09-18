@@ -39,66 +39,52 @@ namespace Services.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public async Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, int pageIndex, int pageSize)
+        public async Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, bool? verified, int pageIndex, int pageSize)
         {
             var claimsPrincipal = _httpContextAccessor.HttpContext.User;
             var currentUserIsSuper = claimsPrincipal.FindFirst("IsSuperAdmin")?.Value;
             var currentUserId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var users = await _userRepository.GetAllUsersAsync();
-            var data = users.Select(s => new UserViewModel
-            {
-                UserId = s.UserId,
-                Email = s.Email,
-                Name = s.Name,
-                Password = new string('*', s.Password.Length),
-                RoleId = s.RoleId,
-            }).ToList();
+            var users = _mapper.Map<List<UserViewModel>>(await _userRepository.GetAllUsersAsync());
 
             if(currentUserIsSuper != "true")
-                data = data.Where(u => u.RoleId != "Admin").ToList();
+                users = users.Where(u => u.RoleId != "Admin").ToList();
             else
-                data = data.Where(u => u.UserId != currentUserId).ToList();
+                users = users.Where(u => u.UserId != currentUserId).ToList();
 
             if (!string.IsNullOrEmpty(filterBy))
             {
-                data = data.Where(d => d.Name.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
-                                   (d.RoleId.Contains(filterBy, StringComparison.OrdinalIgnoreCase)))
+                users = users.Where(d => d.Name.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
+                                   (d.Email.Contains(filterBy, StringComparison.OrdinalIgnoreCase)))
                              .ToList();
             }
 
             if (!string.IsNullOrEmpty(role))
             {
-                data = data.Where(d => d.RoleId.Contains(role, StringComparison.OrdinalIgnoreCase)).ToList();
+                users = users.Where(d => d.RoleId.Contains(role, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            data = sortBy switch
+            if (verified.HasValue)
             {
-                "name_desc" => data.OrderByDescending(t => t.Name).ToList(),
-                "email_desc" => data.OrderByDescending(t => t.Email).ToList(),
-                "email" => data.OrderBy(t => t.Email).ToList(),
-                _ => data.OrderBy(t => t.Name).ToList(),
+                users = users.Where(d => d.IsVerified == verified).ToList();
+            }
+
+            users = sortBy switch
+            {
+                "name_desc" => users.OrderByDescending(t => t.Name).ToList(),
+                "email_desc" => users.OrderByDescending(t => t.Email).ToList(),
+                "email" => users.OrderBy(t => t.Email).ToList(),
+                _ => users.OrderBy(t => t.Name).ToList(),
             };
 
-            var count = data.Count;
-            var items = data.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+            var count = users.Count;
+            var items = users.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return new PaginatedList<UserViewModel>(items, count, pageIndex, pageSize);
         }
 
-        public async Task<UserViewModel> GetUserAsync(string userId)
-        {
-            var model = await _userRepository.FindByIdAsync(userId);
-            return new UserViewModel
-            {
-                UserId = model.UserId,
-                Email = model.Email,
-                Name = model.Name,
-                Password = new string('*', model.Password.Length),
-                RoleId = model.RoleId,
-            };
-        }
-
+        public async Task<UserViewModel> GetUserAsync(string userId) =>
+            _mapper.Map<UserViewModel>(await _userRepository.FindByIdAsync(userId));
         public async Task AddAsync(UserViewModel model)
         {
             var userModel = new AccountServiceModel
@@ -119,6 +105,7 @@ namespace Services.Services
                 user.RoleId = model.RoleId;
                 user.JoinDate = DateTime.Now;
                 user.Password = PasswordManager.EncryptPassword(userModel.Password);
+                user.IsVerified = true;
 
                 _userRepository.AddUser(user);
                 AddAdmin(user);
