@@ -19,7 +19,7 @@ namespace Services.Services
 {
     public class UserService : IUserService
     {
-        private readonly IUserRepository _userRepository;
+        private readonly IUserRepository _repository;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -27,13 +27,13 @@ namespace Services.Services
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
-        /// <param name="userRepository">The user repository.</param>
+        /// <param name="repository">The user repository.</param>
         /// <param name="accountService">The account service.</param>
         /// <param name="mapper">The mapper.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        public UserService(IUserRepository userRepository, IAccountService accountService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        public UserService(IUserRepository repository, IAccountService accountService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
-            _userRepository = userRepository;
+            _repository = repository;
             _accountService = accountService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
@@ -45,7 +45,7 @@ namespace Services.Services
             var currentUserIsSuper = claimsPrincipal.FindFirst("IsSuperAdmin")?.Value;
             var currentUserId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
-            var users = _mapper.Map<List<UserViewModel>>(await _userRepository.GetAllUsersAsync());
+            var users = _mapper.Map<List<UserViewModel>>(await _repository.GetAllUsersAsync());
 
             if(currentUserIsSuper != "true")
                 users = users.Where(u => u.RoleId != "Admin").ToList();
@@ -85,7 +85,8 @@ namespace Services.Services
         }
 
         public async Task<UserViewModel> GetUserAsync(string userId) =>
-            _mapper.Map<UserViewModel>(await _userRepository.FindByIdAsync(userId));
+            _mapper.Map<UserViewModel>(await _repository.FindUserByIdAsync(userId));
+
         public async Task AddAsync(UserViewModel model)
         {
             var userModel = _mapper.Map<AccountServiceModel>(model);
@@ -104,8 +105,8 @@ namespace Services.Services
                 user.Password = PasswordManager.EncryptPassword(userModel.Password);
                 user.IsVerified = true;
 
-                _userRepository.AddUser(user);
-                AddAdmin(user);
+                _repository.AddUser(user);
+                _accountService.AddAdmin(user);
             }
             else
             {
@@ -113,36 +114,80 @@ namespace Services.Services
             }
         }
 
-        private void AddAdmin(User user)
-        {
-            _userRepository.AddAdmin(new Admin
-            {
-                UserId = user.UserId,
-                IsSuper = user.RoleId == "Admin",
-            });
-        }
-
         public async Task UpdateAsync(UserViewModel model)
         {
-            var updatedUser = await _userRepository.FindByIdAsync(model.UserId);
-            model.IsVerified = updatedUser.IsVerified && model.Email == updatedUser.Email; //TODO: send verification email when changed
-            _mapper.Map(model, updatedUser);
+            var user = await _repository.FindUserByIdAsync(model.UserId);
+            bool firstNameChanged = !string.Equals(model.FirstName, user.FirstName, StringComparison.Ordinal);
+            bool middleNameChanged = !string.Equals(model.MiddleName, user.MiddleName, StringComparison.Ordinal);
+            bool lastNameChanged = !string.Equals(model.LastName, user.LastName, StringComparison.Ordinal);
+            bool suffixChanged = !string.Equals(model.Suffix, user.Suffix, StringComparison.Ordinal);
+            bool emailChanged = !string.Equals(model.Email, user.Email, StringComparison.Ordinal);
+            bool roleChanged = !string.Equals(model.RoleId, user.RoleId, StringComparison.Ordinal);
+            bool hasChanges = firstNameChanged || middleNameChanged || lastNameChanged || suffixChanged || emailChanged || roleChanged;
 
-            await _userRepository.UpdateAsync(updatedUser);
+            if(!hasChanges)
+                throw new UserException("No changes detected.");
+
+            model.IsVerified = user.IsVerified && !emailChanged; //TODO: send verification email when changed
+
+            if (roleChanged)
+            {
+                model.RoleId = await SetRole(user.UserId, user.RoleId, model.RoleId);
+                _mapper.Map(model, user);
+                await _repository.UpdateUserAsync(user);
+
+                switch(user.RoleId)
+                {
+                    case "Admin":
+                    case "NLO":
+                        _accountService.AddAdmin(user);
+                        break;
+                    case "Applicant":
+                        _accountService.AddApplicant(user);
+                        break;
+                    case "Recruiter":
+                        _accountService.AddRecruiter(user);
+                        break;
+                }
+            }
+            _mapper.Map(model, user);
+            await _repository.UpdateUserAsync(user);
+        }
+
+        private async Task<string> SetRole(string userId, string currentRole, string newRole)
+        {
+            string[] administrativeRoles = { "Admin", "NLO" };
+            if ((administrativeRoles.Contains(currentRole) && !administrativeRoles.Contains(newRole)) ||
+                (!administrativeRoles.Contains(currentRole) && administrativeRoles.Contains(newRole)))
+                throw new UserException($"Illegal switch from {currentRole} to {newRole}.");
+
+            if (administrativeRoles.Contains(currentRole))
+            {
+                await _repository.DeleteAdminAsync(userId);
+            }
+            else
+            {
+                if(currentRole == "Applicant")
+                    await _repository.DeleteApplicantAsync(userId);
+                else if (currentRole == "Recruiter")
+                    await _repository.DeleteRecruiterAsync(userId);
+            }
+
+            return newRole;
         }
 
         public async Task ResetPasswordAsync(string id)
         {
-            var user = await _userRepository.FindByIdAsync(id);
+            var user = await _repository.FindUserByIdAsync(id);
             user.Password = PasswordManager.EncryptPassword("defpass"); //TODO: randomize and send via email
 
-            await _userRepository.UpdateAsync(user);
+            await _repository.UpdateUserAsync(user);
         }
 
         public async Task DeleteAsync(string userId) => 
-            await _userRepository.DeleteAsync(userId);
+            await _repository.DeleteUserAsync(userId);
 
         public async Task<List<Role>> GetRolesAsync() =>
-            await _userRepository.GetAllRolesAsync();
+            await _repository.GetAllRolesAsync();
     }
 }

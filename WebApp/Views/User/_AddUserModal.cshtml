@@ -17,31 +17,39 @@
             <div class="modal-body">
                 <form id="addUserForm">
                     <input type="hidden" id="addUserId" name="UserId" value="@Model.UserId" />
-                    <div class="form-group">
-                        <label asp-for="FirstName" class="control-label"></label> <span class="text-red-500">*</span>
-                        <input asp-for="FirstName" class="form-control" id="addUserFirstName" name="FirstName" maxlength="100" />
-                        <span asp-validation-for="FirstName" class="text-danger"></span>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="FirstName" class="control-label"></label> <span class="text-red-500">*</span>
+                            <input asp-for="FirstName" class="form-control" id="addUserFirstName" name="FirstName" maxlength="100" />
+                            <span asp-validation-for="FirstName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="MiddleName" class="control-label"></label>
+                            <input asp-for="MiddleName" class="form-control" id="addUserMiddleName" name="MiddleName" maxlength="100" />
+                            <span asp-validation-for="MiddleName" class="text-danger"></span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for=MiddleName class="control-label"></label>
-                        <input asp-for=MiddleName class="form-control" id="addUserMiddleName" name=MiddleName maxlength="100" />
-                        <span asp-validation-for=MiddleName class="text-danger"></span>
+
+                    <div class="form-row">
+                        <div class="form-group col-md-6">
+                            <label asp-for="LastName" class="control-label"></label> <span class="text-red-500">*</span>
+                            <input asp-for="LastName" class="form-control" id="addUserLastName" name="LastName" maxlength="100" />
+                            <span asp-validation-for="LastName" class="text-danger"></span>
+                        </div>
+                        <div class="form-group col-md-6">
+                            <label asp-for="Suffix" class="control-label"></label>
+                            <input asp-for="Suffix" class="form-control" id="addUserSuffix" name="Suffix" maxlength="100" />
+                            <span asp-validation-for="Suffix" class="text-danger"></span>
+                        </div>
                     </div>
-                    <div class="form-group">
-                        <label asp-for=LastName class="control-label"></label> <span class="text-red-500">*</span>
-                        <input asp-for=LastName class="form-control" id="addUserLastName" name=LastName maxlength="100" />
-                        <span asp-validation-for=LastName class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for=Suffix class="control-label"></label>
-                        <input asp-for=Suffix class="form-control" id="addUserSuffix" name=Suffix maxlength="100" />
-                        <span asp-validation-for=Suffix class="text-danger"></span>
-                    </div>
+
                     <div class="form-group">
                         <label asp-for="Email" class="control-label"></label> <span class="text-red-500">*</span>
-                        <input asp-for="Email" class="form-control" id="addUserEmail" name="Email" maxlength="100"/>
+                        <input asp-for="Email" class="form-control" id="addUserEmail" name="Email" maxlength="100" />
                         <span asp-validation-for="Email" class="text-danger"></span>
                     </div>
+
                     <div class="form-group">
                         <label asp-for="RoleId" class="control-label"></label>
                         <select asp-for="RoleId" class="form-control">

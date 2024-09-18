@@ -44,28 +44,63 @@ namespace Data.Repositories
             UnitOfWork.SaveChanges();
         }
 
-        public async Task UpdateAsync(User user)
+        public async Task UpdateUserAsync(User user)
         {
             this.GetDbSet<User>().Update(user);
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteAsync(string UserId)
+        public async Task DeleteUserAsync(string userId)
         {
-            var userToDelete = await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.UserId == UserId);
+            var userToDelete = await this.GetDbSet<User>().Include(u => u.Avatar).FirstOrDefaultAsync(u => u.UserId == userId);
             if (userToDelete != null)
             {
+                if (userToDelete.Avatar != null)
+                {
+                    this.GetDbSet<Avatar>().Remove(userToDelete.Avatar);
+                }
                 userToDelete.IsDeleted = true;
                 this.GetDbSet<User>().Update(userToDelete);
                 await UnitOfWork.SaveChangesAsync();
             }
         }
 
-        #region Helper Methods
-        public async Task<bool> UserExistsAsync(string UserId) =>
-            await this.GetDbSet<User>().AnyAsync(u => u.UserId == UserId);
+        public async Task DeleteAdminAsync(string AdminId)
+        {
+            var adminToDelete = await this.GetDbSet<Admin>().FirstOrDefaultAsync(a => a.UserId == AdminId);
+            if (adminToDelete != null)
+            {
+                this.GetDbSet<Admin>().Remove(adminToDelete);
+                // changes saved with the next call to SaveChanges
+            }
+        }
 
-        public async Task<User> FindByIdAsync(string id) =>
+        public async Task DeleteApplicantAsync(string applicantId)
+        {
+            var applicantToDelete = await this.GetDbSet<Applicant>().Include(a => a.Resume).FirstOrDefaultAsync(a => a.UserId == applicantId);
+            if (applicantToDelete != null)
+            {
+                if (applicantToDelete.Resume != null)
+                {
+                    this.GetDbSet<Resume>().Remove(applicantToDelete.Resume);
+                }
+                this.GetDbSet<Applicant>().Remove(applicantToDelete);
+                // changes saved with the next call to SaveChanges
+            }
+        }
+
+        public async Task DeleteRecruiterAsync(string recruiterId)
+        {
+            var recruiterToDelete = await this.GetDbSet<Recruiter>().FirstOrDefaultAsync(r => r.UserId == recruiterId);
+            if (recruiterToDelete != null)
+            {
+                this.GetDbSet<Recruiter>().Remove(recruiterToDelete);
+                // changes saved with the next call to SaveChanges
+            }
+        }
+
+        #region Helper Methods
+        public async Task<User> FindUserByIdAsync(string id) =>
             await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.UserId == id);
 
         public async Task<Role> FindRoleByIdAsync(string id)

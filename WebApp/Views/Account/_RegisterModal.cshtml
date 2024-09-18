@@ -10,7 +10,7 @@
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
-            <!-- Registration Form -->
+
             <form id="registerUserForm" method="post" action="/Account/Register">
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
@@ -21,30 +21,37 @@
                         <small>Please use your institution/company email address.</small>
                         <span asp-validation-for="Email" class="mt-1 block text-sm text-red-500"></span>
                     </div>
-                    <div class="mb-4">
-                        <label class="mb-1 block font-normal" for="firstName">First Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="firstName" asp-for="FirstName" placeholder="Charlotte"
-                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
-                        <span asp-validation-for="FirstName" class="mt-1 block text-sm text-red-500"></span>
+
+                    <div class="mb-4 flex space-x-4">
+                        <div class="w-1/2">
+                            <label class="mb-1 block font-normal" for="firstName">First Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="firstName" asp-for="FirstName" placeholder="Charlotte"
+                                   class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                            <span asp-validation-for="FirstName" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="mb-1 block font-normal" for="middleName">Middle Name</label>
+                            <input type="text" id="middleName" asp-for="MiddleName" placeholder="Gemal"
+                                   class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                            <span asp-validation-for="MiddleName" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="mb-1 block font-normal" for="middleName">Middle Name</label>
-                        <input type="text" id="middleName" asp-for="MiddleName" placeholder="Gemal"
-                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
-                        <span asp-validation-for="MiddleName" class="mt-1 block text-sm text-red-500"></span>
+
+                    <div class="mb-4 flex space-x-4">
+                        <div class="w-1/2">
+                            <label class="mb-1 block font-normal" for="lastName">Last Name <span class="text-red-500">*</span></label>
+                            <input type="text" id="lastName" asp-for="LastName" placeholder="Taboada"
+                                   class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                            <span asp-validation-for="LastName" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                        <div class="w-1/2">
+                            <label class="mb-1 block font-normal" for="suffix">Suffix</label>
+                            <input type="text" id="suffix" asp-for="Suffix" placeholder="Jr., Sr., III..."
+                                   class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
+                            <span asp-validation-for="Suffix" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
                     </div>
-                    <div class="mb-4">
-                        <label class="mb-1 block font-normal" for="lastName">Last Name <span class="text-red-500">*</span></label>
-                        <input type="text" id="lastName" asp-for="LastName" placeholder="Taboada"
-                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
-                        <span asp-validation-for="LastName" class="mt-1 block text-sm text-red-500"></span>
-                    </div>
-                    <div class="mb-4">
-                        <label class="mb-1 block font-normal" for="suffix">Suffix</label>
-                        <input type="text" id="suffix" asp-for="Suffix" placeholder="Jr., Sr., III..."
-                               class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
-                        <span asp-validation-for="Suffix" class="mt-1 block text-sm text-red-500"></span>
-                    </div>
+
                     <div class="mb-4">
                         <label class="mb-1 block font-normal" for="password">Password <span class="text-red-500">*</span></label>
                         <input type="password" id="password" asp-for="Password" placeholder="******"
@@ -62,7 +69,7 @@
                         <label for="roleCheckbox" class="ml-2 block font-normal">Apply as recruiter</label>
                     </div>
                 </div>
-                <!-- Modal Footer -->
+
                 <div class="modal-footer flex items-center justify-between">
                     <button type="submit" id="registerButton" disabled
                             class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed">

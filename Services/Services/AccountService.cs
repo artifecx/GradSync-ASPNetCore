@@ -11,6 +11,7 @@ using static Resources.Constants.Enums;
 using static Services.Exceptions.UserExceptions;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using Data.Repositories;
 
 namespace Services.Services
 {
@@ -49,7 +50,16 @@ namespace Services.Services
                 AddApplicant(user);
         }
 
-        private void AddApplicant(User user)
+        public void AddAdmin(User user)
+        {
+            _repository.AddAdmin(new Admin
+            {
+                UserId = user.UserId,
+                IsSuper = user.RoleId == "Admin",
+            });
+        }
+
+        public void AddApplicant(User user)
         {
             _repository.AddApplicant(new Applicant
             {
@@ -57,7 +67,7 @@ namespace Services.Services
             });
         }
 
-        private void AddRecruiter(User user)
+        public void AddRecruiter(User user)
         {
             _repository.AddRecruiter(new Recruiter
             {
@@ -74,7 +84,7 @@ namespace Services.Services
             if(user != null)
             {
                 user.LastLoginDate = DateTime.Now;
-                _repository.UpdateAsync(user).Wait();
+                _repository.UpdateUserAsync(user).Wait();
                 return LoginResult.Success;
             }
             return LoginResult.Failed;
