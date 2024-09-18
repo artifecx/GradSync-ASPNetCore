@@ -15,5 +15,5 @@ public partial class Avatar
 
     public DateTime UploadedDate { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual ICollection<User> Users { get; set; } = new List<User>();
 }

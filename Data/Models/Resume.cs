@@ -17,5 +17,5 @@ public partial class Resume
 
     public DateTime UploadedDate { get; set; }
 
-    public virtual Applicant Applicant { get; set; }
+    public virtual ICollection<Applicant> Applicants { get; set; } = new List<Applicant>();
 }
