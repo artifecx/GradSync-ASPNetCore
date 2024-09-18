@@ -116,8 +116,8 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.IdNumber).HasMaxLength(256);
             entity.Property(e => e.ResumeId).HasMaxLength(256);
 
-            entity.HasOne(d => d.EducationalDetails).WithMany(p => p.Applicants)
-                .HasForeignKey(d => d.EducationalDetailsId)
+            entity.HasOne(d => d.EducationalDetails).WithOne(p => p.Applicant)
+                .HasForeignKey<Applicant>(d => d.EducationalDetailsId)
                 .HasConstraintName("FK_Applicant_EducationalDetails");
 
             entity.HasOne(d => d.Resume).WithMany(p => p.Applicants)
