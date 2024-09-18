@@ -55,12 +55,6 @@
                     Applications
                 </a>
             </li>
-            <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "SnIManagement" ? "bg-gray-200" : "")">
-                    <i class="fa fa-industry mr-2"></i>
-                    Skills & Industry
-                </a>
-            </li>
         }
         @if (isRecruiter)
         {
@@ -86,7 +80,7 @@
         <li>
             <hr class="my-2 border-gray-300" />
         </li>
-        @if (!isSuper)
+        @if (!isAdmin)
         {
             <li class="py-2">
                 <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200">
