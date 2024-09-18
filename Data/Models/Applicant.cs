@@ -11,8 +11,6 @@ public partial class Applicant
 
     public string ResumeId { get; set; }
 
-    public string SkillsId { get; set; }
-
     public string EducationalDetailsId { get; set; }
 
     public string JobPreferences { get; set; }
@@ -23,7 +21,7 @@ public partial class Applicant
 
     public virtual Resume Resume { get; set; }
 
-    public virtual Skill Skills { get; set; }
-
     public virtual User User { get; set; }
+
+    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 }
