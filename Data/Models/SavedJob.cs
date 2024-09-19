@@ -15,5 +15,5 @@ public partial class SavedJob
 
     public virtual Job Job { get; set; }
 
-    public virtual User User { get; set; }
+    public virtual Applicant User { get; set; }
 }
