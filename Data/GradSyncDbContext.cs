@@ -28,8 +28,6 @@ public partial class GradSyncDbContext : DbContext
 
     public virtual DbSet<Avatar> Avatars { get; set; }
 
-    public virtual DbSet<CategoryType> CategoryTypes { get; set; }
-
     public virtual DbSet<College> Colleges { get; set; }
 
     public virtual DbSet<Company> Companies { get; set; }
@@ -63,6 +61,10 @@ public partial class GradSyncDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<YearLevel> YearLevels { get; set; }
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
+        => optionsBuilder.UseSqlServer("Addr=localhost;database=GradSyncDb;Integrated Security=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -221,17 +223,6 @@ public partial class GradSyncDbContext : DbContext
                 .HasColumnType("datetime");
         });
 
-        modelBuilder.Entity<CategoryType>(entity =>
-        {
-            entity.ToTable("CategoryType");
-
-            entity.Property(e => e.CategoryTypeId).HasMaxLength(256);
-            entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.Name)
-                .IsRequired()
-                .HasMaxLength(100);
-        });
-
         modelBuilder.Entity<College>(entity =>
         {
             entity.ToTable("College");
@@ -262,18 +253,16 @@ public partial class GradSyncDbContext : DbContext
             entity.HasIndex(e => e.MemorandumOfAgreementId, "IX_Company_MOAId");
 
             entity.Property(e => e.CompanyId).HasMaxLength(256);
-            entity.Property(e => e.Address).HasMaxLength(500);
+            entity.Property(e => e.Address)
+                .IsRequired()
+                .HasMaxLength(500);
             entity.Property(e => e.CompanyLogoId).HasMaxLength(256);
             entity.Property(e => e.ContactEmail)
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.ContactNumber).HasMaxLength(256);
-            entity.Property(e => e.Description)
-                .IsRequired()
-                .HasMaxLength(500);
-            entity.Property(e => e.MemorandumOfAgreementId)
-                .IsRequired()
-                .HasMaxLength(256);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.MemorandumOfAgreementId).HasMaxLength(256);
             entity.Property(e => e.Name)
                 .IsRequired()
                 .HasMaxLength(256);
@@ -284,7 +273,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.MemorandumOfAgreement).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.MemorandumOfAgreementId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Company_MOA");
         });
 
@@ -369,10 +357,6 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("Job");
 
-            entity.HasIndex(e => e.CategoryTypeId, "IX_Job_CategoryTypeId");
-
-            entity.HasIndex(e => e.DepartmentId, "IX_Job_Department");
-
             entity.HasIndex(e => e.EmploymentTypeId, "IX_Job_EmploymentTypeId");
 
             entity.HasIndex(e => e.IsArchived, "IX_Job_IsArchived");
@@ -392,15 +376,9 @@ public partial class GradSyncDbContext : DbContext
             entity.HasIndex(e => e.YearLevelId, "IX_Job_YearLevelId");
 
             entity.Property(e => e.JobId).HasMaxLength(256);
-            entity.Property(e => e.CategoryTypeId)
-                .IsRequired()
-                .HasMaxLength(256);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
-            entity.Property(e => e.DepartmentId)
-                .IsRequired()
-                .HasMaxLength(256);
             entity.Property(e => e.Description)
                 .IsRequired()
                 .HasMaxLength(800);
@@ -430,16 +408,6 @@ public partial class GradSyncDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256);
 
-            entity.HasOne(d => d.CategoryType).WithMany(p => p.Jobs)
-                .HasForeignKey(d => d.CategoryTypeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Job_CategoryType");
-
-            entity.HasOne(d => d.Department).WithMany(p => p.Jobs)
-                .HasForeignKey(d => d.DepartmentId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Job_Department");
-
             entity.HasOne(d => d.EmploymentType).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.EmploymentTypeId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
@@ -448,7 +416,7 @@ public partial class GradSyncDbContext : DbContext
             entity.HasOne(d => d.PostedBy).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.PostedById)
                 .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK_Job_User");
+                .HasConstraintName("FK_Job_Recruiter");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.ScheduleId)
@@ -464,6 +432,25 @@ public partial class GradSyncDbContext : DbContext
                 .HasForeignKey(d => d.YearLevelId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_YearLevel");
+
+            entity.HasMany(d => d.Departments).WithMany(p => p.Jobs)
+                .UsingEntity<Dictionary<string, object>>(
+                    "JobDepartment",
+                    r => r.HasOne<Department>().WithMany()
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_JobDepartment_Department"),
+                    l => l.HasOne<Job>().WithMany()
+                        .HasForeignKey("JobId")
+                        .OnDelete(DeleteBehavior.ClientSetNull)
+                        .HasConstraintName("FK_JobDepartment_Job"),
+                    j =>
+                    {
+                        j.HasKey("JobId", "DepartmentId");
+                        j.ToTable("JobDepartment");
+                        j.IndexerProperty<string>("JobId").HasMaxLength(256);
+                        j.IndexerProperty<string>("DepartmentId").HasMaxLength(256);
+                    });
 
             entity.HasMany(d => d.Skills).WithMany(p => p.Jobs)
                 .UsingEntity<Dictionary<string, object>>(

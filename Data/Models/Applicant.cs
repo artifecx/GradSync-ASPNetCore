@@ -17,9 +17,13 @@ public partial class Applicant
 
     public string Address { get; set; }
 
+    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
+
     public virtual EducationalDetail EducationalDetails { get; set; }
 
     public virtual Resume Resume { get; set; }
+
+    public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual User User { get; set; }
 
