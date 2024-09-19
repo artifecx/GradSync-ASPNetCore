@@ -33,11 +33,11 @@
             @RenderBody()
             @if(ViewBag.loginView == true)
 			{
-                <footer class="footer d-flex justify-content-between align-items-center p-0 mb-3" style="color:white;">
+                <footer class="footer d-flex justify-content-between align-items-center mb-3 p-0" style="color:white;">
                     <div>
                         <img src="~/img/logoBW.png" style="width: 150px;" alt="login-logo" class="ml-5" />
                     </div>
-                    <div class="mr-5 ">
+                    <div class="mr-5">
                         &copy; @DateTime.Now.Year GradSync
                     </div>
                 </footer>
@@ -65,13 +65,13 @@
                         <span aria-hidden="true">&times;</span>
                     </button>
                 </div>
-                <div class="modal-body pl-4 py-1">
+                <div class="modal-body py-1 pl-4">
                     <p>Are you sure you want to log out?</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="bg-gray-500 hover:bg-gray-600 text-white font-semibold py-2 px-4 rounded" data-dismiss="modal">Cancel</button>
+                    <button type="button" class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600" data-dismiss="modal">Cancel</button>
                     <form asp-action="SignOutUser" asp-controller="Account" method="post">
-                        <button type="submit" class="bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded">
+                        <button type="submit" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
                             Confirm
                         </button>
                     </form>
