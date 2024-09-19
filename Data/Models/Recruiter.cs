@@ -13,5 +13,7 @@ public partial class Recruiter
 
     public virtual Company Company { get; set; }
 
+    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+
     public virtual User User { get; set; }
 }

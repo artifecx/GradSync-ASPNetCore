@@ -15,10 +15,6 @@ public partial class Job
 
     public string YearLevelId { get; set; }
 
-    public string DepartmentId { get; set; }
-
-    public string CategoryTypeId { get; set; }
-
     public string EmploymentTypeId { get; set; }
 
     public string StatusTypeId { get; set; }
@@ -39,13 +35,9 @@ public partial class Job
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
-    public virtual CategoryType CategoryType { get; set; }
-
-    public virtual Department Department { get; set; }
-
     public virtual EmploymentType EmploymentType { get; set; }
 
-    public virtual User PostedBy { get; set; }
+    public virtual Recruiter PostedBy { get; set; }
 
     public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
@@ -54,6 +46,8 @@ public partial class Job
     public virtual StatusType StatusType { get; set; }
 
     public virtual YearLevel YearLevel { get; set; }
+
+    public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
 
     public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 }

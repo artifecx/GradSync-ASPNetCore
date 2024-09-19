@@ -30,7 +30,6 @@ namespace WebApp
                 CreateMap<UserViewModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, UserViewModel>().ReverseMap();
-                CreateMap<CompanyViewModel, Company>().ReverseMap();
             }
         }
     }
