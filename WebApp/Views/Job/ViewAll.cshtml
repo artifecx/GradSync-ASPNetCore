@@ -1,0 +1,351 @@
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
+@using Data.Models
+@using Humanizer
+
+@{
+    ViewData["Title"] = "All Jobs";
+    // await Html.RenderPartialAsync("_AddUserModal", new Services.ServiceModels.UserViewModel());
+    // await Html.RenderPartialAsync("_DeleteModal");
+
+    var Companies = ViewBag.Companies as List<Company>;
+    var EmploymentTypes = ViewBag.EmploymentTypes as List<EmploymentType>;
+    var StatusTypes = ViewBag.StatusTypes as List<StatusType>;
+    var WorkSetups = ViewBag.WorkSetups as List<SetupType>;
+
+    string FilterByCompany = ViewData["FilterByCompany"] as string;
+    string FilterByEmploymentType = ViewData["FilterByEmploymentType"] as string;
+    string FilterByStatusType = ViewData["FilterByStatusType"] as string;
+    string FilterByWorkSetup = ViewData["FilterByWorkSetup"] as string;
+
+    string SortBy = ViewData["SortBy"] as string;
+    string Search = ViewData["Search"] as string;
+
+    var EmploymentTypeDefault = string.Empty;
+    var StatusTypeDefault = string.Empty;
+    var WorkSetupDefault = string.Empty;
+    var SortByDefault = string.Empty;
+
+    int PageIndex = Model.PageIndex;
+
+    bool noResult = string.IsNullOrEmpty(Search) && 
+        string.IsNullOrEmpty(FilterByCompany) && 
+        string.IsNullOrEmpty(FilterByEmploymentType) && 
+        string.IsNullOrEmpty(FilterByStatusType) && 
+        string.IsNullOrEmpty(FilterByWorkSetup);
+
+    string sortByCreatedDate = SortBy == "created" ? "created_desc" : "created";
+}
+
+<div class="nav-header flex items-center justify-between">
+    <h1 class="display-6 text-3xl font-semibold">Job Management</h1>
+    <div class="flex items-center">
+        <form method="get" asp-action="GetAll" asp-route-sortBy="@SortBy" asp-route-search="@Search" asp-route-pageIndex="@PageIndex" class="flex items-center">
+            <div class="flex">
+                <input type="text" name="Search" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Job title, position, keywords..." value="@Search" />
+                <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+            <input type="hidden" name="sortBy" value="@SortBy" />
+        </form>
+        <div class="mx-3">
+            @if (User.IsInRole("Recruiter"))
+            {
+                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#createJobModal">
+                    <i class="fa fa-plus"></i>
+                    New Job
+                </button>
+            }
+        </div>
+        <div class="mr-3">
+            <button type="button" class="btn notif-bell" id="notifBellBtn">
+                <i class="fa fa-bell px-1 text-gray-500 hover:text-blue-500"></i>
+            </button>
+        </div>
+        <div id="notificationModal" class="modal fixed-right fade" tabindex="-2" role="dialog">
+            <div class="modal-dialog modal-dialog-aside" role="document">
+                <div class="modal-content">
+                    <!-- Notification Modal -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+    <table class="table-white table min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    @Html.DisplayNameFor(model => model.First().Title)
+                </th>
+
+                <!-- Company Column (with dropdown) -->
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if(FilterByCompany == null){
+                                @Html.DisplayNameFor(model => model.First().Company)
+                            }
+                            else
+                            {
+                                <text>@FilterByCompany</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="companyDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" 
+                                asp-action="GetAll" 
+                                asp-route-sortBy="@SortBy" 
+                                asp-route-search="@Search" 
+                                asp-route-filterByCompany="" 
+                                asp-route-filterByEmploymentType="@FilterByEmploymentType" 
+                                asp-route-filterByStatusType="@FilterByStatusType" 
+                                asp-route-filterByWorkSetup="@FilterByWorkSetup"
+                            >All</a>
+                            @if(Companies != null)
+                            {
+                                foreach (var c in Companies)
+                                {
+                                    <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="GetAll" asp-route-sortBy="@SortBy" asp-route-search="@Search" asp-route-filterByCompany="@c.Name" asp-route-filterByEmploymentType="@FilterByEmploymentType" asp-route-filterByStatusType="@FilterByStatusType" asp-route-filterByWorkSetup="@FilterByWorkSetup">@c.Name</a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </th>
+
+                <!-- Employment Type Column (with dropdown) -->
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (string.IsNullOrEmpty(FilterByEmploymentType))
+                            {
+                                @Html.DisplayNameFor(model => model.First().EmploymentType)
+                            }
+                            else
+                            {
+                                <text>@FilterByEmploymentType</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="employmentTypeDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="GetAll"
+                               asp-route-sortBy="@SortBy"
+                               asp-route-search="@Search"
+                               asp-route-filterByCompany="@FilterByCompany"
+                               asp-route-filterByEmploymentType=""
+                               asp-route-filterByStatusType="@FilterByStatusType"
+                               asp-route-filterByWorkSetup="@FilterByWorkSetup">All</a>
+                            @if (EmploymentTypes != null)
+                            {
+                                foreach (var et in EmploymentTypes)
+                                {
+                                    <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                                       asp-action="GetAll"
+                                       asp-route-sortBy="@SortBy"
+                                       asp-route-search="@Search"
+                                       asp-route-filterByCompany="@FilterByCompany"
+                                       asp-route-filterByEmploymentType="@et.Name"
+                                       asp-route-filterByStatusType="@FilterByStatusType"
+                                       asp-route-filterByWorkSetup="@FilterByWorkSetup">@et.Name</a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </th>
+
+                <!-- Status Type Column (with dropdown) -->
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (string.IsNullOrEmpty(FilterByStatusType))
+                            {
+                                @Html.DisplayNameFor(model => model.First().StatusType)
+                            }
+                            else
+                            {
+                                <text>@FilterByStatusType</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="GetAll"
+                               asp-route-sortBy="@SortBy"
+                               asp-route-search="@Search"
+                               asp-route-filterByCompany="@FilterByCompany"
+                               asp-route-filterByEmploymentType="@FilterByEmploymentType"
+                               asp-route-filterByStatusType=""
+                               asp-route-filterByWorkSetup="@FilterByWorkSetup">All</a>
+                            @if (StatusTypes != null)
+                            {
+                                foreach (var st in StatusTypes)
+                                {
+                                    <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                                       asp-action="GetAll"
+                                       asp-route-sortBy="@SortBy"
+                                       asp-route-search="@Search"
+                                       asp-route-filterByCompany="@FilterByCompany"
+                                       asp-route-filterByEmploymentType="@FilterByEmploymentType"
+                                       asp-route-filterByStatusType="@st.Name"
+                                       asp-route-filterByWorkSetup="@FilterByWorkSetup">@st.Name</a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </th>
+
+                <!-- Work Setup Column (with dropdown) -->
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (string.IsNullOrEmpty(FilterByWorkSetup))
+                            {
+                                @Html.DisplayNameFor(model => model.First().SetupType)
+                            }
+                            else
+                            {
+                                <text>@FilterByWorkSetup</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="workSetupDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="GetAll"
+                               asp-route-sortBy="@SortBy"
+                               asp-route-search="@Search"
+                               asp-route-filterByCompany="@FilterByCompany"
+                               asp-route-filterByEmploymentType="@FilterByEmploymentType"
+                               asp-route-filterByStatusType="@FilterByStatusType"
+                               asp-route-filterByWorkSetup="">All</a>
+                            @if (WorkSetups != null)
+                            {
+                                foreach (var ws in WorkSetups)
+                                {
+                                    <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                                       asp-action="GetAll"
+                                       asp-route-sortBy="@SortBy"
+                                       asp-route-search="@Search"
+                                       asp-route-filterByCompany="@FilterByCompany"
+                                       asp-route-filterByEmploymentType="@FilterByEmploymentType"
+                                       asp-route-filterByStatusType="@FilterByStatusType"
+                                       asp-route-filterByWorkSetup="@ws.Name">@ws.Name</a>
+                                }
+                            }
+                        </div>
+                    </div>
+                </th>
+
+                <!-- CreatedDate Column (sortable) -->
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <a asp-action="GetAll"
+                       asp-route-sortBy="@sortByCreatedDate"
+                       asp-route-search="@Search"
+                       asp-route-filterByCompany="@FilterByCompany"
+                       asp-route-filterByEmploymentType="@FilterByEmploymentType"
+                       asp-route-filterByStatusType="@FilterByStatusType"
+                       asp-route-filterByWorkSetup="@FilterByWorkSetup"
+                       class="text-black hover:text-blue-500">
+                        @Html.DisplayNameFor(model => model.First().CreatedDate)
+                        @(SortBy == "created" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (SortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                    </a>
+                </th>
+                <th class="px-6 py-3"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+                        @(noResult ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    @*await Html.RenderPartialAsync("_EditUserModal", item);*@
+                    <tr>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Title)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Company.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.EmploymentType.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.StatusType.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.SetupType.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.CreatedDate)
+                        </td>
+                        <td>
+                            <a href="javascript:void(0);"
+                               onclick="displayEditModal()"
+                               class="fas fa-info-circle action-icon mx-2"></a> |
+                            <a href="javascript:void(0);"
+                               onclick="displayEditModal()"
+                               class="fas fa-edit action-icon mx-2"></a> |
+                            <button type="button" onclick="displayDeleteModal('@item.JobId', '@item.Title')" class="action-icon mx-1">
+                                <i class="fa fa-archive" aria-hidden="true"></i>
+                                <span class="sr-only">Archive</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <nav class="mt-4 flex justify-end">
+        <ul class="pagination flex items-center">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="GetAll" 
+                        asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@SortBy" asp-route-search="@Search"
+                        asp-route-filterByCompany="@FilterByCompany" asp-route-filterByEmploymentType="@FilterByEmploymentType" 
+                        asp-route-filterByStatusType="@FilterByStatusType" asp-route-filterByWorkSetup="@FilterByWorkSetup"
+                    >Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="GetAll" 
+                        asp-route-pageIndex="@i" asp-route-sortBy="@SortBy" asp-route-search="@Search"
+                        asp-route-filterByCompany="@FilterByCompany" asp-route-filterByEmploymentType="@FilterByEmploymentType" 
+                        asp-route-filterByStatusType="@FilterByStatusType" asp-route-filterByWorkSetup="@FilterByWorkSetup"
+                    >@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="GetAll" 
+                        asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@SortBy" asp-route-search="@Search"
+                        asp-route-filterByCompany="@FilterByCompany" asp-route-filterByEmploymentType="@FilterByEmploymentType" 
+                        asp-route-filterByStatusType="@FilterByStatusType" asp-route-filterByWorkSetup="@FilterByWorkSetup"
+                    >Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Values passed to the js files -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action("GetAll", "Job")" />
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+}
+

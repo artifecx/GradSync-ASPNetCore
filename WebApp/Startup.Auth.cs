@@ -55,7 +55,7 @@ namespace WebApp
                 });
                 options.AddPolicy("Admin", policy =>
                 {
-                    policy.RequireClaim("Role", "Admin");
+                    policy.RequireRole("NLO", "Admin");
                 });
                 options.AddPolicy("Employee", policy =>
                 {

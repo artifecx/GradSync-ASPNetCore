@@ -30,6 +30,9 @@ namespace WebApp
                 CreateMap<UserViewModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, UserViewModel>().ReverseMap();
+                CreateMap<JobViewModel, Job>()
+                    .ReverseMap()
+                    .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.PostedBy.Company));
             }
         }
     }
