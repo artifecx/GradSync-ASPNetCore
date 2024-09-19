@@ -54,6 +54,8 @@ public partial class GradSyncDbContext : DbContext
 
     public virtual DbSet<Schedule> Schedules { get; set; }
 
+    public virtual DbSet<SetupType> SetupTypes { get; set; }
+
     public virtual DbSet<Skill> Skills { get; set; }
 
     public virtual DbSet<StatusType> StatusTypes { get; set; }
@@ -61,10 +63,6 @@ public partial class GradSyncDbContext : DbContext
     public virtual DbSet<User> Users { get; set; }
 
     public virtual DbSet<YearLevel> YearLevels { get; set; }
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Addr=localhost;database=GradSyncDb;Integrated Security=True;MultipleActiveResultSets=True;Encrypt=True;TrustServerCertificate=True;");
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -369,6 +367,8 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ScheduleId, "IX_Job_ScheduleId");
 
+            entity.HasIndex(e => e.SetupTypeId, "IX_Job_SetupTypeId");
+
             entity.HasIndex(e => e.StatusTypeId, "IX_Job_StatusTypeId");
 
             entity.HasIndex(e => e.Title, "IX_Job_Title");
@@ -397,6 +397,9 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.ScheduleId)
                 .IsRequired()
                 .HasMaxLength(256);
+            entity.Property(e => e.SetupTypeId)
+                .IsRequired()
+                .HasMaxLength(256);
             entity.Property(e => e.StatusTypeId)
                 .IsRequired()
                 .HasMaxLength(256);
@@ -422,6 +425,11 @@ public partial class GradSyncDbContext : DbContext
                 .HasForeignKey(d => d.ScheduleId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_Schedule");
+
+            entity.HasOne(d => d.SetupType).WithMany(p => p.Jobs)
+                .HasForeignKey(d => d.SetupTypeId)
+                .OnDelete(DeleteBehavior.ClientSetNull)
+                .HasConstraintName("FK_Job_SetupType");
 
             entity.HasOne(d => d.StatusType).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.StatusTypeId)
@@ -590,6 +598,17 @@ public partial class GradSyncDbContext : DbContext
                 .IsRequired()
                 .HasMaxLength(256);
             entity.Property(e => e.Hours).HasMaxLength(256);
+        });
+
+        modelBuilder.Entity<SetupType>(entity =>
+        {
+            entity.ToTable("SetupType");
+
+            entity.Property(e => e.SetupTypeId).HasMaxLength(256);
+            entity.Property(e => e.Description).HasMaxLength(500);
+            entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(100);
         });
 
         modelBuilder.Entity<Skill>(entity =>
