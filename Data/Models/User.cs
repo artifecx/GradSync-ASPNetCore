@@ -35,15 +35,9 @@ public partial class User
 
     public virtual Applicant Applicant { get; set; }
 
-    public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
-
     public virtual Avatar Avatar { get; set; }
-
-    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
     public virtual Recruiter Recruiter { get; set; }
 
     public virtual Role Role { get; set; }
-
-    public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 }
