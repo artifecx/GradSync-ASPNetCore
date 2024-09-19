@@ -15,6 +15,8 @@ public partial class Job
 
     public string YearLevelId { get; set; }
 
+    public string SetupTypeId { get; set; }
+
     public string EmploymentTypeId { get; set; }
 
     public string StatusTypeId { get; set; }
@@ -42,6 +44,8 @@ public partial class Job
     public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual Schedule Schedule { get; set; }
+
+    public virtual SetupType SetupType { get; set; }
 
     public virtual StatusType StatusType { get; set; }
 
