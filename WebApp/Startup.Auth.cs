@@ -57,13 +57,17 @@ namespace WebApp
                 {
                     policy.RequireRole("NLO", "Admin");
                 });
-                options.AddPolicy("Employee", policy =>
+                options.AddPolicy("AdminOrRecruiter", policy =>
                 {
-                    policy.RequireClaim("Role", "Employee");
+                    policy.RequireRole("Admin", "NLO", "Recruiter");
                 });
-                options.AddPolicy("AdminOrAgent", policy =>
+                options.AddPolicy("Applicant", policy =>
                 {
-                    policy.RequireRole("Admin", "Support Agent");
+                    policy.RequireClaim("Role", "Applicant");
+                });
+                options.AddPolicy("Recruiter", policy =>
+                {
+                    policy.RequireClaim("Role", "Recruiter");
                 });
             });
 
