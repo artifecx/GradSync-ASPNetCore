@@ -20,6 +20,7 @@ namespace WebApp.Controllers
     /// Controller for handling team-related operations.
     /// </summary>
     [Route("users")]
+    [Authorize(Policy = "Admin")]
     public class UserController : ControllerBase<UserController>
     {
         private readonly IUserService _userService;
@@ -55,10 +56,9 @@ namespace WebApp.Controllers
         /// <param name="specialization">The specialization filter.</param>
         /// <param name="pageIndex">The page index.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
-        [Authorize(Policy = "Admin")]
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> Index(string sortBy, string filterBy, string role, bool? verified, int pageIndex = 1)
+        public async Task<IActionResult> GetAllUsers(string sortBy, string filterBy, string role, bool? verified, int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
@@ -82,7 +82,6 @@ namespace WebApp.Controllers
         /// <param name="model">The user view model.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [Route("create")]
         public async Task<IActionResult> Create(UserViewModel model)
         {
@@ -105,7 +104,6 @@ namespace WebApp.Controllers
         /// <param name="model">The user view model.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [Route("update")]
         public async Task<IActionResult> Update(UserViewModel model)
         {
@@ -123,7 +121,6 @@ namespace WebApp.Controllers
         }
 
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [Route("resetpassword")]
         public async Task<IActionResult> ResetPassword(string id)
         {
@@ -146,7 +143,6 @@ namespace WebApp.Controllers
         /// <param name="id">The user identifier.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
         [Route("delete")]
         public async Task<IActionResult> Delete(string id)
         {
