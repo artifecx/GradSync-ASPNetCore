@@ -5,39 +5,38 @@
 
     await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.AccountServiceModel());
 }
-<div>
-    @Html.AntiForgeryToken()
-</div>
-<div class="flex items-center justify-center h-screen bg-cover bg-center bg-login-bg">
+<div class="relative h-screen flex items-center justify-center">
+    <img src="~/img/loginBG.png" alt="loginBG" class="absolute inset-0 w-full h-full object-cover -z-10" />
+
     <div class="bg-white min-h-screen pt-14 text-[#7A1515] flex items-center w-full bg-opacity-0">
-        <form method="post" action="/Account/Login" id="loginForm" class="ml-28 flex flex-col p-8 bg-white rounded-md" style="max-width: 500px; width: 100%;">
-            <div class="text-left mb-3">
+        <form method="post" action="/Account/Login" id="loginForm" class="relative ml-28 flex flex-col p-8 bg-white rounded-md" style="max-width: 500px; width: 100%;">
+            <div class="text-left pb-0">
                 <p class="text-4xl font-bold">Sign In</p>
             </div>
-            <div class="text-left text-black text-sm pb-6">
+            <div class="text-left text-black font-medium text-sm pb-3">
                 <p>Don't have an account? <a href="" class="text-[#7A1515] underline" data-toggle="modal" data-target="#registerUserModal">Create Account</a></p>
             </div>
-            <div class="mb-4">
-                <label class="block font-normal mb-1" for="emailInput">Email Address <span class="text-red-500">*</span></label>
+            <div class="mb-3">
+                <label class="block font-medium mb-1" for="emailInput">Email Address <span class="text-red-350">*</span></label>
                 <input type="email" asp-for="Email" id="emailInput" required
                        class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
             </div>
-            <div class="mb-4">
-                <label class="block font-normal mb-1" for="passwordInput">Password <span class="text-red-500">*</span></label>
+            <div class="mb-3">
+                <label class="block font-medium mb-1" for="passwordInput">Password <span class="text-red-350">*</span></label>
                 <div class="relative">
                     <input type="password" asp-for="Password" id="passwordInput" required
                            class="w-full border border-gray-300 rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
                         <!-- Eye Open Icon -->
                         <svg id="eyeOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0"/>
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7" />
                         </svg>
                         <!-- Eye Closed Icon -->
                         <svg id="eyeClosedIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                d="m9.75 14.25 4.5-4.5m-4.5 0 4.5 4.5M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7"/>
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                  d="m9.75 14.25 4.5-4.5m-4.5 0 4.5 4.5M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7" />
                         </svg>
                     </button>
                 </div>
@@ -48,7 +47,7 @@
             </div>
             <div>
                 <button type="submit" id="loginButton" disabled
-                        class="mt-4 bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded w-full flex justify-center items-center disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        class="mt-2 bg-[#7A1515] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded w-full flex justify-center items-center disabled:bg-white-400 disabled:cursor-not-allowed">
                     Sign in
                 </button>
             </div>
@@ -56,6 +55,7 @@
     </div>
 </div>
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
 @section scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/account.js"></script>
