@@ -42,7 +42,7 @@ namespace WebApp
                     Name = $"{this._environment.ApplicationName}_{token.CookieName}"
                 };
                 options.LoginPath = new PathString("/Account/Login");
-                options.AccessDeniedPath = new PathString("/Account/Login"); // TODO: Change this to a more appropriate path
+                options.AccessDeniedPath = new PathString("/Home/InvalidAccess");
                 options.ReturnUrlParameter = "ReturnUrl";
                 options.TicketDataFormat = new CustomJwtDataFormat(SecurityAlgorithms.HmacSha256, _tokenValidationParameters, Configuration, tokenProviderOptionsFactory);
             });
