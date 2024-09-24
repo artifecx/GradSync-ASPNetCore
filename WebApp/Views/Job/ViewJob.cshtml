@@ -95,10 +95,7 @@
             <div class="mt-6 rounded-lg border p-4">
                 <h3 class="mb-4 text-2xl font-bold">Skills Required:</h3>
                 <div class="flex flex-wrap gap-2">
-                    @foreach (var skill in Model.Skills)
-                    {
-                        <span class="rounded bg-yellow-600 px-2 py-0.5 text-sm font-semibold text-black">@skill.Name</span>
-                    }
+                    <text>@string.Join(", ", (Model.Skills as List<Skill>).Select(skill => skill.Name))</text>
                 </div>
             </div>
             <!-- Job Description -->
