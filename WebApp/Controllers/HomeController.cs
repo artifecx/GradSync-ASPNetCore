@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Security.Claims;
 
 namespace WebApp.Controllers
 {
@@ -36,7 +37,9 @@ namespace WebApp.Controllers
         /// Returns Home View.
         /// </summary>
         /// <returns> Home View </returns>
-        public IActionResult Index()
+        /// 
+        [Authorize]
+        public IActionResult Dashboard()
         {
             return View();
         }

@@ -1,5 +1,7 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
+
+
     content: [
         './Pages/**/*.cshtml',
         './Views/**/*.cshtml',
@@ -7,8 +9,10 @@ module.exports = {
     ],
   theme: {
       extend: {
-          backgroundImage: {
-              'login-bg': "url('/img/loginBG.png')",
+          backgroundImage: {'login-bg': "url('/img/loginBG.png')",
+              fontFamily: {
+                  sans: ['Inter', 'sans-serif'],
+              },
           },
       },
   },
