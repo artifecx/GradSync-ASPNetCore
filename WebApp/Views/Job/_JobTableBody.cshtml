@@ -1,0 +1,77 @@
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
+@using Data.Models
+@using Humanizer
+
+@{
+    ViewData["Title"] = "All Jobs";
+
+    string filterByCompany = ViewData["FilterByCompany"] as string;
+    string filterByEmploymentType = ViewData["FilterByEmploymentType"] as string;
+    string filterByStatusType = ViewData["FilterByStatusType"] as string;
+    string filterByWorkSetup = ViewData["FilterByWorkSetup"] as string;
+
+    string sortBy = ViewData["SortBy"] as string;
+    string search = ViewData["Search"] as string;
+
+    bool noResult = string.IsNullOrEmpty(search) && 
+        string.IsNullOrEmpty(filterByCompany) && 
+        string.IsNullOrEmpty(filterByEmploymentType) && 
+        string.IsNullOrEmpty(filterByStatusType) && 
+        string.IsNullOrEmpty(filterByWorkSetup);
+}
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+            @(noResult ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td class="whitespace-nowrap px-6 py-4">
+                @Html.DisplayFor(modelItem => item.Title)
+            </td>
+            @if (!User.IsInRole("Recruiter"))
+            {
+                <td class="whitespace-nowrap px-6 py-4">
+                    @Html.DisplayFor(modelItem => item.Company.Name)
+                </td>
+            }
+            else
+            {
+                <td class="whitespace-nowrap px-6 py-4">
+                    @Html.DisplayFor(modelItem => item.AvailableSlots)
+                </td>
+            }
+            <td class="whitespace-nowrap px-6 py-4">
+                @Html.DisplayFor(modelItem => item.EmploymentType.Name)
+            </td>
+            <td class="whitespace-nowrap px-6 py-4">
+                @Html.DisplayFor(modelItem => item.StatusType.Name)
+            </td>
+            <td class="whitespace-nowrap px-6 py-4">
+                @Html.DisplayFor(modelItem => item.SetupType.Name)
+            </td>
+            <td class="whitespace-nowrap px-6 py-4">
+                @Html.DisplayFor(modelItem => item.CreatedDate)
+            </td>
+            <td>
+                @Html.ActionLink("", "GetJob", new { 
+                    id = item.JobId, sortBy = sortBy, filterByCompany = filterByCompany, filterByEmploymentType = filterByEmploymentType, 
+                    filterByStatusType = filterByStatusType, filterByWorkSetup = filterByWorkSetup, search = search, pageIndex = Model.PageIndex 
+                }, new { @class = "fas fa-info-circle action-icon" }) |
+                @Html.ActionLink("", "GetJob", new { id = item.JobId, showModal = "editJob" }, new { @class = "fas fa-edit action-icon" }) |
+                <button type="button" onclick="displayDeleteModal('@item.JobId', '@item.Title')" class="action-icon mx-1">
+                    <i class="fa fa-archive" aria-hidden="true"></i>
+                    <span class="sr-only">Archive</span>
+                </button>
+            </td>
+        </tr>
+    }
+}
+        

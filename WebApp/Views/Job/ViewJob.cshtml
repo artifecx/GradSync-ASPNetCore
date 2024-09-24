@@ -1,0 +1,200 @@
+﻿@model Services.ServiceModels.JobViewModel
+@using Data.Models;
+
+@{
+    ViewData["Title"] = $"{Model.Title}";
+    var userId = ViewBag.UserId;
+    string aspAction = User.IsInRole("Recruiter") ? "GetAllJobsRecruiter" : "GetAllJobsAdmin";
+}
+<div class="d-flex justify-content-between nav-header">
+    <a href="#" class="back-button m-2 text-black">
+        <h2 class="font-weight-bold">
+            <i class="fa-solid fa-arrow-left mx-2"></i>
+        </h2>
+    </a>
+</div>
+<div class="min-h-screen bg-[#F5F6F8] px-4 pt-16 text-black md:px-12">
+    <div class="container mx-auto rounded-lg bg-white p-6 shadow-lg">
+        <!-- Header Section -->
+        <div class="flex flex-col items-center justify-between md:flex-row md:items-start">
+            <!-- Left Side -->
+            <div class="flex items-center">
+                <!-- Company Logo -->
+                @*<div class="flex-shrink-0 w-24 md:w-32">
+                    <img src="@Model.CompanyLogoUrl"
+                         alt="@Model.CompanyName"
+                         class="h-24 w-24 rounded-md object-cover md:h-32 md:w-32" />
+                </div>*@
+                <div class="md:ml-6">
+                    <!-- Job Title and Badges -->
+                    <div class="flex space-x-3">
+                        <h1 class="text-3xl font-bold md:text-4xl">@Model.Title</h1>
+                        <div class="py-2">
+                            <text class="flex-center rounded px-1 py-1 @GetEmploymentTypeClass(Model.EmploymentTypeId)">
+                                @Model.EmploymentType.Name
+                            </text>
+                            <text class="flex-center rounded px-1 py-1">
+                                @Model.SetupType.Name
+                            </text>
+                        </div>
+                        <div class="py-2">
+                            <text class="w-20 rounded-lg text-center font-semibold uppercase @(Model.StatusType.Name == "Open" ? "text-green-700" : "text-red-500")">
+                                @Model.StatusType.Name
+                            </text>
+                        </div>
+                    </div>
+                    <h2 class="mt-2 text-lg font-medium md:text-xl">at @Model.Company.Name</h2>
+                    <text class="w-20 rounded-lg text-center font-semibold uppercase">
+                        Available Slots: @Model.AvailableSlots
+                    </text>
+
+                    <!-- Match Percentage -->
+                    @* Uncomment if applicable *@
+                    @*if (User.Identity.IsAuthenticated && Model.MatchPercentage != null)
+                    {
+                        <p class="text-lg font-semibold text-[#7A1515]">
+                        Match Percentage: @Math.Round(Model.MatchPercentage.Value)%
+                    </p>
+                    }*@
+                </div>
+            </div>
+            <!-- Right Side: Action Buttons -->
+            <div class="mt-2 flex gap-2 md:mt-0">
+                <!-- Applicant Buttons -->
+                @if (User.IsInRole("Applicant"))
+                {
+                    <!-- Save Job Button -->
+                    <button onclick="saveJobHandler('@Model.JobId')"
+                            class="flex items-center gap-1 rounded-md bg-[#E5E8ED] px-6 py-2 font-bold text-[#7A1515] hover:text-lg">
+                        <i class="fas fa-book"></i>
+                    </button>
+                    <!-- Apply Button -->
+                    <button onclick="applyJobHandler('@Model.JobId')"
+                            class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
+                        <i class="fas fa-paper-plane pl-2"></i> <text class="px-2">Apply</text>
+                    </button>
+                } 
+                @*Recruiter Buttons*@
+                else if(User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
+                {
+                    <!-- Edit Button -->
+                    <button onclick="applyJobHandler('@Model.JobId')"
+                            class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
+                        <i class="fas fa-edit action-icon pl-2"></i> <text class="px-2">Edit</text>
+                    </button>
+                }
+            </div>
+        </div>
+
+        <!-- Divider -->
+        <div class="mb-6 mt-4 border-b"></div>
+
+        <!-- Main Content -->
+        <div class="grid-cols-1 grid gap-6 md:grid-cols-2">
+            <!-- Skills Required -->
+            <div class="mt-6 rounded-lg border p-4">
+                <h3 class="mb-4 text-2xl font-bold">Skills Required:</h3>
+                <div class="flex flex-wrap gap-2">
+                    @foreach (var skill in Model.Skills)
+                    {
+                        <span class="rounded bg-yellow-600 px-2 py-0.5 text-sm font-semibold text-black">@skill.Name</span>
+                    }
+                </div>
+            </div>
+            <!-- Job Description -->
+            <div class="rounded-lg border p-4">
+                <h3 class="mb-4 text-2xl font-bold">Job Description:</h3>
+                <p class="whitespace-pre-wrap">@Model.Description</p>
+            </div>
+            <!-- Job Overview -->
+            <div class="rounded-lg border p-4">
+                <h3 class="mb-4 text-2xl font-bold">Job Overview:</h3>
+                <ul class="space-y-4">
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-user text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.PostedBy):</strong>
+                        <div>@Model.PostedBy.User?.FirstName</div>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-calendar-alt text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.CreatedDate):</strong>
+                        <div>@Model.CreatedDate</div>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-map-marker-alt text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.Location):</strong>
+                        <div>@Model.Location</div>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa fa-clock-o text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.Schedule):</strong>
+                        <text>@Model.Schedule.Days Days, @Model.Schedule.Hours Hours</text>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fas fa-money-bill-wave text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.Salary):</strong>
+                        <div>@Model.Salary</div>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa fa-graduation-cap text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.YearLevel):</strong>
+                        <text>@Model.YearLevel.Name</text>
+                    </li>
+                    <li class="flex items-center gap-3">
+                        <i class="fa fa-university text-xl"></i>
+                        <strong class="pl-1 pr-1">@Html.DisplayNameFor(model => model.Departments):</strong>
+                        <text>@string.Join(", ", (Model.Departments as List<Department>).Select(department => department.Name))</text>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- TempData for Notifications -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+        sessionStorage.setItem('filterByCompany', urlParams.get('filterByCompany') || '');
+        sessionStorage.setItem('filterByEmploymentType', urlParams.get('filterByEmploymentType') || '');
+        sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
+        sessionStorage.setItem('filterByWorkSetup', urlParams.get('filterByWorkSetup') || '');
+        sessionStorage.setItem('search', urlParams.get('search') || '');
+        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+
+        document.querySelector('.back-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            const baseUrl = '@Url.Action($"{aspAction}", "Job")';
+            const params = new URLSearchParams();
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('filterByCompany', sessionStorage.getItem('filterByCompany') || '');
+            params.set('filterByEmploymentType', sessionStorage.getItem('filterByEmploymentType') || '');
+            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
+            params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
+            params.set('search', sessionStorage.getItem('search') || '');
+            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        });
+    </script>
+}
+
+@functions {
+    public string GetEmploymentTypeClass(string type)
+    {
+        switch (type.ToLower())
+        {
+            case "full-time":
+                return "bg-green-200 text-green-800";
+            case "part-time":
+                return "bg-orange-200 text-orange-800";
+            case "contract":
+                return "bg-yellow-200 text-yellow-800";
+            default:
+                return "bg-gray-200 text-gray-800";
+        }
+    }
+}
