@@ -14,7 +14,6 @@ namespace WebApp.Controllers
     /// <summary>
     /// Home Controller
     /// </summary>
-    [Authorize]
     public class HomeController : ControllerBase<HomeController>
     {
         /// <summary>
@@ -25,6 +24,7 @@ namespace WebApp.Controllers
         /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="mapper"></param>
+        
         public HomeController(
                               IHttpContextAccessor httpContextAccessor,
                               ILoggerFactory loggerFactory,
@@ -38,12 +38,13 @@ namespace WebApp.Controllers
         /// </summary>
         /// <returns> Home View </returns>
         /// 
-        [Authorize]
-        public IActionResult Dashboard()
+        //[Authorize(Policy = "Applicant")]
+        public IActionResult Index()
         {
             return View();
         }
-
+        
+        [Authorize(Policy = "Admin")]
         public IActionResult Dashboard()
         {
             return View();

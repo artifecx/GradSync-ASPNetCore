@@ -37,7 +37,7 @@
 }
 
 <div class="nav-header flex items-center justify-between">
-    <h1 class="display-6 text-3xl font-semibold">Job Management</h1>
+    <h1 class="display-6 text-3xl font-bold text-[#7A1515]">Job Management</h1>
     <div class="flex items-center">
         <form method="get" asp-action="GetAll" asp-route-sortBy="@SortBy" asp-route-search="@Search" asp-route-pageIndex="@PageIndex" class="flex items-center">
             <div class="flex">
@@ -59,7 +59,7 @@
         </div>
         <div class="mr-3">
             <button type="button" class="btn notif-bell" id="notifBellBtn">
-                <i class="fa fa-bell px-1 text-gray-500 hover:text-blue-500"></i>
+                <i class="fa fa-bell px-1 text-gray-500 hover:text-[#7A1515]"></i>
             </button>
         </div>
         <div id="notificationModal" class="modal fixed-right fade" tabindex="-2" role="dialog">
