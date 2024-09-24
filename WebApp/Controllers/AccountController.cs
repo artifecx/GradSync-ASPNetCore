@@ -68,7 +68,11 @@ namespace WebApp.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                bool isAdminOrNLO = User.IsInRole("Admin") || User.IsInRole("NLO");
+                bool isRecruiter = User.IsInRole("Recruiter");
+                if (isAdminOrNLO) 
+                    return RedirectToAction("Dashboard", "Home");
+                return isRecruiter ? RedirectToAction("GetAllJobsRecruiter", "Job") : RedirectToAction("Index", "Home");
             }
 
             return await HandleExceptionAsync(async () =>
@@ -127,7 +131,7 @@ namespace WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Login(LoginViewModel model)
+        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             this._session.SetString("HasSession", "Exist");
 
@@ -138,7 +142,14 @@ namespace WebApp.Controllers
                 await this._signInManager.SignInAsync(user);
                 this._session.SetString("Email", user.Email);
                 this._session.SetString("UserId", user.UserId);
-                return RedirectToAction("Index", "Home");
+
+                bool isAdminOrNLO = string.Equals(user.RoleId, "Admin") || string.Equals(user.RoleId, "NLO");
+                bool isRecruiter = string.Equals(user.RoleId, "Recruiter"); 
+
+                if(isAdminOrNLO)
+                    return RedirectToAction("Dashboard", "Home");
+                else
+                    return isRecruiter ? RedirectToAction("GetAllJobsRecruiter", "Job")  : RedirectToAction("Index", "Home");
             }
             else
             {
