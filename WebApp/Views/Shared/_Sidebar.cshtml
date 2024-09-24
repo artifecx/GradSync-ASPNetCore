@@ -16,42 +16,45 @@
         <img src="~/img/logo1.png"
              class="w-48"
              alt="logo"
-             onclick="window.location.href = '@(User.IsInRole("Employee") ? Url.Action("GetAll", "Ticket") : Url.Action("Index", "Home"))';">
+             onclick="window.location.href = '@(isRecruiter ? Url.Action("GetAllJobsRecruiter", "Job") : Url.Action("Dashboard", "Home"))';">
     </div>
     <div class="mb-2 mt-5 font-semibold text-gray-700">Navigation</div>
     <ul class="flex-grow list-none">
-        @if (isSuper)
+        @if (isAdmin || isSuper)
         {
-            <li class="py-2">
-                <a asp-action="Index" asp-controller="Home" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "bg-gray-200" : "")">
-                    <i class="fa fa-area-chart mr-2"></i>
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="Dashboard" asp-controller="Home" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Home" ? "bg-gray-200" : "")">
+                    <i class="fa fa-area-chart mr-2 text-[#7A1515]"></i>
                     Dashboard
                 </a>
             </li>
-            <li class="py-2">
-                <a asp-action="GetAllUsers" asp-controller="User" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "bg-gray-200" : "")">
-                    <i class="fa fa-users mr-2"></i>
+        }
+        @if (isSuper)
+        {
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="GetAllUsers" asp-controller="User" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "User" ? "bg-gray-200" : "")">
+                    <i class="fa fa-users mr-2 text-[#7A1515]"></i>
                     Users
                 </a>
             </li>
         }
         @if (isAdmin && !isSuper)
         {
-            <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
-                    <i class="fa fa-building mr-2"></i>
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 text-[#7A1515]@(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
+                    <i class="fa fa-building mr-2 text-[#7A1515]"></i>
                     Companies
                 </a>
             </li>
-            <li class="py-2">
-                <a asp-action="GetAllJobsAdmin" asp-controller="Job" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "bg-gray-200" : "")">
-                    <i class="fa fa-suitcase mr-2"></i>
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="GetAllJobsAdmin" asp-controller="Job" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 text-[#7A1515]@(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "bg-gray-200" : "")">
+                    <i class="fa fa-suitcase mr-2 text-[#7A1515]"></i>
                     Jobs
                 </a>
             </li>
-            <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "bg-gray-200" : "")">
-                    <i class="fa fa-check-circle-o mr-2"></i>
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "bg-gray-200" : "")">
+                    <i class="fa fa-check-circle-o mr-2 text-[#7A1515]"></i>
                     Applications
                 </a>
             </li>
@@ -59,19 +62,19 @@
         @if (isRecruiter)
         {
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
+                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
                     <i class="fa fa-building mr-2"></i>
                     Company
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="GetAllJobsRecruiter" asp-controller="Job" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "bg-gray-200" : "")">
+                <a asp-action="GetAllJobsRecruiter" asp-controller="Job" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Job" ? "bg-gray-200" : "")">
                     <i class="fa fa-suitcase mr-2"></i>
                     Jobs
                 </a>
             </li>
             <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "bg-gray-200" : "")">
+                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200 @(ViewContext.RouteData.Values["Controller"].ToString() == "Application" ? "bg-gray-200" : "")">
                     <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
                 </a>
@@ -82,21 +85,21 @@
         </li>
         @if (!isAdmin)
         {
-            <li class="py-2">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200">
+            <li class="py-2 text-[#7A1515]">
+                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200">
                     <i class="fa fa-cog mr-2"></i> Settings
                 </a>
             </li>
         }
-        <li class="py-2">
-            <a href="#" data-toggle="modal" data-target="#logoutModal" class="flex items-center rounded px-2 py-1 hover:bg-gray-200">
+        <li class="py-2 text-[#7A1515]">
+            <a href="#" data-toggle="modal" data-target="#logoutModal" class="flex items-center rounded px-2 py-1 text-[#7A1515] hover:bg-gray-200">
                 <i class="fa fa-sign-out mr-2"></i>
                 Log out
             </a>
         </li>
     </ul>
-    <div class="mt-4 flex items-center rounded bg-gray-100 p-4">
-        <i class="fa fa-user-circle mr-3 text-4xl"></i>
+    <div class="mt-4 flex items-center rounded bg-gray-100 p-4 text-[#7A1515]">
+        <i class="fa fa-user-circle mr-3 text-4xl text-[#7A1515]"></i>
         <div>
             <span>@HttpContextAccessor.HttpContext.User.Identity.Name</span>
             @if (isSuper)
