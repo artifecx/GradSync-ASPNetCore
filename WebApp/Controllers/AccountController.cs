@@ -68,7 +68,8 @@ namespace WebApp.Controllers
         {
             if (User.Identity.IsAuthenticated)
             {
-                return RedirectToAction("Index", "Home");
+                return User.IsInRole("Admin") ? RedirectToAction("Dashboard", "Home") : RedirectToAction("Index", "Home");
+
             }
 
             return await HandleExceptionAsync(async () =>
@@ -138,7 +139,7 @@ namespace WebApp.Controllers
                 await this._signInManager.SignInAsync(user);
                 this._session.SetString("Email", user.Email);
                 this._session.SetString("UserId", user.UserId);
-                return RedirectToAction("Index", "Home");
+                return User.IsInRole("Admin") ? RedirectToAction("Dashboard", "Home") : RedirectToAction("Index", "Home");
             }
             else
             {
