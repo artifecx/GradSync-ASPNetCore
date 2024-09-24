@@ -27,8 +27,8 @@
     margin-top: auto;
     text-align: center; 
 }
-.poppins-medium {
-    font-family: 'Poppins', sans-serif;
+.inter-medium {
+    font-family: 'Inter', sans-serif;
     font-weight: 500;
     background: linear-gradient(-90deg, #052542 0%, #0D5EA8 100%);
     -webkit-background-clip: text;
