@@ -22,6 +22,8 @@ namespace Data.Repositories
                         .Include(j => j.Departments)
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.Company)
+                        .Include(j => j.PostedBy)
+                            .ThenInclude(r => r.User)
                         .Include(j => j.EmploymentType)
                         .Include(j => j.Schedule)
                         .Include(j => j.SetupType)
@@ -30,6 +32,9 @@ namespace Data.Repositories
 
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
+
+        public async Task<List<Job>> GetRecruiterJobsAsync(string userId) =>
+            await GetJobsWithIncludes().Where(j => string.Equals(j.PostedById, userId)).AsNoTracking().ToListAsync();
 
         public async Task AddJobAsync(Job job)
         {
@@ -50,7 +55,7 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<Job> FindJobByIdAsync(string id) =>
+        public async Task<Job> GetJobByIdAsync(string id) =>
             await GetJobsWithIncludes().FirstOrDefaultAsync(j => j.JobId == id);
 
         public async Task<List<Company>> GetCompaniesWithListingsAsync()
@@ -74,5 +79,13 @@ namespace Data.Repositories
         public async Task<List<SetupType>> GetWorkSetupsAsync() =>
             await this.GetDbSet<SetupType>().ToListAsync();
 
+        public async Task<List<YearLevel>> GetYearLevelsAsync() =>
+            await this.GetDbSet<YearLevel>().ToListAsync();
+
+        public async Task<List<Department>> GetDepartmentsAsync() =>
+            await this.GetDbSet<Department>().Include(d => d.College).ToListAsync();
+
+        public async Task<List<Skill>> GetSkillsAsync() =>
+            await this.GetDbSet<Skill>().ToListAsync();
     }
 }

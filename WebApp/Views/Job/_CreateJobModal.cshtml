@@ -1,0 +1,147 @@
+﻿@model Services.ServiceModels.JobViewModel
+@using Data.Models;
+
+@{
+    // Assuming you have these lists in your ViewBag for dropdowns and multi-selects
+    var EmploymentTypes = ViewBag.EmploymentTypes as List<EmploymentType>;
+    var SetupTypes = ViewBag.WorkSetups as List<SetupType>;
+    var YearLevels = ViewBag.YearLevels as List<YearLevel>;
+    var Departments = ViewBag.Departments as List<Department>;
+    var Skills = ViewBag.Skills as List<Skill>;
+}
+
+<div class="modal fade" id="createJobModal" tabindex="-1" role="dialog" aria-labelledby="createJobModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <form id="createJobForm" method="post" action="@Url.Action("CreateJob", "Job")">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="createJobModalLabel">Create Job</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <div class="modal-body">
+                    <!-- Job Title -->
+                    <div class="form-group">
+                        <label asp-for="Title" class="control-label"></label>
+                        <input asp-for="Title" class="form-control" id="createJobTitle" name="Title" maxlength="100" />
+                        <span asp-validation-for="Title" class="text-danger"></span>
+                        <span id="remainingTitleChars" class="text-muted small">100 characters remaining</span>
+                    </div>
+
+                    <!-- Job Description -->
+                    <div class="form-group">
+                        <label asp-for="Description" class="control-label"></label>
+                        <textarea asp-for="Description" class="form-control" id="createJobDescription" name="Description" maxlength="800"></textarea>
+                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <span id="remainingDescriptionChars" class="text-muted small">800 characters remaining</span>
+                    </div>
+
+                    <!-- Employment Type -->
+                    <div class="form-group">
+                        <label asp-for="EmploymentTypeId" class="control-label"></label>
+                        <select asp-for="EmploymentTypeId" class="form-control" id="createJobEmploymentTypeId" name="EmploymentTypeId">
+                            <option value="">-- Select Employment Type --</option>
+                            @foreach (var type in EmploymentTypes)
+                            {
+                                <option value="@type.EmploymentTypeId">@type.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="EmploymentTypeId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Setup Type -->
+                    <div class="form-group">
+                        <label asp-for="SetupTypeId" class="control-label"></label>
+                        <select asp-for="SetupTypeId" class="form-control" id="createJobSetupTypeId" name="SetupTypeId">
+                            <option value="">-- Select Setup Type --</option>
+                            @foreach (var setup in SetupTypes)
+                            {
+                                <option value="@setup.SetupTypeId">@setup.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="SetupTypeId" class="text-danger"></span>
+                    </div>
+
+                    <!-- Location -->
+                    <div class="form-group">
+                        <label asp-for="Location" class="control-label"></label>
+                        <input asp-for="Location" class="form-control" id="createJobLocation" name="Location" />
+                        <span asp-validation-for="Location" class="text-danger"></span>
+                    </div>
+
+                    <!-- Schedule -->
+                    <div class="form-group">
+                        <label class="control-label">Schedule</label>
+                        <div class="form-row">
+                            <div class="col">
+                                <label asp-for="Schedule.Days" class="control-label">Days</label>
+                                <input asp-for="Schedule.Days" class="form-control" id="createJobScheduleDays" name="Schedule.Days" />
+                                <span asp-validation-for="Schedule.Days" class="text-danger"></span>
+                            </div>
+                            <div class="col">
+                                <label asp-for="Schedule.Hours" class="control-label">Hours</label>
+                                <input asp-for="Schedule.Hours" class="form-control" id="createJobScheduleHours" name="Schedule.Hours" />
+                                <span asp-validation-for="Schedule.Hours" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Salary -->
+                    <div class="form-group">
+                        <label asp-for="Salary" class="control-label"></label>
+                        <input asp-for="Salary" class="form-control" id="createJobSalary" name="Salary" />
+                        <span asp-validation-for="Salary" class="text-danger"></span>
+                    </div>
+
+                    <div class="form-group">
+                        <label class="control-label">Schedule</label>
+                        <div class="form-row">
+                            <!-- Year Level -->
+                            <div class="col">
+                                <label asp-for="YearLevelId" class="control-label"></label>
+                                <select asp-for="YearLevelId" class="form-control" id="createJobYearLevelId" name="YearLevelId">
+                                    <option value="">-- Select Year Level --</option>
+                                    @foreach (var yearLevel in YearLevels)
+                                    {
+                                        <option value="@yearLevel.YearLevelId">@yearLevel.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="YearLevelId" class="text-danger"></span>
+                            </div>
+                            <!-- Departments -->
+                            <div class="col">
+                                <label asp-for="Departments" class="control-label"></label>
+                                <select asp-for="Departments" class="form-control" id="createJobDepartments" name="Departments" multiple>
+                                    @foreach (var department in Departments)
+                                    {
+                                        <option value="@department.DepartmentId">@department.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="Departments" class="text-danger"></span>
+                            </div>
+                        </div>
+                    </div> 
+
+                    <!-- Skills -->
+                    <div class="form-group">
+                        <label asp-for="Skills" class="control-label"></label>
+                        <select asp-for="Skills" class="form-control" id="createJobSkills" name="Skills" multiple>
+                            @foreach (var skill in Skills)
+                            {
+                                <option value="@skill.SkillsId">@skill.Name</option>
+                            }
+                        </select>
+                        <span asp-validation-for="Skills" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Create</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

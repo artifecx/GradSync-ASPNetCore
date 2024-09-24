@@ -16,10 +16,17 @@ namespace Services.Interfaces
             string sortBy, string search, string filterByCompany, 
             string filterByEmploymentType, string filterByStatusType, 
             string filterByWorkSetup, int pageIndex, int pageSize);
+        Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
+            string sortBy, string search, string filterByCompany,
+            string filterByEmploymentType, string filterByStatusType,
+            string filterByWorkSetup, int pageIndex, int pageSize);
         Task<JobViewModel> GetJobByIdAsync(string id);
         Task<List<Company>> GetCompaniesWithListingsAsync();
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();
         Task<List<SetupType>> GetWorkSetupsAsync();
+        Task<List<Department>> GetDepartmentsAsync();
+        Task<List<YearLevel>> GetYearLevelsAsync();
+        Task<List<Skill>> GetSkillsAsync();
     }
 }

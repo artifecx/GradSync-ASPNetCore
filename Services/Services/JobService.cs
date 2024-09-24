@@ -11,6 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Resources.Messages;
+using System.Globalization;
 
 namespace Services.Services
 {
@@ -21,6 +22,7 @@ namespace Services.Services
     {
         private readonly IJobRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         public JobService(
             IJobRepository repository,
@@ -30,6 +32,7 @@ namespace Services.Services
         {
             _repository = repository;
             _mapper = mapper;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task AddJobAsync(JobViewModel model)
@@ -54,14 +57,43 @@ namespace Services.Services
             string filterByWorkSetup, int pageIndex, int pageSize)
         {
             var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
+            jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
+                filterByEmploymentType, filterByStatusType, filterByWorkSetup);
 
+            var count = jobs.Count;
+            var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
+        }
+
+        public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
+            string sortBy, string search, string filterByCompany,
+            string filterByEmploymentType, string filterByStatusType,
+            string filterByWorkSetup, int pageIndex, int pageSize)
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
+            jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
+                filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+
+            var count = jobs.Count;
+            var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
+        }
+
+        private async Task<List<JobViewModel>> FilterAndSortJobs(
+            List<JobViewModel> jobs, string sortBy, string search, 
+            string filterByCompany, string filterByEmploymentType, 
+            string filterByStatusType, string filterByWorkSetup)
+        {
             if (!string.IsNullOrEmpty(search))
             {
                 // TODO: Add more search filters
                 jobs = jobs.Where(job => job.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
             }
 
-            if(!string.IsNullOrEmpty(filterByCompany))
+            if (!string.IsNullOrEmpty(filterByCompany))
             {
                 jobs = jobs.Where(job => job.Company.Name == filterByCompany).ToList();
             }
@@ -87,10 +119,7 @@ namespace Services.Services
                 _ => jobs.OrderBy(j => j.CreatedDate).ToList(),
             };
 
-            var count = jobs.Count;
-            var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
+            return jobs;
         }
 
         /// <summary>
@@ -99,7 +128,7 @@ namespace Services.Services
         /// <param name="id">The team identifier.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the team view model.</returns>
         public async Task<JobViewModel> GetJobByIdAsync(string id) =>
-            _mapper.Map<JobViewModel>(await _repository.FindJobByIdAsync(id));
+            _mapper.Map<JobViewModel>(await _repository.GetJobByIdAsync(id));
 
         public async Task<List<Company>> GetCompaniesWithListingsAsync() =>
             await _repository.GetCompaniesWithListingsAsync();
@@ -112,6 +141,15 @@ namespace Services.Services
 
         public async Task<List<SetupType>> GetWorkSetupsAsync() =>
             await _repository.GetWorkSetupsAsync();
+
+        public async Task<List<Department>> GetDepartmentsAsync() =>
+            await _repository.GetDepartmentsAsync();
+
+        public async Task<List<Skill>> GetSkillsAsync() =>
+            await _repository.GetSkillsAsync();
+
+        public async Task<List<YearLevel>> GetYearLevelsAsync() =>
+            await _repository.GetYearLevelsAsync();
 
         #endregion Get Methods
     }

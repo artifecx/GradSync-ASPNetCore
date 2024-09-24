@@ -49,62 +49,129 @@ namespace WebApp.Controllers
         #region GET Methods 
         [HttpGet]
         [Authorize(Policy = "Admin")]
-        [Route("all")]
-        public async Task<IActionResult> GetAll(
-            string SortBy, 
-            string Search, 
-            string FilterByCompany, 
-            string FilterByEmploymentType, 
-            string FilterByStatusType, 
-            string FilterByWorkSetup, 
-            int PageIndex = 1)
+        [Route("admin/all")]
+        public async Task<IActionResult> GetAllJobsAdmin(
+            string sortBy, 
+            string search, 
+            string filterByCompany, 
+            string filterByEmploymentType, 
+            string filterByStatusType, 
+            string filterByWorkSetup, 
+            int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetAllJobsAsync(SortBy, Search, FilterByCompany, FilterByEmploymentType, FilterByStatusType, FilterByWorkSetup, PageIndex, 5);
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
 
-                ViewData["SortBy"] = SortBy;
-                ViewData["Search"] = Search;
-                ViewData["FilterByCompany"] = FilterByCompany;
-                ViewData["FilterByEmploymentType"] = FilterByEmploymentType;
-                ViewData["FilterByStatusType"] = FilterByStatusType;
-                ViewData["FilterByWorkSetup"] = FilterByWorkSetup;
-
+                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
                 ViewBag.Companies = await _jobService.GetCompaniesWithListingsAsync();
-                ViewBag.EmploymentTypes = await _jobService.GetEmploymentTypesAsync();
-                ViewBag.StatusTypes = await _jobService.GetStatusTypesAsync();
-                ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
 
-                return View("ViewAll", jobs);
+                return View("Index", jobs);
             }, "GetAll");
         }
 
+        [HttpGet]
+        [Authorize(Policy = "Recruiter")]
+        [Route("recruiter/all")]
+        public async Task<IActionResult> GetAllJobsRecruiter(
+            string sortBy,
+            string search,
+            string filterByCompany,
+            string filterByEmploymentType,
+            string filterByStatusType,
+            string filterByWorkSetup,
+            int pageIndex = 1)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
+
+                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+
+                return View("Index", jobs);
+            }, "GetAll");
+        }
+
+        private async Task InitializeValues(
+            string sortBy,
+            string search,
+            string filterByCompany,
+            string filterByEmploymentType,
+            string filterByStatusType,
+            string filterByWorkSetup)
+        {
+            ViewData["SortBy"] = sortBy;
+            ViewData["Search"] = search;
+            ViewData["FilterByCompany"] = filterByCompany;
+            ViewData["FilterByEmploymentType"] = filterByEmploymentType;
+            ViewData["FilterByStatusType"] = filterByStatusType;
+            ViewData["FilterByWorkSetup"] = filterByWorkSetup;
+
+            await PopulateViewBagsAsync();
+        }
+
+        private async Task PopulateViewBagsAsync()
+        {
+            ViewBag.EmploymentTypes = await _jobService.GetEmploymentTypesAsync();
+            ViewBag.StatusTypes = await _jobService.GetStatusTypesAsync();
+            ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
+            ViewBag.YearLevels = await _jobService.GetYearLevelsAsync();
+            ViewBag.Departments = await _jobService.GetDepartmentsAsync();
+            ViewBag.Skills = await _jobService.GetSkillsAsync();
+        }
+
         /// <summary>
-        /// Views the selected team.
+        /// Views the selected job.
         /// </summary>
         /// <param name="id">The identifier.</param>
         /// <param name="showModal">The show modal.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpGet]
-        [Authorize(Policy = "Admin")]
+        [Authorize]
         [Route("view")]
-        public async Task<IActionResult> ViewTeam(string id, string showModal = null)
+        public async Task<IActionResult> GetJob(string id, string showModal = null)
         {
             return await HandleExceptionAsync(async () =>
             {
-                return Json(new { success = false });
-            }, "ViewTeam");
+                if (string.IsNullOrEmpty(id))
+                {
+                    TempData["ErrorMessage"] = "Invalid job id!";
+                    return RedirectToAction(RedirectString());
+                }
+
+                var job = await _jobService.GetJobByIdAsync(id);
+                if (job == null)
+                {
+                    TempData["ErrorMessage"] = "Job not found!";
+                    return RedirectToAction(RedirectString());
+                }
+
+                ViewBag.ShowModal = showModal;
+                ViewBag.UserId = UserId;
+                await PopulateViewBagsAsync();
+
+                return View("ViewJob", job);
+            }, "ViewJob");
+        }
+
+        private string RedirectString()
+        {
+            bool isRecruiter = User.IsInRole("Recruiter");
+            bool isApplicant = User.IsInRole("Applicant");
+            if (isApplicant) return "GetAllJobsApplicant";
+
+            return isRecruiter ? "GetAllJobsRecruiter" : "GetAllJobsAdmin";
         }
         #endregion GET Methods
 
         #region POST Methods        
         /// <summary>
-        /// Creates a new team.
+        /// Creates a new job.
         /// </summary>
-        /// <param name="model">The team view model.</param>
+        /// <param name="model">The job view model.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
+        [Authorize(Policy = "Recruiter")]
         [Route("create")]
         public async Task<IActionResult> Create(JobViewModel model)
         {
@@ -121,12 +188,12 @@ namespace WebApp.Controllers
         }
 
         /// <summary>
-        /// Updates the selected team.
+        /// Updates the selected job.
         /// </summary>
-        /// <param name="model">The team view model.</param>
+        /// <param name="model">The job view model.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
+        [Authorize(Policy = "AdminOrRecruiter")]
         [Route("update")]
         public async Task<IActionResult> Update(JobViewModel model)
         {
@@ -144,81 +211,19 @@ namespace WebApp.Controllers
         }
 
         /// <summary>
-        /// Deletes the selected team.
+        /// Deletes the selected job.
         /// </summary>
-        /// <param name="id">The team identifier.</param>
+        /// <param name="id">The job identifier.</param>
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
-        [Authorize(Policy = "Admin")]
+        [Authorize(Policy = "AdminOrRecruiter")]
         [Route("delete")]
         public async Task<IActionResult> Delete(string id)
         {
             return await HandleExceptionAsync(async () =>
             {
-                //if (ModelState.IsValid)
-                //{
-                //    await _teamService.DeleteAsync(id);
-                //    TempData["SuccessMessage"] = Common.SuccessDeleteTeam;
-                //    return Json(new { success = true });
-                //}
-                //TempData["ErrorMessage"] = Errors.ErrorDeleteTeam;
                 return Json(new { success = false });
             }, "Delete");
-        }
-
-        /// <summary>
-        /// Assigns an agent to a team.
-        /// </summary>
-        /// <param name="teamId">The team identifier.</param>
-        /// <param name="agentId">The agent identifier.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
-        [HttpPost]
-        [Authorize(Policy = "Admin")]
-        [Route("assignagent")]
-        public async Task<IActionResult> AssignAgent(string teamId, string agentId)
-        {
-            return await HandleExceptionAsync(async () =>
-            {
-                //if (ModelState.IsValid)
-                //{
-                //    await _teamService.AddTeamMemberAsync(teamId, agentId);
-                //    TempData["SuccessMessage"] = Common.SuccessAssignAgent;
-                //    return Json(new { success = true });
-                //}
-                //TempData["ErrorMessage"] = Errors.ErrorAssignAgent;
-                return Json(new { success = false });
-            }, "AssignAgent");
-        }
-
-        /// <summary>
-        /// Reassigns an agent to a different team.
-        /// </summary>
-        /// <param name="oldTeamId">The old team identifier.</param>
-        /// <param name="newTeamId">The new team identifier.</param>
-        /// <param name="agentId">The agent identifier.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
-        [HttpPost]
-        [Authorize(Policy = "Admin")]
-        [Route("reassignagent")]
-        public async Task<IActionResult> ReassignAgent(string oldTeamId, string newTeamId, string agentId)
-        {
-            return await HandleExceptionAsync(async () =>
-            {
-                if (ModelState.IsValid)
-                {
-                    //await _teamService.RemoveTeamMemberAsync(oldTeamId, agentId);
-                    //if (!string.IsNullOrEmpty(newTeamId))
-                    //{
-                    //    await _teamService.AddTeamMemberAsync(newTeamId, agentId);
-                    //}
-
-                    TempData["SuccessMessage"] = string.IsNullOrEmpty(newTeamId) ?
-                        Common.SuccessUnassignAgent : Common.SuccessReassignAgent;
-                    return Json(new { success = true });
-                }
-                TempData["ErrorMessage"] = Errors.ErrorReassignAgent;
-                return Json(new { success = false });
-            }, "ReassignAgent");
         }
         #endregion POST Methods
     }
