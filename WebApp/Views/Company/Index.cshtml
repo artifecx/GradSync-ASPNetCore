@@ -1,0 +1,235 @@
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.CompanyViewModel>
+
+@{
+    ViewData["Title"] = "All Companies";
+    // await Html.RenderPartialAsync("_AddUserModal", new Services.ServiceModels.UserViewModel());
+    // await Html.RenderPartialAsync("_ResetPasswordModal");
+    // await Html.RenderPartialAsync("_DeleteModal");
+
+    string aspAction = "GetAllCompanies";
+
+    string search = ViewData["Search"] as string;
+    string sortBy = ViewData["SortBy"] as string;
+    bool? verified = ViewData["Verified"] as bool?;
+    bool? hasValidMOA = ViewData["HasValidMOA"] as bool?;
+    int pageIndex = Model.PageIndex;
+
+    string sortByName = string.IsNullOrEmpty(sortBy) ? "name_desc" : null;
+    string sortByActiveListings = string.Equals(sortBy, "jobs") ? "jobs_desc" : "jobs";
+}
+
+<div class="nav-header flex items-center justify-between">
+    <h1 class="display-6 text-3xl font-semibold text-[#7A1515]">Company Management</h1>
+    <div class="flex items-center">
+        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+            <div class="flex">
+                <input type="text" name="filterBy" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Company name" value="@search" />
+                <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-[#7A1515] px-3 py-2 text-white hover:border-[#991b1b]">
+                    <i class="fa fa-search"></i>
+                </button>
+            </div>
+            <input type="hidden" name="sortBy" value="@sortBy" />
+        </form>
+    </div>
+</div>
+
+<div class="container-fluid px-4 py-3">
+    <table class="table-white table min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <a asp-action="@aspAction" asp-route-sortBy="@sortByName" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA" class="text-black hover:text-blue-500">
+                        @Html.DisplayNameFor(model => model.First().Name)
+                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                    </a>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    @Html.DisplayNameFor(model => model.First().ContactEmail)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    @Html.DisplayNameFor(model => model.First().ContactNumber)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    @Html.DisplayNameFor(model => model.First().Address)
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <a asp-action="@aspAction" asp-route-sortBy="@sortByActiveListings" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA" class="text-black hover:text-blue-500">
+                        @Html.DisplayNameFor(model => model.First().ActiveJobListings)
+                        @(string.Equals(sortBy, "jobs") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                    </a>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="verifiedDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (!verified.HasValue)
+                            {
+                                @Html.DisplayNameFor(model => model.First().IsVerified)
+                            }
+                            else
+                            {
+                                <text>@(verified == true ? "Verified" : "Unverified")</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="verifiedDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA="@hasValidMOA"
+                               asp-route-verified="">All</a>
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA="@hasValidMOA"
+                               asp-route-verified="true">Verified</a>
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA="@hasValidMOA"
+                               asp-route-verified="false">Unverified</a>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                    <div class="dropdown relative">
+                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="verifiedDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            @if (!hasValidMOA.HasValue)
+                            {
+                                @Html.DisplayNameFor(model => model.First().HasValidMOA)
+                            }
+                            else
+                            {
+                                <text>@(hasValidMOA == true ? "With MOA" : "No MOA")</text>
+                            }
+                            <i class="fa-solid fa-chevron-down"></i>
+                        </a>
+                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="verifiedDropdown">
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA=""
+                               asp-route-verified="@verified">All</a>
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA="true"
+                               asp-route-verified="@verified">With MOA</a>
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-hasValidMOA="false"
+                               asp-route-verified="@verified">No MOA</a>
+                        </div>
+                    </div>
+                </th>
+                <th class="px-6 py-3"></th>
+            </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+            @if (!Model.Any())
+            {
+                <tr>
+                    <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+                        @(string.IsNullOrEmpty(search) ? Html.Raw("No companies found") : Html.Raw("No companies found matching the criteria"))
+                    </td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var item in Model)
+                {
+                    @*await Html.RenderPartialAsync("_EditUserModal", item);*@
+                    <tr>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Name)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.ContactEmail)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.ContactNumber)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.Address)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @Html.DisplayFor(modelItem => item.ActiveJobListings)
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @if (item.IsVerified)
+                            {
+                                <span>&#10004;</span>
+                            }
+                            else
+                            {
+                                <span>&#10006;</span>
+                            }
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            @if (item.HasValidMOA)
+                            {
+                                <span>&#10004;</span>
+                            }
+                            else
+                            {
+                                <span>&#10006;</span>
+                            }
+                        </td>
+                        <td>
+                            @Html.ActionLink("", "GetCompany", new
+                                {
+                                    id = item.CompanyId,
+                                    sortBy = sortBy,
+                                    verified = verified,
+                                    hasValidMOA = hasValidMOA,
+                                    search = search,
+                                    pageIndex = Model.PageIndex
+                                }, new { @class = "fas fa-info-circle action-icon" }) |
+                            @Html.ActionLink("", "GetCompany", new { id = item.CompanyId, showModal = "editCompany" }, new { @class = "fas fa-edit action-icon" }) |
+                            <button type="button" onclick="displayDeleteModal('@item.CompanyId', '@item.Name')" class="action-icon mx-1">
+                                <i class="fa fa-archive" aria-hidden="true"></i>
+                                <span class="sr-only">Archive</span>
+                            </button>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+
+    <nav class="mt-4 flex justify-end">
+        <ul class="pagination flex items-center">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA">Previous</a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA">@i</a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA">Next</a>
+                </li>
+            }
+        </ul>
+    </nav>
+</div>
+
+<!-- Values passed to the js files -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+}
