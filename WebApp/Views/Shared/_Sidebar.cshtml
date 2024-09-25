@@ -41,7 +41,7 @@
         @if (isAdmin && !isSuper)
         {
             <li class="py-2 text-[#7A1515]">
-                <a asp-action="" asp-controller="" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 text-[#7A1515]@(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
+                <a asp-action="GetAllCompanies" asp-controller="Company" class="flex items-center rounded px-2 py-1 hover:bg-gray-200 text-[#7A1515]@(ViewContext.RouteData.Values["Controller"].ToString() == "Company" ? "bg-gray-200" : "")">
                     <i class="fa fa-building mr-2 text-[#7A1515]"></i>
                     Companies
                 </a>
