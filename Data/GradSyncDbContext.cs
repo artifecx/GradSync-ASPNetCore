@@ -100,7 +100,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.User).WithOne(p => p.Admin)
                 .HasForeignKey<Admin>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Admin_User");
         });
 
@@ -118,15 +117,16 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.EducationalDetails).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.EducationalDetailsId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Applicant_EducationalDetails");
 
             entity.HasOne(d => d.Resume).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.ResumeId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Applicant_Resume");
 
             entity.HasOne(d => d.User).WithOne(p => p.Applicant)
                 .HasForeignKey<Applicant>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Applicant_User");
 
             entity.HasMany(d => d.Skills).WithMany(p => p.Users)
@@ -134,11 +134,9 @@ public partial class GradSyncDbContext : DbContext
                     "ApplicantSkill",
                     r => r.HasOne<Skill>().WithMany()
                         .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_ApplicantSkills_Skills"),
                     l => l.HasOne<Applicant>().WithMany()
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_ApplicantSkills_Applicant"),
                     j =>
                     {
@@ -182,7 +180,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.Job).WithMany(p => p.Applications)
                 .HasForeignKey(d => d.JobId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Application_Job");
 
             entity.HasOne(d => d.User).WithMany(p => p.Applications)
@@ -267,10 +264,12 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.CompanyLogo).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.CompanyLogoId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Company_CompanyLogo");
 
             entity.HasOne(d => d.MemorandumOfAgreement).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.MemorandumOfAgreementId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Company_MOA");
         });
 
@@ -316,7 +315,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.College).WithMany(p => p.Departments)
                 .HasForeignKey(d => d.CollegeId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Department_College");
         });
 
@@ -418,7 +416,6 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.PostedBy).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.PostedById)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Job_Recruiter");
 
             entity.HasOne(d => d.Schedule).WithMany(p => p.Jobs)
@@ -446,11 +443,9 @@ public partial class GradSyncDbContext : DbContext
                     "JobDepartment",
                     r => r.HasOne<Department>().WithMany()
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_JobDepartment_Department"),
                     l => l.HasOne<Job>().WithMany()
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_JobDepartment_Job"),
                     j =>
                     {
@@ -465,11 +460,9 @@ public partial class GradSyncDbContext : DbContext
                     "JobSkill",
                     r => r.HasOne<Skill>().WithMany()
                         .HasForeignKey("SkillsId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_JobSkills_Skills"),
                     l => l.HasOne<Job>().WithMany()
                         .HasForeignKey("JobId")
-                        .OnDelete(DeleteBehavior.ClientSetNull)
                         .HasConstraintName("FK_JobSkills_Job"),
                     j =>
                     {
@@ -519,11 +512,11 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.Company).WithMany(p => p.Recruiters)
                 .HasForeignKey(d => d.CompanyId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_Recruiter_Company");
 
             entity.HasOne(d => d.User).WithOne(p => p.Recruiter)
                 .HasForeignKey<Recruiter>(d => d.UserId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK_Recruiter_User");
         });
 
@@ -683,6 +676,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.Avatar).WithMany(p => p.Users)
                 .HasForeignKey(d => d.AvatarId)
+                .OnDelete(DeleteBehavior.Cascade)
                 .HasConstraintName("FK_User_Avatar");
 
             entity.HasOne(d => d.Role).WithMany(p => p.Users)
