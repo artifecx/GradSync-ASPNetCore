@@ -15,6 +15,6 @@ namespace Data.Interfaces
         Task ArchiveCompanyAsync(string companyId);
         Task<Company> GetCompanyByIdAsync(string id);
         bool HasChanges(Company company);
-        bool CompanyExists(Company company);
+        bool CompanyExists(Company company, string excludeCompanyId = null);
     }
 }

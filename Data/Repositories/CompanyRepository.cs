@@ -117,7 +117,7 @@ namespace Data.Repositories
             return entry.Properties.Any(p => p.IsModified);
         }
 
-        public bool CompanyExists(Company company)
+        public bool CompanyExists(Company company, string excludeCompanyId = null)
         {
             var dbSet = this.GetDbSet<Company>();
 
@@ -126,7 +126,7 @@ namespace Data.Repositories
             string prefix = company.Name.Substring(0, Math.Min(3, company.Name.Length)).ToLowerInvariant();
 
             var companies = dbSet
-                .Where(c => !c.IsArchived && c.Name.ToLower().StartsWith(prefix))
+                .Where(c => !c.IsArchived && c.CompanyId != excludeCompanyId && c.Name.ToLower().StartsWith(prefix))
                 .Select(c => new { c.CompanyId, c.Name })
                 .ToList();
 
@@ -142,7 +142,7 @@ namespace Data.Repositories
             return false;
         }
 
-        private string NormalizeCompanyName(string name)
+        private static string NormalizeCompanyName(string name)
         {
             return name
                 .Replace(" ", "")
@@ -152,7 +152,7 @@ namespace Data.Repositories
                 .ToLowerInvariant();
         }
 
-        private bool AreNamesSimilar(string name1, string name2)
+        private static bool AreNamesSimilar(string name1, string name2)
         {
             int similarityRatio = Fuzz.TokenSetRatio(name1, name2);
 
