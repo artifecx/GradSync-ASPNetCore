@@ -2,9 +2,8 @@
 
 @{
     ViewData["Title"] = "All Companies";
-    // await Html.RenderPartialAsync("_AddUserModal", new Services.ServiceModels.UserViewModel());
-    // await Html.RenderPartialAsync("_ResetPasswordModal");
-    // await Html.RenderPartialAsync("_DeleteModal");
+    await Html.RenderPartialAsync("_AddCompanyModal", new Services.ServiceModels.CompanyViewModel());
+    await Html.RenderPartialAsync("_DeleteModal"); 
 
     string aspAction = "GetAllCompanies";
 
@@ -30,6 +29,15 @@
             </div>
             <input type="hidden" name="sortBy" value="@sortBy" />
         </form>
+        @if (User.IsInRole("NLO"))
+        {
+            <div class="mx-3">
+                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#addCompanyModal">
+                    <i class="fa fa-plus"></i>
+                    Add Company
+                </button>
+            </div>
+        }
     </div>
 </div>
 
@@ -229,7 +237,11 @@
 
 <!-- Values passed to the js files -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action("GetAllCompanies", "Company")" />
+<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Company")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/archive.js"></script>
+    <script src="~/js/company.js"></script>
 }

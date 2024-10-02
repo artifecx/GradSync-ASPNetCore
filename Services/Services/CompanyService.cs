@@ -12,6 +12,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using Resources.Messages;
 using System.Globalization;
+using static Services.Exceptions.UserExceptions;
+using static Services.Exceptions.CompanyExceptions;
+using Services.Manager;
 
 namespace Services.Services
 {
@@ -22,35 +25,48 @@ namespace Services.Services
     {
         private readonly ICompanyRepository _repository;
         private readonly IMapper _mapper;
-        private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IJobRepository _jobRepository;
+        private readonly IAccountService _accountService;
 
         public CompanyService(
             ICompanyRepository repository,
             IMapper mapper,
             ILogger<CompanyService> logger,
-            IHttpContextAccessor httpContextAccessor,
-            IJobRepository jobRepository)
+            IAccountService accountService)
         {
             _repository = repository;
             _mapper = mapper;
-            _httpContextAccessor = httpContextAccessor;
-            _jobRepository = jobRepository;
+            _accountService = accountService;
         }
 
-        public async Task AddCompanysync(CompanyViewModel model)
+        public async Task AddCompanyAsync(CompanyViewModel model)
         {
-            throw new NotImplementedException();
+            var company = _mapper.Map<Company>(model);
+            if (_repository.CompanyExists(company))
+                throw new CompanyException("Company with the same name already exists.");
+
+            company.CompanyId = Guid.NewGuid().ToString();
+
+            if (string.Equals(_accountService.GetCurrentUserRole(), "NLO"))
+                company.IsVerified = true;
+            else
+                throw new CompanyException("Could not verify user to enable adding companies.");
+
+            await _repository.AddCompanyAsync(company);
         }
 
         public async Task UpdateCompanyAsync(CompanyViewModel model)
         {
-            throw new NotImplementedException();
-        }
+            var company = await _repository.GetCompanyByIdAsync(model.CompanyId);
 
-        public async Task DeleteCompanyAsync(string id)
-        {
-            throw new NotImplementedException();
+            if (company == null)
+                throw new CompanyException("Company not found.");
+
+            _mapper.Map(model, company);
+
+            if (!_repository.HasChanges(company))
+                throw new CompanyException("No changes detected.");
+
+            await _repository.UpdateCompanyAsync(company);
         }
 
         #region Get Methods        
@@ -122,5 +138,8 @@ namespace Services.Services
         public async Task<CompanyViewModel> GetCompanyByIdAsync(string id) =>
             _mapper.Map<CompanyViewModel>(await _repository.GetCompanyByIdAsync(id));
         #endregion Get Methods
+
+        public async Task ArchiveCompanyAsync(string companyId) =>
+            await _repository.ArchiveCompanyAsync(companyId);
     }
 }

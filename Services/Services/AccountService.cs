@@ -12,6 +12,7 @@ using static Services.Exceptions.UserExceptions;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
 using Data.Repositories;
+using Microsoft.AspNetCore.Http;
 
 namespace Services.Services
 {
@@ -19,16 +20,18 @@ namespace Services.Services
     {
         private readonly IUserRepository _repository;
         private readonly IMapper _mapper;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountService"/> class.
         /// </summary>
         /// <param name="repository">The repository.</param>
         /// <param name="mapper">The mapper.</param>
-        public AccountService(IUserRepository repository, IMapper mapper)
+        public AccountService(IUserRepository repository, IMapper mapper, IHttpContextAccessor httpContextAccessor)
         {
             _mapper = mapper;
             _repository = repository;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public void RegisterUser(AccountServiceModel model)
@@ -92,5 +95,8 @@ namespace Services.Services
 
         public bool UserExists(string Email) =>
             _repository.GetAllUsersAsync().Result.Exists(x => x.Email == Email);
+
+        public string GetCurrentUserRole() =>
+            _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     }
 }
