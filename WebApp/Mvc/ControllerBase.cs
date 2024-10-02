@@ -11,9 +11,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
-using Services.Exceptions;
-using static Services.Exceptions.TicketExceptions;
-using static Services.Exceptions.TeamExceptions;
+using static Services.Exceptions.CompanyExceptions;
 using static Services.Exceptions.UserExceptions;
 using Services.Interfaces;
 using System.Collections.Generic;
@@ -157,18 +155,40 @@ namespace WebApp.Mvc
         /// Starts the log.
         /// </summary>
         /// <param name="methodName">Name of the method.</param>
-        public void StartLog(string methodName)
+        public void StartLog(object action, string methodName)
         {
-            _logger.LogInformation($"=======Ticket : {methodName} Started=======");
+            string controllerName = GetControllerNameFromAction(action);
+            _logger.LogInformation($"======={controllerName} : {methodName} Started=======");
         }
 
         /// <summary>
         /// Ends the log.
         /// </summary>
         /// <param name="methodName">Name of the method.</param>
-        public void EndLog(string methodName)
+        public void EndLog(object action, string methodName)
         {
-            _logger.LogInformation($"=======Ticket : {methodName} Ended=======");
+            string controllerName = GetControllerNameFromAction(action);
+            _logger.LogInformation($"======={controllerName} : {methodName} Ended=======");
+        }
+
+        private string GetControllerNameFromAction(object action)
+        {
+            if (action is Delegate del)
+            {
+                var methodInfo = del.Method;
+                var controllerType = methodInfo.DeclaringType;
+                var controllerName = controllerType.DeclaringType?.Name != null ? 
+                    controllerType.DeclaringType.Name : controllerType.Name;
+
+                if (controllerName.EndsWith("Controller"))
+                {
+                    controllerName = controllerName.Substring(0, controllerName.Length - "Controller".Length);
+                }
+
+                return controllerName;
+            }
+
+            return "UnknownController";
         }
 
         #region Exception Handlers
@@ -181,7 +201,7 @@ namespace WebApp.Mvc
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return action();
             }
             catch (Exception ex)
@@ -191,14 +211,14 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
         public JsonResult HandleException(Func<JsonResult> action, string actionName)
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return action();
             }
             catch (Exception ex)
@@ -208,7 +228,7 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
 
@@ -216,7 +236,7 @@ namespace WebApp.Mvc
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return action();
             }
             catch (Exception ex)
@@ -226,7 +246,7 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
         #endregion Exception Handlers
@@ -258,24 +278,24 @@ namespace WebApp.Mvc
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return await action();
             }
-            catch (TeamNameAlreadyExistsException ex) when (LogAndSetErrorMessage(ex, actionName))
+            catch (UserException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 return RedirectToAction(actionName);
             }
-            catch (DuplicateTicketException ex) when (LogAndSetErrorMessage(ex, actionName))
-            {
-                return RedirectToAction(actionName);
-            }
-            catch (NoChangesException ex) when (LogAndSetErrorMessage(ex, actionName))
+            catch (UserException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 return RedirectToAction(actionName, new { id = ex.Id });
             }
-            catch (InvalidFileException ex) when (LogAndSetErrorMessage(ex, actionName))
+            catch (CompanyException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
-                return HandleRedirect(actionName, ex.Id);
+                return RedirectToAction(actionName);
+            }
+            catch (CompanyException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName, new { id = ex.Id });
             }
             catch (Exception ex)
             {
@@ -284,7 +304,7 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
 
@@ -292,28 +312,22 @@ namespace WebApp.Mvc
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return await action();
             }
-            catch (TeamException ex)
-            {
-                TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
-                return new JsonResult(new { success = false, error = ex.Message });
-            }
-            catch (TicketException ex)
-            {
-                TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
-                return new JsonResult(new { success = false, error = ex.Message });
-            }
-            catch (InvalidOperationException ex)
+            catch (CompanyException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
                 _logger.LogError(ex, $"Error in {actionName}");
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (UserException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+                _logger.LogError(ex, $"Error in {actionName}");
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+            catch (InvalidOperationException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
                 _logger.LogError(ex, $"Error in {actionName}");
@@ -326,7 +340,7 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
 
@@ -334,7 +348,7 @@ namespace WebApp.Mvc
         {
             try
             {
-                StartLog(actionName);
+                StartLog(action, actionName);
                 return await action();
             }
             catch (Exception ex)
@@ -344,7 +358,7 @@ namespace WebApp.Mvc
             }
             finally
             {
-                EndLog(actionName);
+                EndLog(action, actionName);
             }
         }
 

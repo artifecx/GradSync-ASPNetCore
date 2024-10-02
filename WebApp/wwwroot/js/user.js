@@ -73,8 +73,6 @@ function submitEditUser() {
         return;
     }
 
-    console.log("valid result: " + form.valid());
-
     var formData = form.serialize();
 
     $.ajax({

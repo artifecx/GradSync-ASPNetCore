@@ -65,7 +65,7 @@ namespace WebApp.Controllers
                 await InitializeValues(sortBy, search, verified, hasValidMOA);
 
                 return View("Index", companies);
-            }, "GetAll");
+            }, "GetAllCompanies");
         }
 
         private async Task InitializeValues(
@@ -80,31 +80,85 @@ namespace WebApp.Controllers
             ViewData["HasValidMOA"] = hasValidMOA;
         }
 
-        //[HttpGet]
-        //[Authorize]
-        //[Route("view")]
-        //public async Task<IActionResult> GetCompany(string id, string showModal = null)
-        //{
-        //    return await HandleExceptionAsync(async () =>
-        //    {
-        //        if (string.IsNullOrEmpty(id))
-        //        {
-        //            TempData["ErrorMessage"] = "Invalid company id!";
-        //            return RedirectToAction("GetAllCompanies");
-        //        }
+        [HttpGet]
+        [Authorize]
+        [Route("view")]
+        public async Task<IActionResult> GetCompany(string id, string showModal = null)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    TempData["ErrorMessage"] = "Invalid company id!";
+                    return RedirectToAction("GetAllCompanies");
+                }
 
-        //        var company = await _companyService.GetCompanyByIdAsync(id);
-        //        if (company == null)
-        //        {
-        //            TempData["ErrorMessage"] = "Company not found!";
-        //            return RedirectToAction("GetAllCompanies");
-        //        }
+                var company = await _companyService.GetCompanyByIdAsync(id);
+                if (company == null)
+                {
+                    TempData["ErrorMessage"] = "Company not found!";
+                    return RedirectToAction("GetAllCompanies");
+                }
 
-        //        ViewBag.ShowModal = showModal;
+                ViewBag.ShowModal = showModal;
 
-        //        return View("ViewCompany", company);
-        //    }, "ViewJob");
-        //}
+                return View("ViewCompany", company);
+            }, "GetCompany");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "AdminOrRecruiter")]
+        [Route("add")]
+        public async Task<IActionResult> AddCompany(CompanyViewModel company)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    await _companyService.AddCompanyAsync(company);
+                    TempData["SuccessMessage"] = "Company added successfully!";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occured while adding company.";
+                return Json(new { success = false });
+            }, "AddCompany");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "AdminOrRecruiter")]
+        [Route("update")]
+        public async Task<IActionResult> UpdateCompany(CompanyViewModel company)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    await _companyService.UpdateCompanyAsync(company);
+                    TempData["SuccessMessage"] = "Company updated successfully!";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occured while updating company.";
+                return Json(new { success = false });
+            }, "UpdateCompany");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "Admin")]
+        [Route("archive")]
+        public async Task<IActionResult> Archive(string id)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (!string.IsNullOrEmpty(id))
+                {
+                    await _companyService.ArchiveCompanyAsync(id);
+                    TempData["SuccessMessage"] = "Company archived successfully!";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occured while archiving company.";
+                return Json(new { success = false });
+            }, "Archive");
+        }
         #endregion
     }
 }

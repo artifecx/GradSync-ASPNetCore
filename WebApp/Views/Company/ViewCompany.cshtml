@@ -1,0 +1,111 @@
+﻿@model Services.ServiceModels.CompanyViewModel
+
+@{
+    ViewData["Title"] = $"Company | {Model.Name}";
+    var aspAction = "GetAllCompanies";
+
+    // await Html.RenderPartialAsync("_AddRecruiterModal", Model);
+    // await Html.RenderPartialAsync("_ReassignRecruiterModal", Model);
+}
+
+<!-- Back Button -->
+<div class="flex items-center justify-between">
+    <a href="#" class="back-button m-2 text-black">
+        <h2 class="font-bold">
+            <i class="fa-solid fa-arrow-left mx-2"></i>
+        </h2>
+    </a>
+</div>
+
+@Html.AntiForgeryToken()
+<div class="container mx-auto p-4">
+    <div class="mb-4 rounded bg-white px-5 py-4 shadow-md">
+        <div class="grid-cols-1 grid gap-4 md:grid-cols-2">
+            <!-- Company Details Section -->
+            <div>
+                <div class="flex items-center">
+                    <h4 class="text-xl font-semibold">Company Details</h4>
+                    @if (User.IsInRole("NLO"))
+                    {
+                        <div id="editIcon">
+                            <a href="javascript:void(0);" onclick="enableEditMode()" class="fas fa-edit ml-2 text-blue-500"></a>
+                        </div>
+                    }
+                </div>
+
+                <div class="text-red-500">
+                    <div asp-validation-summary="ModelOnly"></div>
+                </div>
+                <form id="editCompanyForm">
+                    <input type="hidden" name="CompanyId" id="companyId" value="@Model.CompanyId" />
+                    <div class="mb-4">
+                        <label asp-for="Name" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                        <input asp-for="Name" id="companyName" value="@Model.Name" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                        <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <div class="mb-4 flex space-x-4">
+                        <div class="w-1/2">
+                            <label asp-for="ContactEmail" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                            <input asp-for="ContactEmail" id="companyEmail" value="@Model.ContactEmail" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                            <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                        <div class="w-1/2">
+                            <label asp-for="ContactNumber" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                            <input asp-for="ContactNumber" id="companyNumber" value="@Model.ContactNumber" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                            <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Address" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                        <input asp-for ="Address" id="companyAddress" value="@Model.Address" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                        <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label asp-for="Description" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                        <textarea asp-for="Description" id="companyDescription" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly>@(string.IsNullOrEmpty(Model.Description) ? "No description." : Model.Description)</textarea>
+                        <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                </form>
+
+                <!-- Save and Cancel Buttons -->
+                <div id="editButtons" class="hidden pb-5">
+                    <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" onclick="submitChanges()">Save Changes</button>
+                    <button type="button" class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600" onclick="cancelEdit()">Cancel</button>
+                </div>
+            </div>
+
+            <!-- Recruiters Section -->
+            @if (User.IsInRole("NLO"))
+            {
+                <div>
+                    @await Html.PartialAsync("_RecruiterSection", Model)
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+@section Scripts {
+    <script src="~/js/company.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+        sessionStorage.setItem('verified', urlParams.get('verified') || '');
+        sessionStorage.setItem('hasValidMOA', urlParams.get('hasValidMOA') || '');
+        sessionStorage.setItem('search', urlParams.get('search') || '');
+        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+
+        document.querySelector('.back-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            const baseUrl = '@Url.Action($"{aspAction}", "Company")';
+            const params = new URLSearchParams();
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('verified', sessionStorage.getItem('verified') || '');
+            params.set('hasValidMOA', sessionStorage.getItem('hasValidMOA') || '');
+            params.set('search', sessionStorage.getItem('search') || '');
+            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        });
+    </script>
+}
