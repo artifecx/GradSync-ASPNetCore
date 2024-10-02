@@ -23,7 +23,7 @@ namespace WebApp
             this._services.AddSingleton<IMapper>(sp => mapperConfiguration.CreateMapper());
         }
 
-        private class AutoMapperProfileConfiguration : Profile
+        private sealed class AutoMapperProfileConfiguration : Profile
         {
             public AutoMapperProfileConfiguration()
             {
@@ -35,7 +35,7 @@ namespace WebApp
                     .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.PostedBy.Company));
                 CreateMap<CompanyViewModel, Company>()
                     .ReverseMap()
-                    .ForMember(dest => dest.ActiveJobListings, opt => opt.MapFrom(src => src.Recruiters.Count(r => r.Jobs.Any(j => !j.IsArchived))));
+                    .ForMember(dest => dest.ActiveJobListings, opt => opt.MapFrom(src => src.Recruiters.SelectMany(r => r.Jobs).Count(j => !j.IsArchived)));
             }
         }
     }
