@@ -12,7 +12,6 @@ using System.Security.Claims;
 using Data.Repositories;
 using System.Threading.Tasks;
 using Resources.Messages;
-using static Services.Exceptions.TeamExceptions;
 using static Services.Exceptions.UserExceptions;
 
 namespace Services.Services

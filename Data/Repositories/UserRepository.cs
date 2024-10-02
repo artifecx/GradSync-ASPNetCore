@@ -52,52 +52,52 @@ namespace Data.Repositories
 
         public async Task DeleteUserAsync(string userId)
         {
-            var userToDelete = await this.GetDbSet<User>().Include(u => u.Avatar).FirstOrDefaultAsync(u => u.UserId == userId);
-            if (userToDelete != null)
-            {
-                if (userToDelete.Avatar != null)
+            var ids = await GetDbSet<User>()
+                .Where(u => u.UserId == userId)
+                .Select(u => new User
                 {
-                    this.GetDbSet<Avatar>().Remove(userToDelete.Avatar);
-                }
-                userToDelete.IsDeleted = true;
-                this.GetDbSet<User>().Update(userToDelete);
-                await UnitOfWork.SaveChangesAsync();
+                    UserId = u.UserId,
+                    AvatarId = u.AvatarId,
+                    RoleId = u.RoleId
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            if (ids.AvatarId != null)
+            {
+                await GetDbSet<Avatar>()
+                    .Where(a => a.AvatarId == ids.AvatarId)
+                    .ExecuteDeleteAsync();
             }
+
+            if (string.Equals(ids.RoleId, "Admin"))
+                await DeleteAdminAsync(ids.UserId);
+            else if (string.Equals(ids.RoleId, "Applicant"))
+                await DeleteApplicantAsync(ids.UserId);
+            else if (string.Equals(ids.RoleId, "Recruiter"))
+                await DeleteRecruiterAsync(ids.UserId);
+
+            await GetDbSet<User>()
+                .Where(u => u.UserId == userId)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(u => u.IsDeleted, true)
+                    .SetProperty(u => u.AvatarId, (string)null));
         }
 
-        public async Task DeleteAdminAsync(string AdminId)
-        {
-            var adminToDelete = await this.GetDbSet<Admin>().FirstOrDefaultAsync(a => a.UserId == AdminId);
-            if (adminToDelete != null)
-            {
-                this.GetDbSet<Admin>().Remove(adminToDelete);
-                // changes saved with the next call to SaveChanges
-            }
-        }
+        public async Task DeleteAdminAsync(string adminId) =>
+            await GetDbSet<Admin>()
+                .Where(a => a.UserId == adminId)
+                .ExecuteDeleteAsync();
 
-        public async Task DeleteApplicantAsync(string applicantId)
-        {
-            var applicantToDelete = await this.GetDbSet<Applicant>().Include(a => a.Resume).FirstOrDefaultAsync(a => a.UserId == applicantId);
-            if (applicantToDelete != null)
-            {
-                if (applicantToDelete.Resume != null)
-                {
-                    this.GetDbSet<Resume>().Remove(applicantToDelete.Resume);
-                }
-                this.GetDbSet<Applicant>().Remove(applicantToDelete);
-                // changes saved with the next call to SaveChanges
-            }
-        }
+        public async Task DeleteApplicantAsync(string applicantId) =>
+            await GetDbSet<Applicant>()
+                .Where(a => a.UserId == applicantId)
+                .ExecuteDeleteAsync();
 
-        public async Task DeleteRecruiterAsync(string recruiterId)
-        {
-            var recruiterToDelete = await this.GetDbSet<Recruiter>().FirstOrDefaultAsync(r => r.UserId == recruiterId);
-            if (recruiterToDelete != null)
-            {
-                this.GetDbSet<Recruiter>().Remove(recruiterToDelete);
-                // changes saved with the next call to SaveChanges
-            }
-        }
+        public async Task DeleteRecruiterAsync(string recruiterId) =>
+            await GetDbSet<Recruiter>()
+                .Where(a => a.UserId == recruiterId)
+                .ExecuteDeleteAsync();
 
         #region Helper Methods
         public async Task<User> FindUserByIdAsync(string id) =>

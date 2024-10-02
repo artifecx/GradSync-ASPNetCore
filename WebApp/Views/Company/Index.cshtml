@@ -2,9 +2,8 @@
 
 @{
     ViewData["Title"] = "All Companies";
-    // await Html.RenderPartialAsync("_AddUserModal", new Services.ServiceModels.UserViewModel());
-    // await Html.RenderPartialAsync("_ResetPasswordModal");
-    // await Html.RenderPartialAsync("_DeleteModal");
+    await Html.RenderPartialAsync("_AddCompanyModal", new Services.ServiceModels.CompanyViewModel());
+    await Html.RenderPartialAsync("_DeleteModal"); 
 
     string aspAction = "GetAllCompanies";
 
@@ -23,13 +22,22 @@
     <div class="flex items-center">
         <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
             <div class="flex">
-                <input type="text" name="filterBy" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Company name" value="@search" />
+                <input type="text" name="search" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Company name" value="@search" />
                 <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-[#7A1515] px-3 py-2 text-white hover:border-[#991b1b]">
                     <i class="fa fa-search"></i>
                 </button>
             </div>
             <input type="hidden" name="sortBy" value="@sortBy" />
         </form>
+        @if (User.IsInRole("NLO"))
+        {
+            <div class="mx-3">
+                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#addCompanyModal">
+                    <i class="fa fa-plus"></i>
+                    Add Company
+                </button>
+            </div>
+        }
     </div>
 </div>
 
@@ -229,7 +237,11 @@
 
 <!-- Values passed to the js files -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action("GetAllCompanies", "Company")" />
+<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Company")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/archive.js"></script>
+    <script src="~/js/company.js"></script>
 }

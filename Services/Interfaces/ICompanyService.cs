@@ -12,5 +12,9 @@ namespace Services.Interfaces
     {
         Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(
             string sortBy, string search, bool? verified, bool? hasValidMOA, int pageIndex, int pageSize);
+        Task<CompanyViewModel> GetCompanyByIdAsync(string id);
+        Task AddCompanyAsync(CompanyViewModel model);
+        Task UpdateCompanyAsync(CompanyViewModel model);
+        Task ArchiveCompanyAsync(string companyId);
     }
 }
