@@ -57,11 +57,13 @@ namespace Services.Services
         public async Task UpdateCompanyAsync(CompanyViewModel model)
         {
             var company = await _repository.GetCompanyByIdAsync(model.CompanyId);
-
             if (company == null)
                 throw new CompanyException("Company not found.");
 
             _mapper.Map(model, company);
+
+            if (_repository.CompanyExists(company, company.CompanyId))
+                throw new CompanyException("Company with the same name already exists.");
 
             if (!_repository.HasChanges(company))
                 throw new CompanyException("No changes detected.");
