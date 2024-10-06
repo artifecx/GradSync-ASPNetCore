@@ -26,15 +26,16 @@
 }
 
 <tr>
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+    <!-- Job Title Column -->
+    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
         @Html.DisplayNameFor(model => model.First().Title)
     </th>
 
     @if (!User.IsInRole("Recruiter"))
     {   
         <!-- Company Column (with dropdown) -->
-        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-            <div class="dropdown relative">
+        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+            <div class="dropdown relative flex justify-center items-center">
                 <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @if (filterByCompany == null)
                     {
@@ -44,7 +45,7 @@
                     {
                         <text>@filterByCompany</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    <i class="fa-solid fa-chevron-down ml-1"></i>
                 </a>
                 <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="companyDropdown">
                     <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
@@ -68,14 +69,14 @@
     }
     else
     {
-        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+        <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
             @Html.DisplayNameFor(model => model.First().AvailableSlots)
         </th>
     }
 
     <!-- Employment Type Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-        <div class="dropdown relative">
+    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+        <div class="dropdown relative flex justify-center items-center">
             <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByEmploymentType))
                 {
@@ -85,7 +86,7 @@
                 {
                     <text>@filterByEmploymentType</text>
                 }
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-down ml-1"></i>
             </a>
             <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="employmentTypeDropdown">
                 <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
@@ -115,8 +116,8 @@
     </th>
 
     <!-- Status Type Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-        <div class="dropdown relative">
+    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+        <div class="dropdown relative flex justify-center items-center">
             <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByStatusType))
                 {
@@ -126,7 +127,7 @@
                 {
                     <text>@filterByStatusType</text>
                 }
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-down ml-1"></i>
             </a>
             <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
                 <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
@@ -156,8 +157,8 @@
     </th>
 
     <!-- Work Setup Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-        <div class="dropdown relative">
+    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
+        <div class="dropdown relative flex justify-center items-center">
             <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByWorkSetup))
                 {
@@ -167,7 +168,7 @@
                 {
                     <text>@filterByWorkSetup</text>
                 }
-                <i class="fa-solid fa-chevron-down"></i>
+                <i class="fa-solid fa-chevron-down ml-1"></i>
             </a>
             <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="workSetupDropdown">
                 <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
@@ -197,7 +198,7 @@
     </th>
 
     <!-- CreatedDate Column (sortable) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+    <th class="px-6 py-3 text-center text-xs font-medium uppercase tracking-wider text-gray-500">
         <a asp-action="@aspAction"
            asp-route-sortBy="@sortByCreatedDate"
            asp-route-search="@search"
@@ -205,10 +206,11 @@
            asp-route-filterByEmploymentType="@filterByEmploymentType"
            asp-route-filterByStatusType="@filterByStatusType"
            asp-route-filterByWorkSetup="@filterByWorkSetup"
-           class="text-black hover:text-blue-500">
+           class="text-black hover:text-blue-500 flex justify-center items-center">
             @Html.DisplayNameFor(model => model.First().CreatedDate)
-            @(sortBy == "created" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+            @(sortBy == "created" ? Html.Raw("<i class='fa-solid fa-sort-up ml-1'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down ml-1'></i>") : Html.Raw("<i class='fa-solid fa-sort ml-1'></i>")))
         </a>
     </th>
-    <th class="px-6 py-3"></th>
+
+    <th class="px-6 py-3 text-center"></th>
 </tr>

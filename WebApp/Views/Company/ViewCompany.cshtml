@@ -3,41 +3,36 @@
 @{
     ViewData["Title"] = $"Company | {Model.Name}";
     var aspAction = "GetAllCompanies";
-
-    // await Html.RenderPartialAsync("_AddRecruiterModal", Model);
-    // await Html.RenderPartialAsync("_ReassignRecruiterModal", Model);
 }
 
-<!-- Back Button -->
-<div class="flex items-center justify-between">
-    <a href="#" class="back-button m-2 text-black">
-        <h2 class="font-bold">
-            <i class="fa-solid fa-arrow-left mx-2"></i>
-        </h2>
-    </a>
-</div>
-
-@Html.AntiForgeryToken()
+<!-- Container for Company Details -->
 <div class="container mx-auto p-4">
     <div class="mb-4 rounded bg-white px-5 py-4 shadow-md">
         <div class="grid-cols-1 grid gap-4 md:grid-cols-2">
             <!-- Company Details Section -->
             <div>
-                <div class="flex items-center">
-                    <h4 class="text-xl font-semibold">Company Details</h4>
-                    @if (User.IsInRole("NLO"))
-                    {
-                        <div id="editIcon">
-                            <a href="javascript:void(0);" onclick="enableEditMode()" class="fas fa-edit ml-2 text-blue-500"></a>
-                        </div>
-                    }
-                </div>
-
                 <div class="text-red-500">
                     <div asp-validation-summary="ModelOnly"></div>
                 </div>
                 <form id="editCompanyForm">
                     <input type="hidden" name="CompanyId" id="companyId" value="@Model.CompanyId" />
+                    
+                    <!-- Company Details Section Header with Back Button -->
+                    <div class="flex items-center mb-4">
+                        <a href="#" class="back-button text-black mr-4">
+                            <h2 class="font-bold">
+                                <i class="fa-solid fa-arrow-left mx-2"></i>
+                            </h2>
+                        </a>
+                        <h4 class="text-xl font-semibold">Company Details</h4>
+                        @if (User.IsInRole("NLO"))
+                        {
+                            <div id="editIcon" class="ml-auto">
+                                <a href="javascript:void(0);" onclick="enableEditMode()" class="fas fa-edit text-2xl ml-2" style="color: #7A1515;"></a>
+                            </div>
+                        }
+                    </div>
+
                     <div class="mb-4">
                         <label asp-for="Name" class="mb-2 block text-sm font-bold text-gray-700"></label>
                         <input asp-for="Name" id="companyName" value="@Model.Name" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
@@ -57,7 +52,7 @@
                     </div>
                     <div class="mb-4">
                         <label asp-for="Address" class="mb-2 block text-sm font-bold text-gray-700"></label>
-                        <input asp-for ="Address" id="companyAddress" value="@Model.Address" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                        <input asp-for="Address" id="companyAddress" value="@Model.Address" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
                         <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
                     </div>
                     <div class="mb-4">

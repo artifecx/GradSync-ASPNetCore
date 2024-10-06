@@ -14,6 +14,6 @@
 
 .page-item.active .page-link {
     color: white !important;
-    background: var(--primary-color) !important;
-    border: 1px var(--primary-color) black !important;
+    background: #7A1515 !important;
+    border: 1px solid #7A1515 black !important;
 }
