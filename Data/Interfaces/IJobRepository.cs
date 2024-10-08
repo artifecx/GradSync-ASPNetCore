@@ -8,6 +8,8 @@ namespace Data.Interfaces
 {
     public interface IJobRepository
     {
+        Task<List<Application>> GetAllApplicationsNoIncludesAsync();
+        Task<List<Job>> GetAllJobsDepartmentsIncludeAsync();
         Task<List<Job>> GetAllJobsAsync();
         Task<List<Job>> GetRecruiterJobsAsync(string userId);
         Task AddJobAsync(Job job);

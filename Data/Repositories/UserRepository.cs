@@ -20,6 +20,9 @@ namespace Data.Repositories
         public async Task<List<User>> GetAllUsersAsync() =>
             await this.GetDbSet<User>().Where(u => !u.IsDeleted).Include(u => u.Role).ToListAsync();
 
+        public async Task<List<User>> GetAllUsersNoIncludesAsync() =>
+            await this.GetDbSet<User>().AsNoTracking().ToListAsync();
+
         public void AddUser(User user)
         {
             this.GetDbSet<User>().Add(user);

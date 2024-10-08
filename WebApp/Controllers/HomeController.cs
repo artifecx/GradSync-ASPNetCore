@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace WebApp.Controllers
 {
@@ -16,6 +17,7 @@ namespace WebApp.Controllers
     /// </summary>
     public class HomeController : ControllerBase<HomeController>
     {
+        private readonly IDashboardService _dashboardService;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -24,13 +26,15 @@ namespace WebApp.Controllers
         /// <param name="configuration"></param>
         /// <param name="localizer"></param>
         /// <param name="mapper"></param>
-        
+
         public HomeController(
-                              IHttpContextAccessor httpContextAccessor,
-                              ILoggerFactory loggerFactory,
-                              IConfiguration configuration,
-                              IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+            IDashboardService dashboardService,
+            IHttpContextAccessor httpContextAccessor,
+            ILoggerFactory loggerFactory,
+            IConfiguration configuration,
+            IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
+            _dashboardService = dashboardService;
         }
 
         /// <summary>
@@ -45,9 +49,10 @@ namespace WebApp.Controllers
         }
         
         [Authorize(Policy = "Admin")]
-        public IActionResult Dashboard()
+        public async Task<IActionResult> Dashboard()
         {
-            return View();
+            var dashboardData = await _dashboardService.GetDashboardData();
+            return View(dashboardData);
         }
 
         public IActionResult InvalidAccess()
