@@ -30,6 +30,12 @@ namespace Data.Repositories
                         .Include(j => j.StatusType);
         }
 
+        public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
+            await this.GetDbSet<Application>().AsNoTracking().ToListAsync();
+
+        public async Task<List<Job>> GetAllJobsDepartmentsIncludeAsync() =>
+            await this.GetDbSet<Job>().Include(j => j.Departments).AsNoTracking().ToListAsync();
+
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
 
