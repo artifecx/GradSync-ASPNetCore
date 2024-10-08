@@ -9,7 +9,7 @@
 
     string aspAction = "GetAllUsers";
 
-    string filterBy = ViewData["FilterBy"] as string;
+    string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
     string role = ViewData["Role"] as string;
     bool? verified = ViewData["Verified"] as bool?;
@@ -22,35 +22,18 @@
 <div class="nav-header flex items-center justify-between">
     <h1 class="display-6 text-3xl font-semibold text-[#7A1515]">User Management</h1>
     <div class="flex items-center">
-        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" class="flex items-center">
-            <div class="flex">
-                <input type="text" name="filterBy" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Name or email" value="@filterBy" />
-                <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-[#7A1515] px-3 py-2 text-white hover:border-[#991b1b]">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
+        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name or email" })
             <input type="hidden" name="sortBy" value="@sortBy" />
         </form>
         <div class="mx-3">
             @if (User.IsInRole("Admin"))
             {
-                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#addUserModal">
+                <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" data-toggle="modal" data-target="#addUserModal">
                     <i class="fa fa-plus"></i>
                     New User
                 </button>
             }
-        </div>
-        <div class="mr-3">
-            <button type="button" class="btn notif-bell" id="notifBellBtn">
-                <i class="fa fa-bell px-1 text-gray-500 hover:text-blue-500"></i>
-            </button>
-        </div>
-        <div id="notificationModal" class="modal fixed-right fade" tabindex="-2" role="dialog">
-            <div class="modal-dialog modal-dialog-aside" role="document">
-                <div class="modal-content">
-                    <!-- Notification Modal -->
-                </div>
-            </div>
         </div>
     </div>
 </div>
@@ -63,13 +46,13 @@
                     Name
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <a asp-action="@aspAction" asp-route-sortBy="@sortByName" asp-route-filterBy="@filterBy" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
+                    <a asp-action="@aspAction" asp-route-sortBy="@sortByName" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
                         @Html.DisplayNameFor(model => model.First().LastName)
                         @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                     </a>
                 </th>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <a asp-action="@aspAction" asp-route-sortBy="@sortByEmail" asp-route-filterBy="@filterBy" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
+                    <a asp-action="@aspAction" asp-route-sortBy="@sortByEmail" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
                         @Html.DisplayNameFor(model => model.First().Email)
                         @(sortBy == "email" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "email_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                     </a>
@@ -87,10 +70,10 @@
                             <i class="fa-solid fa-chevron-down"></i>
                         </a>
                         <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="roleDropdown">
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" asp-route-role="" asp-route-verified="@verified">All</a>
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-role="" asp-route-verified="@verified">All</a>
                             @foreach (var r in ViewBag.Roles)
                             {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy" asp-route-role="@r.Name" asp-route-verified="@verified">@r.Name</a>
+                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-role="@r.Name" asp-route-verified="@verified">@r.Name</a>
                             }
                         </div>
                     </div>
@@ -111,19 +94,19 @@
                             <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
                                 asp-action="@aspAction"
                                 asp-route-sortBy="@sortBy" 
-                                asp-route-filterBy="@filterBy" 
+                                asp-route-search="@search" 
                                 asp-route-role="@role" 
                                 asp-route-verified="">All</a>
                             <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
                                asp-action="@aspAction"
                                asp-route-sortBy="@sortBy"
-                               asp-route-filterBy="@filterBy"
+                               asp-route-search="@search"
                                asp-route-role="@role"
                                asp-route-verified="true">Verified</a>
                             <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
                                asp-action="@aspAction"
                                asp-route-sortBy="@sortBy"
-                               asp-route-filterBy="@filterBy"
+                               asp-route-search="@search"
                                asp-route-role="@role" 
                                asp-route-verified="false">Unverified</a>
                         </div>
@@ -137,7 +120,7 @@
             {
                 <tr>
                     <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
-                        @(string.IsNullOrEmpty(filterBy) ? Html.Raw("No users found") : Html.Raw("No users found matching the criteria"))
+                        @(string.IsNullOrEmpty(search) ? Html.Raw("No users found") : Html.Raw("No users found matching the criteria"))
                     </td>
                 </tr>
             }
@@ -197,19 +180,19 @@
             @if (Model.HasPreviousPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">Previous</a>
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">Previous</a>
                 </li>
             }
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">@i</a>
+                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-search="@search">@i</a>
                 </li>
             }
             @if (Model.HasNextPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-filterBy="@filterBy">Next</a>
+                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">Next</a>
                 </li>
             }
         </ul>

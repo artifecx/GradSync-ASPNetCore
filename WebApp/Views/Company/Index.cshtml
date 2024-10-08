@@ -21,18 +21,13 @@
     <h1 class="display-6 text-3xl font-semibold text-[#7A1515]">Company Management</h1>
     <div class="flex items-center">
         <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
-            <div class="flex">
-                <input type="text" name="search" class="form-control btn-radius rounded-l-md border border-gray-300 px-3 py-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Company name" value="@search" />
-                <button type="submit" class="btn btn-primary btn-radius-r rounded-r-md bg-[#7A1515] px-3 py-2 text-white hover:border-[#991b1b]">
-                    <i class="fa fa-search"></i>
-                </button>
-            </div>
+            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
             <input type="hidden" name="sortBy" value="@sortBy" />
         </form>
         @if (User.IsInRole("NLO"))
         {
             <div class="mx-3">
-                <button type="button" class="btn btn-primary btn-radius rounded-md bg-blue-500 px-3 py-2 text-white hover:bg-blue-600" data-toggle="modal" data-target="#addCompanyModal">
+                <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" data-toggle="modal" data-target="#addCompanyModal">
                     <i class="fa fa-plus"></i>
                     Add Company
                 </button>
@@ -42,7 +37,10 @@
 </div>
 
 <div class="container-fluid px-4 py-3">
-    <table class="table-white table min-w-full divide-y divide-gray-200">
+    <div class="float-right py-2">
+        <a href="#" class="action-icon"><i class="fa fa-archive" aria-hidden="true"></i> Archived Companies</a>
+    </div>
+    <table class="min-w-full table-auto divide-y divide-gray-200 text-left shadow-lg">
         <thead class="bg-gray-50">
             <tr>
                 <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
@@ -51,22 +49,22 @@
                         @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                     </a>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     @Html.DisplayNameFor(model => model.First().ContactEmail)
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     @Html.DisplayNameFor(model => model.First().ContactNumber)
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     @Html.DisplayNameFor(model => model.First().Address)
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     <a asp-action="@aspAction" asp-route-sortBy="@sortByActiveListings" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-verified="@verified" asp-route-hasValidMOA="@hasValidMOA" class="text-black hover:text-blue-500">
                         @Html.DisplayNameFor(model => model.First().ActiveJobListings)
                         @(string.Equals(sortBy, "jobs") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                     </a>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     <div class="dropdown relative">
                         <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="verifiedDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if (!verified.HasValue)
@@ -101,7 +99,7 @@
                         </div>
                     </div>
                 </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                     <div class="dropdown relative">
                         <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="verifiedDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                             @if (!hasValidMOA.HasValue)
@@ -136,14 +134,14 @@
                         </div>
                     </div>
                 </th>
-                <th class="px-6 py-3"></th>
+                <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Actions</th>
             </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
             @if (!Model.Any())
             {
                 <tr>
-                    <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+                    <td colspan="8" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
                         @(string.IsNullOrEmpty(search) ? Html.Raw("No companies found") : Html.Raw("No companies found matching the criteria"))
                     </td>
                 </tr>
@@ -152,7 +150,6 @@
             {
                 @foreach (var item in Model)
                 {
-                    @*await Html.RenderPartialAsync("_EditUserModal", item);*@
                     <tr>
                         <td class="whitespace-nowrap px-6 py-4">
                             @Html.DisplayFor(modelItem => item.Name)

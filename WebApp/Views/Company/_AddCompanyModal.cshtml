@@ -1,7 +1,7 @@
 ﻿@model Services.ServiceModels.CompanyViewModel
 
 <div class="modal fade" id="addCompanyModal" tabindex="-1" role="dialog" aria-labelledby="addCompanyModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title" id="addCompanyModalLabel">Add Company</h5>
@@ -10,47 +10,55 @@
                 </button>
             </div>
 
-            <div class="modal-body">
+            <div class="modal-body p-4">
                 <form id="addCompanyForm">
                     <!-- Company Name -->
                     <div class="form-group">
                         <label asp-for="Name" class="control-label"></label>
                         <input asp-for="Name" class="form-control" id="addCompanyName" name="Name" maxlength="100" />
-                        <span asp-validation-for="Name" class="text-danger"></span>
+                        <span asp-validation-for="Name" class="text-danger small"></span>
                     </div>
 
                     <!-- Company Email -->
                     <div class="form-group">
                         <label asp-for="ContactEmail" class="control-label"></label>
                         <input asp-for="ContactEmail" type="email" class="form-control" id="addCompanyEmail" name="ContactEmail" maxlength="100" />
-                        <span asp-validation-for="ContactEmail" class="text-danger"></span>
+                        <span asp-validation-for="ContactEmail" class="text-danger small"></span>
                     </div>
 
                     <!-- Company Number -->
                     <div class="form-group">
                         <label asp-for="ContactNumber" class="control-label"></label>
                         <input asp-for="ContactNumber" type="number" class="form-control" id="addCompanyNumber" name="ContactNumber" maxlength="20" />
-                        <span asp-validation-for="ContactNumber" class="text-danger"></span>
+                        <span asp-validation-for="ContactNumber" class="text-danger small"></span>
                     </div>
 
                     <!-- Company Address -->
                     <div class="form-group">
                         <label asp-for="Address" class="control-label"></label>
                         <input asp-for="Address" class="form-control" id="addCompanyAddress" name="Address" maxlength="100" />
-                        <span asp-validation-for="Address" class="text-danger"></span>
+                        <span asp-validation-for="Address" class="text-danger small"></span>
                     </div>
 
                     <!-- Company Description -->
                     <div class="form-group">
                         <label asp-for="Description" class="control-label"></label>
                         <textarea asp-for="Description" class="form-control" id="addCompanyDescription" name="Description" maxlength="800"></textarea>
-                        <span asp-validation-for="Description" class="text-danger"></span>
+                        <span asp-validation-for="Description" class="text-danger small"></span>
                     </div>
                 </form>
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="btn btn-primary" onclick="submitAddCompany()">Add</button>
+            <div class="modal-footer flex space-x-2">
+                <button type="button"
+                        class="flex-1 rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600"
+                        data-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="submit"
+                        class="flex-1 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                        onclick="submitAddCompany()">
+                    Add
+                </button>
             </div>
         </div>
     </div>
