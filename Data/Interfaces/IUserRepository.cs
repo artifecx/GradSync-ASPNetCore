@@ -10,6 +10,7 @@ namespace Data.Interfaces
     public interface IUserRepository
     {
         Task<List<User>> GetAllUsersAsync();
+        Task<List<User>> GetAllUsersNoIncludesAsync();
         void AddUser(User user);
         void AddApplicant(Applicant applicant);
         void AddRecruiter(Recruiter recruiter);
