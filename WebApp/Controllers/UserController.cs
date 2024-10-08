@@ -58,13 +58,13 @@ namespace WebApp.Controllers
         /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllUsers(string sortBy, string filterBy, string role, bool? verified, int pageIndex = 1)
+        public async Task<IActionResult> GetAllUsers(string sortBy, string search, string role, bool? verified, int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var users = await _userService.GetAllAsync(sortBy, filterBy, role, verified, pageIndex, 5);
+                var users = await _userService.GetAllAsync(sortBy, search, role, verified, pageIndex, 5);
 
-                ViewData["FilterBy"] = filterBy;
+                ViewData["Search"] = search;
                 ViewData["SortBy"] = sortBy;
                 ViewData["Role"] = role;
                 ViewData["Verified"] = verified;
