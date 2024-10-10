@@ -16,17 +16,17 @@
             <div class="text-left text-black font-medium text-sm pb-3 subpixel-antialiased">
                 <p>Don't have an account? <a href="" class="text-[#7A1515] underline" data-toggle="modal" data-target="#registerUserModal">Create Account</a></p>
             </div>
-            <div class="mb-3">
+            <div class="mb-3 text-black">
 
-                <label class="block font-medium mb-1" for="emailInput">Email Address <span class="text-red-350">*</span></label>
+                <label class="block text-[#7A1515] font-medium mb-1" for="emailInput">Email Address <span class="text-[#7A1515]">*</span></label>
                 <input type="email" asp-for="Email" id="emailInput" required
-                       class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
+                       class="w-full border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#7A1515]" />
             </div>
-            <div class="mb-2">
-                <label class="block font-medium mb-1" for="passwordInput">Password <span class="text-red-350">*</span></label>
+            <div class="mb-2 text-black">
+                <label class="text-[#7A1515] font-medium mb-1" for="passwordInput">Password <span class="text-[#7A1515]">*</span></label>
                 <div class="relative">
                     <input type="password" asp-for="Password" id="passwordInput" required
-                           class="w-full border border-gray-300 rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#991b1b]" />
+                           class="w-full border border-gray-300 rounded-md p-2 pr-10 focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent hover:border-[#7A1515]" />
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500">
                         <!-- Eye Open Icon -->
                         <svg id="eyeOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -43,7 +43,7 @@
                 </div>
                 @if (TempData["ErrorMessageLogin"] != null)
                 {
-                    <span class="text-red-500 text-sm mt-1 block">@(TempData["ErrorMessageLogin"])</span>
+                    <span class="text-[#7A1515] text-sm mt-1 block">@(TempData["ErrorMessageLogin"])</span>
                 }
             </div>
 
@@ -53,7 +53,7 @@
 
             <div>
                 <button type="submit" id="loginButton" disabled
-                        class="mt-2 bg-[#743030] hover:bg-[#A53D3D] text-white font-semibold py-2 px-4 rounded w-full flex justify-center items-center disabled:bg-white-400 disabled:cursor-not-allowed">
+                        class="mt-2 bg-[#7A1515] hover:bg-[#7A1515] text-white font-semibold py-2 px-4 rounded w-full flex justify-center items-center disabled:bg-gray-400 disabled:cursor-not-allowed">
                     Sign in
                 </button>
             </div>
