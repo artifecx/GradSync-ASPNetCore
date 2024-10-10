@@ -19,6 +19,30 @@
     border-right: 1px solid var(--border-color);
     font-weight: bold;
 }
+
+    /* Styling for sidebar links */
+            .sidebar ul li a:hover {
+                color: #991b1b;
+            }
+
+            s
+        /* Hover, focus, and active states */
+        .sidebar li a:hover,
+        .sidebar li a:focus,
+        .sidebar li a:active {
+            color: #991b1b !important; /* Override default hover color */
+            text-decoration: underline; /* Add underline on hover, focus, or active */
+            text-decoration-color: #991b1b; /* Ensure underline matches text color */
+        }
+
+        /* Ensure that items with bg-gray-200 still apply the hover color correctly */
+        .sidebar li a.bg-gray-200:hover,
+        .sidebar li a.bg-gray-200:focus,
+        .sidebar li a.bg-gray-200:active {
+            color: #991b1b !important;
+        }
+
+
 .user-info {
     display: flex;
     align-items: center; 
