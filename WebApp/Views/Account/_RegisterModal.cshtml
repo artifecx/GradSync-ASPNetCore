@@ -14,23 +14,28 @@
             <form id="registerUserForm" method="post" action="/Account/Register">
                 <div class="modal-body">
                     @Html.AntiForgeryToken()
+                    <div class="mb-4" style="display:none;">
+                        <label asp-for="Username"></label>
+                        <input asp-for="Username" />
+                    </div>
+
                     <div class="mb-4">
-                        <label class="mb-1 block text-gray-700 font-semibold" for="email">Email Address <span class="text-red-500">*</span></label>
+                        <label class="mb-1 block font-semibold text-gray-700" for="email">Email Address <span class="text-red-500">*</span></label>
                         <input type="text" id="email" asp-for="Email" placeholder="juandelacruz@gradsync.com"
                                class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                         <span asp-validation-for="Email" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
-                        <p class="text-xs text-[#7A1515] font-normal">Please use your institution/company email address.</p>
+                        <p class="text-xs font-normal text-[#7A1515]">Please use your institution/company email address.</p>
                     </div>
 
                     <div class="mb-4 flex space-x-4">
                         <div class="w-1/2">
-                            <label class="mb-1 block text-gray-700 font-semibold" for="firstName">First Name <span class="text-red-500">*</span></label>
+                            <label class="mb-1 block font-semibold text-gray-700" for="firstName">First Name <span class="text-red-500">*</span></label>
                             <input type="text" id="firstName" asp-for="FirstName" placeholder="Juan"
                                    class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                             <span asp-validation-for="FirstName" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
                         </div>
                         <div class="w-1/2">
-                            <label class="mb-1 block text-gray-700 font-semibold" for="middleName">Middle Name</label>
+                            <label class="mb-1 block font-semibold text-gray-700" for="middleName">Middle Name</label>
                             <input type="text" id="middleName" asp-for="MiddleName" placeholder="Martinez"
                                    class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                             <span asp-validation-for="MiddleName" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
@@ -39,13 +44,13 @@
 
                     <div class="mb-4 flex space-x-4">
                         <div class="w-1/2">
-                            <label class="mb-1 block text-gray-700 font-semibold" for="lastName">Last Name <span class="text-red-500">*</span></label>
+                            <label class="mb-1 block font-semibold text-gray-700" for="lastName">Last Name <span class="text-red-500">*</span></label>
                             <input type="text" id="lastName" asp-for="LastName" placeholder="Dela Cruz"
                                    class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                             <span asp-validation-for="LastName" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
                         </div>
                         <div class="w-1/2">
-                            <label class="mb-1 block text-gray-700 font-semibold" for="suffix">Suffix</label>
+                            <label class="mb-1 block font-semibold text-gray-700" for="suffix">Suffix</label>
                             <input type="text" id="suffix" asp-for="Suffix" placeholder="Jr., Sr., III..."
                                    class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                             <span asp-validation-for="Suffix" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
@@ -53,32 +58,33 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="mb-1 block text-gray-700 font-semibold" for="password">Password <span class="text-red-500">*</span></label>
+                        <label class="mb-1 block font-semibold text-gray-700" for="password">Password <span class="text-red-500">*</span></label>
                         <input type="password" id="password" asp-for="Password" placeholder="******"
                                class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                         <span asp-validation-for="Password" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
                     </div>
                     <div class="mb-4">
-                        <label class="mb-1 block text-gray-700 font-semibold" for="confirmpassword">Confirm Password <span class="text-red-500">*</span></label>
+                        <label class="mb-1 block font-semibold text-gray-700" for="confirmpassword">Confirm Password <span class="text-red-500">*</span></label>
                         <input type="password" id="confirmpassword" asp-for="ConfirmPassword" placeholder="******"
                                class="w-full rounded-md border border-gray-300 p-2 hover:border-[#991b1b] focus:outline-none focus:ring-2 focus:ring-[#991b1b]" />
                         <span asp-validation-for="ConfirmPassword" class="mt-1 block text-sm font-medium text-[#7A1515]"></span>
                     </div>
                 </div>
 
-                <div class="modal-footer flex justify-between items-center w-full">
-                    <div class="flex items-center w-full">
+                <div class="modal-footer flex w-full items-center justify-between">
+                    <div class="flex w-full items-center">
                         <input type="checkbox"  id="roleCheckbox" asp-for="AsRecruiter" value="true"
-                               class="h-5 w-5 appearance-none rounded border-[#7A1515] required:checked:bg-[#7A1515] checked:border-[#7A1515] transition-all duration-300 focus:ring-2 focus:ring-[#991b1b] cursor-pointer" />
-                        <label for="roleCheckbox" class="ml-2 pt-2 text-[#7A1515] font-bold cursor-pointer">Apply as recruiter</label>
+                               class="h-5 w-5 cursor-pointer appearance-none rounded border-[#7A1515] transition-all duration-300 checked:border-[#7A1515] focus:ring-2 focus:ring-[#991b1b] required:checked:bg-[#7A1515]" />
+                        <label for="roleCheckbox" class="ml-2 cursor-pointer pt-2 font-bold text-[#7A1515]">Apply as recruiter</label>
                     </div>
 
                     <button type="submit" id="registerButton" disabled
-                            class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed whitespace-nowrap">
+                            class="whitespace-nowrap rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed">
                         Sign Up
                     </button>
                 </div>
 
+                <input type="hidden" name="FormLoadTime" value="@DateTime.UtcNow.Ticks" />
             </form>
         </div>
     </div>
