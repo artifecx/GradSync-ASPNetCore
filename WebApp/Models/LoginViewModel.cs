@@ -8,13 +8,13 @@ namespace WebApp.Models
     /// </summary>
     public class LoginViewModel
     {
-        /// <summary>ユーザーID</summary>
-        [JsonPropertyName("userId")]
         [Required(ErrorMessage = "Email is required.")]
         public string Email { get; set; }
-        /// <summary>パスワード</summary>
-        [JsonPropertyName("password")]
+
         [Required(ErrorMessage = "Password is required.")]
         public string Password { get; set; }
+
+        /// Honeypot, do not use
+        public string Username { get; set; }
     }
 }

@@ -363,5 +363,19 @@ namespace WebApp.Mvc
         }
 
         #endregion Async Exception Handlers
+
+        public void CheckFormSubmissionTime(string FormLoadTime)
+        {
+            long ticks;
+            if (long.TryParse(FormLoadTime, out ticks))
+            {
+                var loadTime = new DateTime(ticks);
+                var timeTaken = DateTime.UtcNow - loadTime;
+                if (timeTaken.TotalSeconds < 10)
+                {
+                    throw new UserException("An has error occurred while registering user.");
+                }
+            }
+        }   
     }
 }
