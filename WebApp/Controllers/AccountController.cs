@@ -97,10 +97,18 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> Register(AccountServiceModel model)
+        public async Task<IActionResult> Register(AccountServiceModel model, string FormLoadTime)
         {
             return await HandleExceptionAsync(async () =>
             {
+                CheckFormSubmissionTime(FormLoadTime);
+
+                if (!string.IsNullOrEmpty(model.Username))
+                {
+                    TempData["ErrorMessage"] = "An has error occurred while registering user.";
+                    return Json(new { success = false });
+                }
+
                 if (model != null || string.IsNullOrEmpty(UserId))
                 {
                     _userService.RegisterUser(model);
@@ -133,6 +141,12 @@ namespace WebApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
+            if (!string.IsNullOrEmpty(model.Username))
+            {
+                TempData["ErrorMessageLogin"] = "An has error occurred while logging in.";
+                return View(model);
+            }
+
             this._session.SetString("HasSession", "Exist");
 
             User user = null;

@@ -37,5 +37,8 @@ namespace Services.ServiceModels
         public string ConfirmPassword { get; set; }
 
         public bool AsRecruiter { get; set; }
+
+        /// Honeypot, do not use
+        public string Username { get; set; }
     }
 }
