@@ -10,13 +10,13 @@
     bool isLoggedIn = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 }
 
-<nav class="fixed w-full bg-white text-[#743030] z-50">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
+<nav class="fixed z-50 w-full bg-white text-[#743030]">
+    <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="flex h-16 justify-between">
             <div class="flex">
                 <div class="flex-shrink-0 flex items-center">
-                    <a href="@(User.IsInRole("Employee") ? Url.Action("GetAll", "Ticket") : Url.Action("Index", "Home"))" class="flex items-center">
-                        <img src="~/img/logo1.png" alt="Logo" class="h-8 w-auto mr-3">
+                    <a href="@Url.Action("Index", "Home")" class="flex items-center">
+                        <img src="~/img/logo1.png" alt="Logo" class="mr-3 h-8 w-auto">
                     </a>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:space-x-8">
@@ -26,14 +26,14 @@
                     @* Conditionally render 'Jobs' link based on user role *@
                     @if (!isAdmin)
                     {
-                        <a href="@Url.Action("Index", "Job")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                        <a href="@Url.Action("GetAllJobsApplicant", "Job")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
                             Find Job
                         </a>
                     }
-                    <a href="@Url.Action("Index", "Contact")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                    <a href="@Url.Action("Contact", "Home")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
                         Contact
                     </a>
-                    <a href="@Url.Action("Index", "About")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
+                    <a href="@Url.Action("About", "Home")" class="inline-flex items-center px-1 pt-1 text-sm font-medium hover:underline">
                         About
                     </a>
                 </div>
@@ -42,13 +42,13 @@
                 @if (isLoggedIn)
                 {
                     <!-- Profile dropdown -->
-                    <div class="ml-3 relative">
-                        <button type="button" class="flex text-sm rounded-full focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown()">
+                    <div class="relative ml-3">
+                        <button type="button" class="flex rounded-full text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown()">
                             <span class="sr-only">Open user menu</span>
                             <i class="fa fa-user-circle fa-2x"></i>
                         </button>
                         <!-- Dropdown menu -->
-                        <div id="dropdown-menu" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-white hidden" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                        <div id="dropdown-menu" class="absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white py-1 shadow-lg" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
                             <a href="@Url.Action("GetUserPreferences", "UserPreferences")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
                                 <i class="fa fa-cog mr-2"></i> Settings
                             </a>
@@ -61,14 +61,14 @@
                 else
                 {
                     <div class="flex space-x-4">
-                        <a href="/Account/Login" class="font-semibold text-sm px-5 py-2 rounded bg-[#743030] text-white">Sign In</a>
-                        <a href="/Account/Register" class="font-semibold text-sm px-5 py-2 rounded bg-[#FFBF03] text-[#743030]">Register</a>
+                        <a href="/Account/Login" class="rounded bg-[#743030] px-5 py-2 text-sm font-semibold text-white">Sign In</a>
+                        <a href="/Account/Register" class="rounded bg-[#FFBF03] px-5 py-2 text-sm font-semibold text-[#743030]">Register</a>
                     </div>
                 }
             </div>
             <div class="-mr-2 flex items-center md:hidden">
                 <!-- Mobile menu button -->
-                <button type="button" class="bg-white inline-flex items-center justify-center p-2 rounded-md text-[#743030] hover:bg-gray-100 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu()">
+                <button type="button" class="inline-flex items-center justify-center rounded-md bg-white p-2 text-[#743030] hover:bg-gray-100 focus:outline-none" aria-controls="mobile-menu" aria-expanded="false" onclick="toggleMobileMenu()">
                     <span class="sr-only">Open main menu</span>
                     <svg id="menu-icon" class="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <!-- Menu icon -->
@@ -84,8 +84,8 @@
     </div>
 
     <!-- Mobile menu -->
-    <div class="md:hidden hidden" id="mobile-menu">
-        <div class="pt-2 pb-3 space-y-1">
+    <div class="hidden md:hidden" id="mobile-menu">
+        <div class="space-y-1 pb-3 pt-2">
             <a href="@Url.Action("Index", "Home")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
                 Home
             </a>
@@ -102,7 +102,7 @@
                 About
             </a>
         </div>
-        <div class="pt-4 pb-3 border-t border-gray-200">
+        <div class="border-t border-gray-200 pb-3 pt-4">
             @if (isLoggedIn)
             {
                 <div class="flex items-center px-5">

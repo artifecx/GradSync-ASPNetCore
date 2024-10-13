@@ -92,6 +92,28 @@ namespace WebApp.Controllers
             }, "GetAllJobsRecruiter");
         }
 
+        [HttpGet]
+        [Authorize(Policy = "Applicant")]
+        [Route("all")]
+        public async Task<IActionResult> GetAllJobsApplicant(
+            string sortBy,
+            string search,
+            string filterByCompany,
+            string filterByEmploymentType,
+            string filterByStatusType,
+            string filterByWorkSetup,
+            int pageIndex = 1)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
+
+                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+
+                return View("IndexApplicant", jobs);
+            }, "GetAllJobsApplicant");
+        }
+
         private async Task InitializeValues(
             string sortBy,
             string search,
