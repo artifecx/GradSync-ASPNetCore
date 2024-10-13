@@ -1,10 +1,26 @@
-﻿body {
+﻿html {
+    font-size: 14px;
+    position: relative;
+    min-height: 100%;
+}
+
+@media (min-width: 768px) {
+    html {
+        font-size: 16px;
+    }
+}
+
+body {
     background-color: var(--background-color5) !important;
 }
 
 .layout {
     display: flex;
     min-height: 100vh;
+}
+
+.hide-navbar {
+    display: none;
 }
 
 .sidebar {
@@ -59,7 +75,6 @@
     -webkit-text-fill-color: transparent;
 }
 
-
 .user-info .icon {
 font-size:32px;
 margin-right: 10px;
@@ -70,26 +85,6 @@ margin-left:20px;
 display: flex;
 flex-direction: column;
 align-items: center; 
-}
-
-
-.list-unstyled li a {
-    text-decoration: none;
-    color: var(--text-color-gray);
-}
-
-.list-unstyled li a:hover {
-    text-decoration: none;
-    color: black;
-}
-
-.list-unstyled li a.active {
-    color: black;
-}
-
-
-.list-unstyled {
-    padding-left: 15px;
 }
 
 .content {
