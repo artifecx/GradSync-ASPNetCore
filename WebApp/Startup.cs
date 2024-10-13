@@ -18,10 +18,9 @@ using System;
 using System.IO;
 using System.Text;
 using Quartz;
-using Quartz.Spi;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Services.Services;
-
+using Services.ServiceModels;
+using Microsoft.AspNetCore.Http;
+using System.Threading.RateLimiting;
 
 namespace WebApp
 {
@@ -121,9 +120,61 @@ namespace WebApp
                 options.ValueLengthLimit = 1024 * 1024 * 100;
             });
 
+            services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
+
             services.AddSingleton<IFileProvider>(
                 new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "wwwroot")));
+        
+            services.AddRateLimiter(options =>
+            {
+                options.AddPolicy("PasswordResetPolicy", context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 1,
+                            Window = TimeSpan.FromMinutes(30),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        }));
+
+                options.AddPolicy("GeneralApiPolicy", context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 100,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 10,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        }));
+
+                options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 1000,
+                            Window = TimeSpan.FromMinutes(1),
+                            QueueLimit = 50,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        }));
+
+                options.OnRejected = async (context, cancellationToken) =>
+                {
+                    context.HttpContext.Response.StatusCode = 429;
+                    context.HttpContext.Response.ContentType = "application/json";
+
+                    var response = new
+                    {
+                        Message = "Too many requests. Please try again later."
+                    };
+
+                    await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+                };
+
+            });
         }
 
         /// <summary>
