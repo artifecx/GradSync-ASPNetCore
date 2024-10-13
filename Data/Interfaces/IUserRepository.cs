@@ -11,17 +11,18 @@ namespace Data.Interfaces
     {
         Task<List<User>> GetAllUsersAsync();
         Task<List<User>> GetAllUsersNoIncludesAsync();
+        Task<User> GetUserByIdAsync(string id);
+        Task<List<Role>> GetAllRolesAsync();
         void AddUser(User user);
-        void AddApplicant(Applicant applicant);
-        void AddRecruiter(Recruiter recruiter);
-        void AddAdmin(Admin nlo);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string userId);
+        void AddAdmin(Admin admin);
         Task DeleteAdminAsync(string adminId);
+        void AddApplicant(Applicant applicant);
         Task DeleteApplicantAsync(string applicantId);
+        void AddRecruiter(Recruiter recruiter);
         Task DeleteRecruiterAsync(string recruiterId);
-        Task<User> FindUserByIdAsync(string id);
-        Task<Role> FindRoleByIdAsync(string id);
-        Task<List<Role>> GetAllRolesAsync();
+
+        bool IsSuperAdmin(string adminId);
     }
 }
