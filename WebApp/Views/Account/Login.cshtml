@@ -6,7 +6,7 @@
     await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.AccountServiceModel());
 }
 <div class="relative flex h-screen items-center justify-center">
-    <img src="~/img/loginBG.png" alt="loginBG" class="-z-10 absolute inset-0 h-full w-full object-cover" />
+    <img src="~/img/loginBG.png" alt="loginBG" class="-z-0 absolute inset-0 h-full w-full object-cover" />
 
     <div class="bg-opacity-0 flex min-h-screen w-full items-center bg-white pt-14 text-[#7A1515]">
         <form method="post" action="/Account/Login" id="loginForm" class="relative ml-28 flex flex-col rounded-md bg-white p-8" style="max-width: 500px; width: 100%;">
