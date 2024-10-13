@@ -2,19 +2,16 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
-using Microsoft.Build.Exceptions;
 using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using static Services.Exceptions.CompanyExceptions;
 using static Services.Exceptions.UserExceptions;
-using Services.Interfaces;
-using System.Collections.Generic;
+using static Services.Exceptions.EmailExceptions;
+using static Resources.Messages.ErrorMessages;
 
 namespace WebApp.Mvc
 {
@@ -64,7 +61,7 @@ namespace WebApp.Mvc
         /// </summary>
         public string UserId
         {
-            get { return User.FindFirst(ClaimTypes.NameIdentifier).Value; }
+            get { return User.FindFirst(ClaimTypes.NameIdentifier)?.Value; }
         }
 
         /// <summary>
@@ -171,7 +168,12 @@ namespace WebApp.Mvc
             _logger.LogInformation($"======={controllerName} : {methodName} Ended=======");
         }
 
-        private string GetControllerNameFromAction(object action)
+        /// <summary>
+        /// Gets the controller name from action.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <returns></returns>
+        private static string GetControllerNameFromAction(object action)
         {
             if (action is Delegate del)
             {
@@ -191,90 +193,28 @@ namespace WebApp.Mvc
             return "UnknownController";
         }
 
-        #region Exception Handlers
+        #region Async Exception Handlers        
         /// <summary>
-        /// Handles the exception.
+        /// Logs and sets an error message.
         /// </summary>
-        /// <param name="action">The action.</param>
+        /// <param name="ex">The exception.</param>
         /// <param name="actionName">Name of the action.</param>
-        public IActionResult HandleException(Func<IActionResult> action, string actionName)
-        {
-            try
-            {
-                StartLog(action, actionName);
-                return action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in {actionName}");
-                return View("Error");
-            }
-            finally
-            {
-                EndLog(action, actionName);
-            }
-        }
-        public JsonResult HandleException(Func<JsonResult> action, string actionName)
-        {
-            try
-            {
-                StartLog(action, actionName);
-                return action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in {actionName}");
-                return new JsonResult(new { success = false, error = "An error occurred. Please try again later." });
-            }
-            finally
-            {
-                EndLog(action, actionName);
-            }
-        }
-
-        public FileResult HandleException(Func<FileResult> action, string actionName)
-        {
-            try
-            {
-                StartLog(action, actionName);
-                return action();
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in {actionName}");
-                return null;
-            }
-            finally
-            {
-                EndLog(action, actionName);
-            }
-        }
-        #endregion Exception Handlers
-
-        #region Async Exception Handlers
+        /// <returns>true</returns>
         private bool LogAndSetErrorMessage(Exception ex, string actionName)
         {
-            TempData["ErrorMessage"] = ex.Message.ToString();
+            TempData["ErrorMessage"] = string.Equals("Login", actionName) ? null : ex.Message.ToString();
             _logger.LogError(ex, $"Error in {actionName}");
             return true;
         }
 
-        private IActionResult HandleRedirect(string actionName, string id = null)
-        {
-            if (actionName == "Create")
-            {
-                return RedirectToAction(actionName);
-            }
-
-            if (actionName == "Delete")
-            {
-                return RedirectToAction("GetAll");
-            }
-
-            return !string.IsNullOrEmpty(id) ? RedirectToAction(actionName, new { id }) : RedirectToAction(actionName);
-        }
-
-        public async Task<IActionResult> HandleExceptionAsync(Func<Task<IActionResult>> action, string actionName)
+        /// <summary>
+        /// Handles an <see cref="IActionResult"/> exception asynchronously.
+        /// Logs the exception and redirects to the specified action.
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="actionName">Name of the action.</param>
+        /// <returns></returns>
+        protected async Task<IActionResult> HandleExceptionAsync(Func<Task<IActionResult>> action, string actionName)
         {
             try
             {
@@ -297,6 +237,19 @@ namespace WebApp.Mvc
             {
                 return RedirectToAction(actionName, new { id = ex.Id });
             }
+            catch (EmailException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName);
+            }
+            catch (EmailException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName, new { id = ex.Id });
+            }
+            catch (UserNotVerifiedException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                TempData["ErrorMessageLogin"] = ex.Message;
+                return RedirectToAction(actionName);
+            }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Error in {actionName}");
@@ -308,7 +261,14 @@ namespace WebApp.Mvc
             }
         }
 
-        public async Task<JsonResult> HandleExceptionAsync(Func<Task<JsonResult>> action, string actionName)
+        /// <summary>
+        /// Handles a <see cref="JsonResult"/> exception asynchronously.
+        /// Sets a <see cref="TempData"/> error message and logs the exception. 
+        /// </summary>
+        /// <param name="action">The action.</param>
+        /// <param name="actionName">Name of the action.</param>
+        /// <returns><see cref="JsonResult"/></returns>
+        protected async Task<JsonResult> HandleExceptionAsync(Func<Task<JsonResult>> action, string actionName)
         {
             try
             {
@@ -322,6 +282,12 @@ namespace WebApp.Mvc
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (UserException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+                _logger.LogError(ex, $"Error in {actionName}");
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+            catch (EmailException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
                 _logger.LogError(ex, $"Error in {actionName}");
@@ -343,25 +309,25 @@ namespace WebApp.Mvc
                 EndLog(action, actionName);
             }
         }
+        #endregion
 
-        public async Task<FileResult> HandleExceptionAsync(Func<Task<FileResult>> action, string actionName)
+        /// <summary>
+        /// Checks the form submission time.
+        /// </summary>
+        /// <param name="FormLoadTime">The form load time.</param>
+        /// <exception cref="UserException"></exception>
+        protected static void CheckFormSubmissionTime(string FormLoadTime)
         {
-            try
+            long ticks;
+            if (long.TryParse(FormLoadTime, out ticks))
             {
-                StartLog(action, actionName);
-                return await action();
+                var loadTime = new DateTime(ticks);
+                var timeTaken = DateTime.UtcNow - loadTime;
+                if (timeTaken.TotalSeconds < 10)
+                {
+                    throw new UserException(Error_UserRegistrationDefault);
+                }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, $"Error in {actionName}");
-                return null;
-            }
-            finally
-            {
-                EndLog(action, actionName);
-            }
-        }
-
-        #endregion Async Exception Handlers
+        }   
     }
 }

@@ -16,7 +16,21 @@ $('#confirmResetBtn').on('click', function () {
         success: function (response) {
             if (response.success) {
                 window.location.href = baseUrl;
-            } else {
+            }
+            else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (jqXHR) {
+            if (jqXHR.status === 429) {
+                var response = jqXHR.responseJSON;
+                var errorMessage = response.message || "Too many requests. Please try again later.";
+                $('#resetPasswordModal').modal('hide');
+
+                toastr.error(errorMessage);
+            }
+            else {
                 var errorMessage = response.error || "An error occurred.";
                 toastr.error(errorMessage);
             }

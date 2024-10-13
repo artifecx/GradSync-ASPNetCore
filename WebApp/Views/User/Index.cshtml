@@ -18,21 +18,13 @@
     string sortByEmail = sortBy == "email" ? "email_desc" : "email";
 }
 
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-</head>
 
-<body class="bg-[#F5F7F8]">
+<div class="bg-[#F5F7F8]">
     <div class="flex min-h-screen">
-        <div class="flex-1 p-3 flex items-center justify-center">
-            <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-7xl h-full">
+        <div class="flex-1 flex items-center justify-center p-3">
+            <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
                 <div class="flex items-center justify-between">
-                    <h1 class="text-4xl font-bold text-left text-[#7A1515] pb-8">User Management</h1>
+                    <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">User Management</h1>
 
                     <!-- Search and Add User Button -->
                     <div class="flex items-center pb-8">
@@ -46,7 +38,7 @@
                         @if (User.IsInRole("Admin"))
                         {
                             <button type="button"
-                                    class="ml-4 bg-[#7A1515] text-white font-semibold px-4 py-2 rounded-md hover:bg-[#A53D3D]">
+                                    class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
                                 <i class="fas fa-plus"></i> Add User
                             </button>
                         }
@@ -54,8 +46,8 @@
                 </div>
 
                 <!-- User Table -->
-                <div class="overflow-auto rounded-lg bg-[#F5F7F8] h-[80vh]">
-                    <table class="min-w-full bg-white table-auto rounded-lg">
+                <div class="h-[80vh] overflow-auto rounded-lg bg-[#F5F7F8]">
+                    <table class="min-w-full table-auto rounded-lg bg-white">
                         <thead class="bg-gray-100">
                             <tr>
                                 <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
@@ -92,7 +84,7 @@
                                         <button class="cursor-pointer uppercase text-black hover:text-[#A53D3D]" id="roleDropdown">
                                             Role <i class="fas fa-chevron-down"></i>
                                         </button>
-                                        <div class="absolute hidden bg-white border rounded-md mt-1" id="roleDropdownMenu">
+                                        <div class="absolute mt-1 hidden rounded-md border bg-white" id="roleDropdownMenu">
                                             <a asp-action="@aspAction"
                                                asp-route-role=""
                                                class="block px-4 py-2 hover:bg-gray-100">All</a>
@@ -113,7 +105,7 @@
                                             Verified <i class="fas fa-chevron-down"></i>
                                         </button>
 
-                                        <div class="absolute hidden bg-white border rounded-md mt-1" id="verifiedDropdownMenu">
+                                        <div class="absolute mt-1 hidden rounded-md border bg-white" id="verifiedDropdownMenu">
                                             <a class="block px-4 py-2 text-sm hover:bg-gray-100"
                                                asp-action="@aspAction"
                                                asp-route-sortBy="@sortBy"
@@ -173,16 +165,14 @@
 
                                         <td class="px-6 py-3 text-center">
                                             <div class="relative">
-                                                <button id="actionDropdownBtn"
-                                                        class="cursor-pointer text-black hover:text-[#A53D3D] focus:outline-none"
-                                                        aria-expanded="false" aria-haspopup="true">
+                                                <button data-userid="@item.UserId" class="actionDropdownBtn cursor-pointer text-black hover:text-[#A53D3D] focus:outline-none">
                                                     <i class="fas fa-ellipsis-v"></i>
                                                 </button>
 
                                                 @*Action Dropdown Menu AMBOT NLNG GAJUD LATER NLNG YAN*@
-                                                <div id="actionDropdownMenu"
-                                                     class="text-left hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
-                                                    <div class="py-1 space-y-1">
+                                                <div id="actionDropdownMenu-@item.UserId" 
+                                                    class="actionDropdownMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white text-left shadow-lg ring-black">
+                                                    <div class="space-y-1 py-1">
                                                         <!-- Edit User -->
                                                         <a href="javascript:void(0);"
                                                            onclick="displayEditModal(
@@ -197,14 +187,14 @@
 
                                                         <!-- Reset Password -->
                                                         <button onclick="displayResetPasswordModal('@item.UserId', '@item.FirstName')"
-                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 hover:text-blue-800">
+                                                                class="flex w-full items-center px-4 py-2 text-left text-sm text-blue-600 hover:bg-gray-100 hover:text-blue-800">
                                                             <i class="fas fa-key mr-2 w-5" aria-hidden="true"></i>
                                                             <span>Reset Password</span>
                                                         </button>
 
                                                         <!-- Delete User -->
                                                         <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.FirstName')"
-                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 hover:text-red-800">
+                                                                class="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 hover:text-red-800">
                                                             <i class="fas fa-trash-alt mr-2 w-5" aria-hidden="true"></i>
                                                             <span>Delete</span>
                                                         </button>
@@ -219,7 +209,7 @@
                     </table>
                 </div>
 
-                <nav class="pt-3 flex justify-center">
+                <nav class="flex justify-center pt-3">
                     <ul class="pagination flex items-center">
                         @if (Model.HasPreviousPage)
                         {
@@ -248,7 +238,7 @@
             </div>
         </div>
     </div>
-    </div>
+</div>
 
     <!-- Values passed to the js files -->
     <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
@@ -256,61 +246,46 @@
     <input type="hidden" id="resetUrl" value="@Url.Action("ResetPassword", "User")" />
     <input type="hidden" id="deleteUrl" value="@Url.Action("Delete", "User")" />
 
-
+@section Scripts{
     <script src="~/js/delete.js"></script>
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/user.js"></script>
     <script>
-        $('#roleDropdown').on('click', function (e) {
-            e.preventDefault();
-            $(this).next('.dropdown-menu').toggleClass('hidden');
-        });
-                        });
-    </script>
-
-    <script>
-        const actionDropdownBtn = document.getElementById('actionDropdownBtn');
-        const actionDropdownMenu = document.getElementById('actionDropdownMenu');
-
-        function toggleDropdown(menuId) {
-            document.getElementById(menuId).classList.toggle('hidden');
-        }
-
-        document.getElementById('roleDropdown').onclick = function () {
-            toggleDropdown('roleDropdownMenu');
-        };
-
-        document.getElementById('verifiedDropdown').onclick = function () {
-            toggleDropdown('verifiedDropdownMenu');
-        };
-
-        actionDropdownBtn.addEventListener('click', function (e) {
-            e.preventDefault();
-            actionDropdownMenu.classList.toggle('hidden');
-        });
-
         document.addEventListener('click', function (e) {
-            if (!actionDropdownBtn.contains(e.target) && !actionDropdownMenu.contains(e.target)) {
-                actionDropdownMenu.classList.add('hidden');
+            const actionBtn = e.target.closest('.actionDropdownBtn');
+            if (actionBtn) {
+                const userId = actionBtn.dataset.userid;
+                const menu = document.getElementById(`actionDropdownMenu-${userId}`);
+                menu.classList.toggle('hidden');
+                document.querySelectorAll('.actionDropdownMenu').forEach(m => {
+                    if (m.id !== `actionDropdownMenu-${userId}`) {
+                        m.classList.add('hidden');
+                    }
+                });
+                return;
+            }
+
+            if (!e.target.closest('.actionDropdownMenu') && !e.target.closest('.actionDropdownBtn')) {
+                document.querySelectorAll('.actionDropdownMenu').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+
+            if (e.target.closest('#roleDropdown')) {
+                document.getElementById('roleDropdownMenu').classList.toggle('hidden');
+                return;
+            }
+
+            if (e.target.closest('#verifiedDropdown')) {
+                document.getElementById('verifiedDropdownMenu').classList.toggle('hidden');
+                return;
+            }
+            if (!e.target.closest('#roleDropdownMenu') && !e.target.closest('#roleDropdown')) {
+                document.getElementById('roleDropdownMenu').classList.add('hidden');
+            }
+            if (!e.target.closest('#verifiedDropdownMenu') && !e.target.closest('#verifiedDropdown')) {
+                document.getElementById('verifiedDropdownMenu').classList.add('hidden');
             }
         });
-
-        // Handle Action Dropdown for each user
-        // const actionDropdownBtn = document.getElementById('actionDropdownBtn');
-        // const actionDropdownMenu = document.getElementById('actionDropdownMenu');
-        
-        // document.querySelectorAll('button[id^="actionDropdownBtn"]').forEach(button => {
-        //     const userId = button.id.split('-')[1];
-        //     const menuId = `actionDropdownMenu-${userId}`;
-        //     const actionDropdownMenu = document.getElementById(menuId);
-
-        //     document.addEventListener('click', function (e) {
-        //         if (!button.contains(e.target) && !actionDropdownMenu.contains(e.target)) {
-        //             actionDropdownMenu.classList.add('hidden'); 
-        //         }
-        //     });
-        // });
     </script>
-
-</body>
-</html>
+}

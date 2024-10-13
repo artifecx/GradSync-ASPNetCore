@@ -67,7 +67,7 @@ namespace WebApp.Controllers
                 ViewBag.Companies = await _jobService.GetCompaniesWithListingsAsync();
 
                 return View("Index", jobs);
-            }, "GetAll");
+            }, "GetAllJobsAdmin");
         }
 
         [HttpGet]
@@ -89,7 +89,7 @@ namespace WebApp.Controllers
                 await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
 
                 return View("Index", jobs);
-            }, "GetAll");
+            }, "GetAllJobsRecruiter");
         }
 
         private async Task InitializeValues(
@@ -151,7 +151,7 @@ namespace WebApp.Controllers
                 await PopulateViewBagsAsync();
 
                 return View("ViewJob", job);
-            }, "ViewJob");
+            }, "GetJob");
         }
 
         private string RedirectString()
@@ -182,7 +182,7 @@ namespace WebApp.Controllers
                     // Implement
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = Errors.ErrorCreateTeam;
+                TempData["ErrorMessage"] = "";
                 return Json(new { success = false });
             }, "Create");
         }
