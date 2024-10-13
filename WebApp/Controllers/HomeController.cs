@@ -15,6 +15,7 @@ namespace WebApp.Controllers
     /// <summary>
     /// Home Controller
     /// </summary>
+    [Route("home")]
     public class HomeController : ControllerBase<HomeController>
     {
         private readonly IDashboardService _dashboardService;
@@ -41,13 +42,14 @@ namespace WebApp.Controllers
         /// Returns Home View.
         /// </summary>
         /// <returns> Home View </returns>
-        /// 
+        [Route("/")]
         [Authorize(Policy = "Applicant")]
         public IActionResult Index()
         {
             return View();
         }
-        
+
+        [Route("dashboard")]
         [Authorize(Policy = "Admin")]
         public async Task<IActionResult> Dashboard()
         {
@@ -55,6 +57,21 @@ namespace WebApp.Controllers
             return View(dashboardData);
         }
 
+        [Route("/contact-us")]
+        [Authorize]
+        public async Task<IActionResult> Contact()
+        {
+            return View();
+        }
+
+        [Route("/about-us")]
+        [Authorize]
+        public async Task<IActionResult> About()
+        {
+            return View();
+        }
+
+        [Route("/unauthorized")]
         public IActionResult InvalidAccess()
         {
             return View();
