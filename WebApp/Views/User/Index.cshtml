@@ -8,7 +8,6 @@
     await Html.RenderPartialAsync("_DeleteModal");
 
     string aspAction = "GetAllUsers";
-
     string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
     string role = ViewData["Role"] as string;
@@ -19,202 +18,299 @@
     string sortByEmail = sortBy == "email" ? "email_desc" : "email";
 }
 
-<div class="nav-header flex items-center justify-between">
-    <h1 class="display-6 text-3xl font-semibold text-[#7A1515]">User Management</h1>
-    <div class="flex items-center">
-        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
-            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name or email" })
-            <input type="hidden" name="sortBy" value="@sortBy" />
-        </form>
-        <div class="mx-3">
-            @if (User.IsInRole("Admin"))
-            {
-                <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" data-toggle="modal" data-target="#addUserModal">
-                    <i class="fa fa-plus"></i>
-                    New User
-                </button>
-            }
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Management</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F5F7F8]">
+    <div class="flex min-h-screen">
+        <div class="flex-1 p-3 flex items-center justify-center">
+            <div class="bg-white shadow-md rounded-lg p-6 w-full max-w-7xl h-full">
+                <div class="flex items-center justify-between">
+                    <h1 class="text-4xl font-bold text-left text-[#7A1515] pb-8">User Management</h1>
+
+                    <!-- Search and Add User Button -->
+                    <div class="flex items-center pb-8">
+                        <form method="get" asp-action="@aspAction" class="flex items-center space-x-2">
+                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Search by name or email" })
+                            <input type="hidden" name="sortBy" value="@sortBy" />
+                            <input type="hidden" name="role" value="@role" />
+                            <input type="hidden" name="verified" value="@verified" />
+                        </form>
+
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <button type="button"
+                                    class="ml-4 bg-[#7A1515] text-white font-semibold px-4 py-2 rounded-md hover:bg-[#A53D3D]">
+                                <i class="fas fa-plus"></i> Add User
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- User Table -->
+                <div class="overflow-auto rounded-lg bg-[#F5F7F8] h-[80vh]">
+                    <table class="min-w-full bg-white table-auto rounded-lg">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <a asp-action="@aspAction"
+                                       asp-route-sortBy="@sortByName"
+                                       asp-route-search="@search"
+                                       asp-route-pageIndex="@pageIndex"
+                                       asp-route-role="@role"
+                                       asp-route-verified="@verified"
+                                       class="cursor-pointer text-black hover:text-[#A53D3D]">
+                                        Name
+                                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fas fa-sort'></i>") :
+                                            (sortBy == "name_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort-up'></i>")))
+                                    </a>
+                                </th>
+
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <a asp-action="@aspAction"
+                                       asp-route-sortBy="@sortByEmail"
+                                       asp-route-search="@search"
+                                       asp-route-pageIndex="@pageIndex"
+                                       asp-route-role="@role"
+                                       asp-route-verified="@verified"
+                                       class="cursor-pointer text-black hover:text-[#A53D3D">
+                                        Email
+                                        @(sortBy == "email" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
+                                            (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
+                                    </a>
+                                </th>
+
+                                <!-- Role Dropdown Filter -->
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <div class="relative">
+                                        <button class="cursor-pointer uppercase text-black hover:text-[#A53D3D]" id="roleDropdown">
+                                            Role <i class="fas fa-chevron-down"></i>
+                                        </button>
+                                        <div class="absolute hidden bg-white border rounded-md mt-1" id="roleDropdownMenu">
+                                            <a asp-action="@aspAction"
+                                               asp-route-role=""
+                                               class="block px-4 py-2 hover:bg-gray-100">All</a>
+                                            @foreach (var r in ViewBag.Roles)
+                                            {
+                                                <a asp-action="@aspAction"
+                                                   asp-route-role="@r.Name"
+                                                   class="block px-4 py-2 hover:bg-gray-100">@r.Name</a>
+                                            }
+                                        </div>
+                                    </div>
+                                </th>
+
+                                <!-- Verified Dropdown Filter -->
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <div class="relative">
+                                        <button class="cursor-pointer uppercase text-black hover:text-[#A53D3D]" id="verifiedDropdown">
+                                            Verified <i class="fas fa-chevron-down"></i>
+                                        </button>
+
+                                        <div class="absolute hidden bg-white border rounded-md mt-1" id="verifiedDropdownMenu">
+                                            <a class="block px-4 py-2 text-sm hover:bg-gray-100"
+                                               asp-action="@aspAction"
+                                               asp-route-sortBy="@sortBy"
+                                               asp-route-search="@search"
+                                               asp-route-role="@role"
+                                               asp-route-verified="">All</a>
+                                            <a class="block px-4 py-2 text-sm hover:bg-gray-100"
+                                               asp-action="@aspAction"
+                                               asp-route-sortBy="@sortBy"
+                                               asp-route-search="@search"
+                                               asp-route-role="@role"
+                                               asp-route-verified="true">Verified</a>
+                                            <a class="block px-4 py-2 text-sm hover:bg-gray-100"
+                                               asp-action="@aspAction"
+                                               asp-route-sortBy="@sortBy"
+                                               asp-route-search="@search"
+                                               asp-route-role="@role"
+                                               asp-route-verified="false">Unverified</a>
+                                        </div>
+                                    </div>
+                                </th>
+
+                                <th class="py-3 text-left text-sm font-medium uppercase tracking-wider text-black hover:text-[#A53D3D]">Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @if (!Model.Any())
+                            {
+                                <tr>
+                                    <td colspan="6" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
+                                        @(string.IsNullOrEmpty(search) ? "No users found." : "No users found matching the criteria.")
+                                    </td>
+                                </tr>
+                            }
+                            else
+                            {
+                                @foreach (var item in Model)
+                                {
+                                    await Html.RenderPartialAsync("_EditUserModal", item);
+                                    <tr class="hover:bg-gray-100">
+                                        <td class="px-6 py-3 text-sm text-gray-900">
+                                            @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
+                                        </td>
+                                        <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.Email)</td>
+                                        <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.RoleId)</td>
+                                        <td class="px-6 py-3 text-sm">
+                                            @if (item.IsVerified)
+                                            {
+                                                <span class="text-green-600">&#10004; Verified</span>
+                                            }
+                                            else
+                                            {
+                                                <span class="text-red-600">&#10006; Not Verified</span>
+                                            }
+                                        </td>
+
+                                        <td class="px-6 py-3 text-center">
+                                            <div class="relative">
+                                                <button id="actionDropdownBtn"
+                                                        class="cursor-pointer text-black hover:text-[#A53D3D] focus:outline-none"
+                                                        aria-expanded="false" aria-haspopup="true">
+                                                    <i class="fas fa-ellipsis-v"></i>
+                                                </button>
+
+                                                @*Action Dropdown Menu AMBOT NLNG GAJUD LATER NLNG YAN*@
+                                                <div id="actionDropdownMenu"
+                                                     class="text-left hidden absolute right-0 z-10 mt-2 w-48 origin-top-right rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5">
+                                                    <div class="py-1 space-y-1">
+                                                        <!-- Edit User -->
+                                                        <a href="javascript:void(0);"
+                                                           onclick="displayEditModal(
+                                                            '@item.UserId','@item.FirstName'
+                                                            ,'@item.LastName','@item.MiddleName'
+                                                            ,'@item.Suffix','@item.Email'
+                                                            ,'@item.RoleId','@item.IsVerified')"
+                                                           class="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-[#A53D3D]">
+                                                            <i class="fas fa-edit mr-2 w-5"></i>
+                                                            <span>Edit</span>
+                                                        </a>
+
+                                                        <!-- Reset Password -->
+                                                        <button onclick="displayResetPasswordModal('@item.UserId', '@item.FirstName')"
+                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-blue-600 hover:bg-gray-100 hover:text-blue-800">
+                                                            <i class="fas fa-key mr-2 w-5" aria-hidden="true"></i>
+                                                            <span>Reset Password</span>
+                                                        </button>
+
+                                                        <!-- Delete User -->
+                                                        <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.FirstName')"
+                                                                class="flex items-center w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100 hover:text-red-800">
+                                                            <i class="fas fa-trash-alt mr-2 w-5" aria-hidden="true"></i>
+                                                            <span>Delete</span>
+                                                        </button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+                <nav class="pt-3 flex justify-center">
+                    <ul class="pagination flex items-center">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-search="@search">@i</a>
+                            </li>
+                        }
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
         </div>
     </div>
-</div>
+    </div>
 
-<div class="container-fluid px-4 py-3">
-    <table class="table-white table min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-            <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    Name
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <a asp-action="@aspAction" asp-route-sortBy="@sortByName" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
-                        @Html.DisplayNameFor(model => model.First().LastName)
-                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                    </a>
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <a asp-action="@aspAction" asp-route-sortBy="@sortByEmail" asp-route-search="@search" asp-route-pageIndex="@pageIndex" asp-route-role="@role" asp-route-verified="@verified" class="text-black hover:text-blue-500">
-                        @Html.DisplayNameFor(model => model.First().Email)
-                        @(sortBy == "email" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "email_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                    </a>
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <div class="dropdown relative">
-                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="roleDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @if(role == null){
-                                @Html.DisplayNameFor(model => model.First().Roles)
-                            }
-                            else
-                            {
-                                <text>@role</text>
-                            }
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </a>
-                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="roleDropdown">
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-role="" asp-route-verified="@verified">All</a>
-                            @foreach (var r in ViewBag.Roles)
-                            {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-role="@r.Name" asp-route-verified="@verified">@r.Name</a>
-                            }
-                        </div>
-                    </div>
-                </th>
-                <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
-                    <div class="dropdown relative">
-                        <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="verifiedDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                            @if(!verified.HasValue){
-                                @Html.DisplayNameFor(model => model.First().IsVerified)
-                            }
-                            else
-                            {
-                                <text>@(verified == true ? "Verified" : "Unverified")</text>
-                            }
-                            <i class="fa-solid fa-chevron-down"></i>
-                        </a>
-                        <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="verifiedDropdown">
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                                asp-action="@aspAction"
-                                asp-route-sortBy="@sortBy" 
-                                asp-route-search="@search" 
-                                asp-route-role="@role" 
-                                asp-route-verified="">All</a>
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                               asp-action="@aspAction"
-                               asp-route-sortBy="@sortBy"
-                               asp-route-search="@search"
-                               asp-route-role="@role"
-                               asp-route-verified="true">Verified</a>
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                               asp-action="@aspAction"
-                               asp-route-sortBy="@sortBy"
-                               asp-route-search="@search"
-                               asp-route-role="@role" 
-                               asp-route-verified="false">Unverified</a>
-                        </div>
-                    </div>
-                </th>
-                <th class="px-6 py-3"></th>
-            </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-            @if (!Model.Any())
-            {
-                <tr>
-                    <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
-                        @(string.IsNullOrEmpty(search) ? Html.Raw("No users found") : Html.Raw("No users found matching the criteria"))
-                    </td>
-                </tr>
-            }
-            else
-            {
-                @foreach (var item in Model)
-                {
-                    await Html.RenderPartialAsync("_EditUserModal", item);
-                    <tr>
-                        <td class="whitespace-nowrap px-6 py-4">
-                            @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.MiddleName)
-                        </td>
-                        <td class="whitespace-nowrap px-6 py-4">
-                            @Html.DisplayFor(modelItem => item.LastName) @Html.DisplayFor(modelItem => item.Suffix)
-                        </td>
-                        <td class="whitespace-nowrap px-6 py-4">
-                            @Html.DisplayFor(modelItem => item.Email)
-                        </td>
-                        <td class="whitespace-nowrap px-6 py-4">
-                            @Html.DisplayFor(modelItem => item.RoleId)
-                        </td>
-                        <td class="whitespace-nowrap px-6 py-4">
-                            @if (item.IsVerified)
-                            {
-                                <span>&#10004;</span>
-                            }
-                            else
-                            {
-                                <span>&#10006;</span>
-                            }
-                        </td>
-                        <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                            <a href="javascript:void(0);" 
-                                onclick="displayEditModal(
-                                        '@item.UserId','@item.FirstName'
-                                        ,'@item.LastName','@item.MiddleName'
-                                        ,'@item.Suffix','@item.Email'
-                                        ,'@item.RoleId','@item.IsVerified')" 
-                                class="fas fa-edit action-icon mx-2"></a> |
-                            <button type="button" onclick="displayResetPasswordModal('@item.UserId', '@item.FirstName')" class="action-icon mx-1">
-                                <i class="fa fa-key" aria-hidden="true"></i>
-                                <span class="sr-only">Reset Password</span>
-                            </button> |
-                            <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.FirstName')" class="action-icon mx-1 text-red-500 hover:text-red-700">
-                                <i class="fas fa-trash-alt" aria-hidden="true"></i>
-                                <span class="sr-only">Delete</span>
-                            </button>
-                        </td>
-                    </tr>
-                }
-            }
-        </tbody>
-    </table>
+    <!-- Values passed to the js files -->
+    <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+    <input type="hidden" id="baseUrl" value="@Url.Action("GetAllUsers", "User")" />
+    <input type="hidden" id="resetUrl" value="@Url.Action("ResetPassword", "User")" />
+    <input type="hidden" id="deleteUrl" value="@Url.Action("Delete", "User")" />
 
-    <nav class="mt-4 flex justify-end">
-        <ul class="pagination flex items-center">
-            @if (Model.HasPreviousPage)
-            {
-                <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">Previous</a>
-                </li>
-            }
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-search="@search">@i</a>
-                </li>
-            }
-            @if (Model.HasNextPage)
-            {
-                <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-search="@search">Next</a>
-                </li>
-            }
-        </ul>
-    </nav>
-</div>
 
-<!-- Values passed to the js files -->
-<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
-<input type="hidden" id="baseUrl" value="@Url.Action("GetAllUsers", "User")" />
-<input type="hidden" id="resetUrl" value="@Url.Action("ResetPassword", "User")" />
-<input type="hidden" id="deleteUrl" value="@Url.Action("Delete", "User")" />
-
-@section Scripts {
     <script src="~/js/delete.js"></script>
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/user.js"></script>
     <script>
-            $('#roleDropdown').on('click', function (e) {
-                e.preventDefault();
-                $(this).next('.dropdown-menu').toggleClass('hidden');
-            });
+        $('#roleDropdown').on('click', function (e) {
+            e.preventDefault();
+            $(this).next('.dropdown-menu').toggleClass('hidden');
         });
+                        });
     </script>
-}
 
+    <script>
+        const actionDropdownBtn = document.getElementById('actionDropdownBtn');
+        const actionDropdownMenu = document.getElementById('actionDropdownMenu');
+
+        function toggleDropdown(menuId) {
+            document.getElementById(menuId).classList.toggle('hidden');
+        }
+
+        document.getElementById('roleDropdown').onclick = function () {
+            toggleDropdown('roleDropdownMenu');
+        };
+
+        document.getElementById('verifiedDropdown').onclick = function () {
+            toggleDropdown('verifiedDropdownMenu');
+        };
+
+        actionDropdownBtn.addEventListener('click', function (e) {
+            e.preventDefault();
+            actionDropdownMenu.classList.toggle('hidden');
+        });
+
+        document.addEventListener('click', function (e) {
+            if (!actionDropdownBtn.contains(e.target) && !actionDropdownMenu.contains(e.target)) {
+                actionDropdownMenu.classList.add('hidden');
+            }
+        });
+
+        // Handle Action Dropdown for each user
+        // const actionDropdownBtn = document.getElementById('actionDropdownBtn');
+        // const actionDropdownMenu = document.getElementById('actionDropdownMenu');
+        
+        // document.querySelectorAll('button[id^="actionDropdownBtn"]').forEach(button => {
+        //     const userId = button.id.split('-')[1];
+        //     const menuId = `actionDropdownMenu-${userId}`;
+        //     const actionDropdownMenu = document.getElementById(menuId);
+
+        //     document.addEventListener('click', function (e) {
+        //         if (!button.contains(e.target) && !actionDropdownMenu.contains(e.target)) {
+        //             actionDropdownMenu.classList.add('hidden'); 
+        //         }
+        //     });
+        // });
+    </script>
+
+</body>
+</html>
