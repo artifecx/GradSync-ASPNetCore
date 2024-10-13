@@ -22,14 +22,14 @@ namespace Resources.Messages {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class UserRoles {
+    public class ErrorMessages {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal UserRoles() {
+        internal ErrorMessages() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Resources.Messages {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Resources.Messages.UserRoles", typeof(UserRoles).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Resources.Messages.ErrorMessages", typeof(ErrorMessages).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -61,29 +61,65 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Admin.
+        ///   Looks up a localized string similar to No changes detected..
         /// </summary>
-        public static string Admin {
+        public static string Error_NoChanges {
             get {
-                return ResourceManager.GetString("Admin", resourceCulture);
+                return ResourceManager.GetString("Error_NoChanges", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Employee.
+        ///   Looks up a localized string similar to User already exists!.
         /// </summary>
-        public static string Employee {
+        public static string Error_UserExists {
             get {
-                return ResourceManager.GetString("Employee", resourceCulture);
+                return ResourceManager.GetString("Error_UserExists", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Support Agent.
+        ///   Looks up a localized string similar to Illegal switch from {0} to {1}..
         /// </summary>
-        public static string SupportAgent {
+        public static string Error_UserIllegalRoleSwitch {
             get {
-                return ResourceManager.GetString("SupportAgent", resourceCulture);
+                return ResourceManager.GetString("Error_UserIllegalRoleSwitch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Incorrect email or password..
+        /// </summary>
+        public static string Error_UserIncorrectLoginDetails {
+            get {
+                return ResourceManager.GetString("Error_UserIncorrectLoginDetails", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An has error occurred while logging in..
+        /// </summary>
+        public static string Error_UserLoginDefault {
+            get {
+                return ResourceManager.GetString("Error_UserLoginDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Please check your registered email and spam folder for the verification link. If you haven&apos;t received it, contact us at info.gradsync@gmail.com..
+        /// </summary>
+        public static string Error_UserNotVerified {
+            get {
+                return ResourceManager.GetString("Error_UserNotVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An has error occurred while registering user..
+        /// </summary>
+        public static string Error_UserRegistrationDefault {
+            get {
+                return ResourceManager.GetString("Error_UserRegistrationDefault", resourceCulture);
             }
         }
     }
