@@ -18,11 +18,11 @@
              alt="logo"
              onclick="window.location.href = '@(isRecruiter ? Url.Action("GetAllJobsRecruiter", "Job") : Url.Action("Dashboard", "Home"))';">
     </div>
-    <div class="mb-2 mt-5 font-semibold text-gray-700">Navigation</div>
+    <div class="bg-[#F5F7F8] mb-2 mt-5 font-semibold text-gray-700">Navigation</div>
     <ul class="flex-grow list-none text-[#7A1515]">
         @if (isAdmin || isSuper)
         {
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="Dashboard" asp-controller="Home"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                     hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -34,7 +34,7 @@
         }
         @if (isSuper)
         {
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllUsers" asp-controller="User"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -45,7 +45,7 @@
         }
         @if (isAdmin && !isSuper)
         {
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllCompanies" asp-controller="Company"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -53,7 +53,7 @@
                     Companies
                 </a>
             </li>
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllJobsAdmin" asp-controller="Job"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -61,7 +61,7 @@
                     Jobs
                 </a>
             </li>
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -72,7 +72,7 @@
         }
         @if (isRecruiter)
         {
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -80,7 +80,7 @@
                     Company
                 </a>
             </li>
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllJobsRecruiter" asp-controller="Job"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -88,7 +88,7 @@
                     Jobs
                 </a>
             </li>
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -102,7 +102,7 @@
         </li>
         @if (!isAdmin)
         {
-            <li class="py-2">
+            <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
                    class="flex items-center rounded px-2 py-1 text-[#7A1515]
                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
@@ -110,7 +110,7 @@
                 </a>
             </li>
         }
-        <li class="py-2">
+        <li class="bg-[#F5F7F8] py-2">
             <a href="#" data-toggle="modal" data-target="#logoutModal"
                class="flex items-center rounded px-2 py-1 text-[#7A1515]
                hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
