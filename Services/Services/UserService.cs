@@ -9,19 +9,24 @@ using System.Collections.Generic;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
-using Data.Repositories;
 using System.Threading.Tasks;
-using Resources.Messages;
 using static Services.Exceptions.UserExceptions;
+using static Resources.Constants.UserRoles;
+using static Resources.Messages.ErrorMessages;
+using System.Text;
 
 namespace Services.Services
 {
+    /// <summary>
+    /// Service class for handling operations related to <see cref="User"/>.
+    /// </summary>
     public class UserService : IUserService
     {
         private readonly IUserRepository _repository;
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IEmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
@@ -30,15 +35,37 @@ namespace Services.Services
         /// <param name="accountService">The account service.</param>
         /// <param name="mapper">The mapper.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        public UserService(IUserRepository repository, IAccountService accountService, IMapper mapper, IHttpContextAccessor httpContextAccessor)
+        /// <param name="emailService">The email service.</param>
+        public UserService
+            (
+                IUserRepository repository, 
+                IAccountService accountService,
+                IMapper mapper,
+                IHttpContextAccessor httpContextAccessor,
+                IEmailService emailService
+            )
         {
             _repository = repository;
             _accountService = accountService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
+            _emailService = emailService;
         }
 
-        public async Task<PaginatedList<UserViewModel>> GetAllAsync(string sortBy, string filterBy, string role, bool? verified, int pageIndex, int pageSize)
+        #region Get Methods
+        /// <summary>
+        /// Retrieves filtered and sorted users asynchronously.
+        /// </summary>
+        /// <param name="sortBy">User defined sort order.</param>
+        /// <param name="search">User defined searchfilter.</param>
+        /// <param name="role">User defined role filter.</param>
+        /// <param name="verified">User defined filter of verified status.</param>
+        /// <param name="pageIndex">Page index.</param>
+        /// <param name="pageSize">Page size.</param>
+        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
+        /// The task result contains a paginated list of <see cref="UserViewModel"/>.</returns>
+        public async Task<PaginatedList<UserViewModel>> GetAllUsersAsync
+            (string sortBy, string search, string role, bool? verified, int pageIndex, int pageSize)
         {
             var claimsPrincipal = _httpContextAccessor.HttpContext.User;
             var currentUserIsSuper = claimsPrincipal.FindFirst("IsSuperAdmin")?.Value;
@@ -47,16 +74,22 @@ namespace Services.Services
             var users = _mapper.Map<List<UserViewModel>>(await _repository.GetAllUsersAsync());
 
             if(currentUserIsSuper != "true")
-                users = users.Where(u => u.RoleId != "Admin").ToList();
-            else
-                users = users.Where(u => u.UserId != currentUserId).ToList();
-
-            if (!string.IsNullOrEmpty(filterBy))
             {
-                users = users.Where(d => d.FirstName.Contains(filterBy, StringComparison.OrdinalIgnoreCase) ||
-                                   (d.LastName.Contains(filterBy, StringComparison.OrdinalIgnoreCase)) ||
-                                   (d.Email.Contains(filterBy, StringComparison.OrdinalIgnoreCase)))
-                             .ToList();
+                users = users.Where(u => u.RoleId != Role_Admin).ToList();
+            }
+            else
+            {
+                users = users.Where(u => u.UserId != currentUserId).ToList();
+            } 
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                users = users.Where
+                    (
+                        d => d.FirstName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        d.LastName.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        d.Email.Contains(search, StringComparison.OrdinalIgnoreCase)
+                    ).ToList();
             }
 
             if (!string.IsNullOrEmpty(role))
@@ -83,19 +116,41 @@ namespace Services.Services
             return new PaginatedList<UserViewModel>(items, count, pageIndex, pageSize);
         }
 
+        /// <summary>
+        /// Retrieves a <see cref="User"/> by its identifier asynchronously.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
+        /// The task result contains the <see cref="UserViewModel"/>.</returns>
         public async Task<UserViewModel> GetUserAsync(string userId) =>
-            _mapper.Map<UserViewModel>(await _repository.FindUserByIdAsync(userId));
+            _mapper.Map<UserViewModel>(await _repository.GetUserByIdAsync(userId));
 
-        public async Task AddAsync(UserViewModel model)
+        /// <summary>
+        /// Retrieves all <see cref="Role"/> asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
+        /// The task result contains the <see cref="List{T}"/> of <see cref="Role"/>.</returns>
+        public async Task<List<Role>> GetRolesAsync() =>
+            await _repository.GetAllRolesAsync();
+        #endregion
+
+        #region CRUD Methods
+        /// <summary>
+        /// Retrieves all <see cref="Role"/> asynchronously.
+        /// </summary>
+        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
+        /// The task result contains the <see cref="List{T}"/> of <see cref="Role"/>.</returns>
+        /// <exception cref="UserException">Thrown when a similar user already exists</exception>
+        public async Task AddUserAsync(UserViewModel model)
         {
             var userModel = _mapper.Map<AccountServiceModel>(model);
             userModel.Password = "defpass"; //Default password
-            userModel.AsRecruiter = model.RoleId == "Recruiter";
+            userModel.AsRecruiter = model.RoleId == Role_Recruiter;
 
-            if (model.RoleId == "NLO" || model.RoleId == "Admin")
+            if (model.RoleId == Role_NLO || model.RoleId == Role_Admin)
             {
                 if (_accountService.UserExists(userModel.Email))
-                    throw new UserException("User already exists!");
+                    throw new UserException(Error_UserExists);
 
                 var user = _mapper.Map<User>(userModel);
                 user.UserId = Guid.NewGuid().ToString();
@@ -113,9 +168,15 @@ namespace Services.Services
             }
         }
 
-        public async Task UpdateAsync(UserViewModel model)
+        /// <summary>
+        /// Updates an existing user asynchronously.
+        /// </summary>
+        /// <param name="model">The user view model.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="UserException">Thrown when no changes were detected.</exception>
+        public async Task UpdateUserAsync(UserViewModel model)
         {
-            var user = await _repository.FindUserByIdAsync(model.UserId);
+            var user = await _repository.GetUserByIdAsync(model.UserId);
             bool firstNameChanged = !string.Equals(model.FirstName, user.FirstName, StringComparison.Ordinal);
             bool middleNameChanged = !string.Equals(model.MiddleName, user.MiddleName, StringComparison.Ordinal);
             bool lastNameChanged = !string.Equals(model.LastName, user.LastName, StringComparison.Ordinal);
@@ -125,13 +186,13 @@ namespace Services.Services
             bool hasChanges = firstNameChanged || middleNameChanged || lastNameChanged || suffixChanged || emailChanged || roleChanged;
 
             if(!hasChanges)
-                throw new UserException("No changes detected.");
+                throw new UserException(Error_NoChanges);
 
             model.IsVerified = user.IsVerified && !emailChanged; //TODO: send verification email when changed
 
             if (roleChanged)
             {
-                model.RoleId = await SetRole(user.UserId, user.RoleId, model.RoleId);
+                model.RoleId = await SetUserRole(user.UserId, user.RoleId, model.RoleId);
                 _mapper.Map(model, user);
                 await _repository.UpdateUserAsync(user);
 
@@ -153,40 +214,72 @@ namespace Services.Services
             await _repository.UpdateUserAsync(user);
         }
 
-        private async Task<string> SetRole(string userId, string currentRole, string newRole)
+        /// <summary>
+        /// Deletes an existing user asynchronously.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task DeleteUserAsync(string userId) =>
+            await _repository.DeleteUserAsync(userId);
+        #endregion
+
+        #region Helper Methods
+        /// <summary>
+        /// Resets a user's password asynchronously and sends an email to the user.
+        /// </summary>
+        /// <param name="id">The user identifier.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        public async Task ResetUserPasswordAsync(string id)
         {
-            string[] administrativeRoles = { "Admin", "NLO" };
+            var user = await _repository.GetUserByIdAsync(id);
+            string newPassword = PasswordGenerator.GeneratePassword();
+            user.Password = PasswordManager.EncryptPassword(newPassword);
+
+            await _repository.UpdateUserAsync(user);
+
+            string subject = "Your Password Has Been Reset";
+            string body = $"Hello {user.FirstName},\n\n" +
+                          "Your password has been successfully reset. " +
+                          "Please use the following temporary password to log in and change your password immediately:\n\n" +
+                          $"Temporary Password: {newPassword}\n\n" +
+                          "If you did not request this change, please reply to this email immediately.\n\n" +
+                          "Best regards,\n" +
+                          "GradSync";
+
+            //TODO: uncomment
+            //await _emailService.SendEmailAsync(user.Email, subject, body);
+        }
+
+        /// <summary>
+        /// Sets a user <see cref="Role"/> asynchronously. 
+        /// Hard deletes the previous role and adds the new role.
+        /// </summary>
+        /// <param name="userId">The user identifier.</param>
+        /// <param name="currentRole">The user's current role.</param>
+        /// <param name="newRole">The user's new role.</param>
+        /// <returns>A <see cref="string"/> containing the new user role.</returns>
+        /// <exception cref="UserException">Thrown when going to an administrative role from a non-administrative role and vice versa</exception>
+        private async Task<string> SetUserRole(string userId, string currentRole, string newRole)
+        {
+            string[] administrativeRoles = { Role_Admin, Role_NLO };
             if ((administrativeRoles.Contains(currentRole) && !administrativeRoles.Contains(newRole)) ||
                 (!administrativeRoles.Contains(currentRole) && administrativeRoles.Contains(newRole)))
-                throw new UserException($"Illegal switch from {currentRole} to {newRole}.");
-
+                throw new UserException(string.Format(Error_UserIllegalRoleSwitch, currentRole, newRole));
+            
             if (administrativeRoles.Contains(currentRole))
             {
                 await _repository.DeleteAdminAsync(userId);
             }
             else
             {
-                if(currentRole == "Applicant")
+                if(currentRole == Role_Applicant)
                     await _repository.DeleteApplicantAsync(userId);
-                else if (currentRole == "Recruiter")
+                else if (currentRole == Role_Recruiter)
                     await _repository.DeleteRecruiterAsync(userId);
             }
 
             return newRole;
         }
-
-        public async Task ResetPasswordAsync(string id)
-        {
-            var user = await _repository.FindUserByIdAsync(id);
-            user.Password = PasswordManager.EncryptPassword("defpass"); //TODO: randomize and send via email
-
-            await _repository.UpdateUserAsync(user);
-        }
-
-        public async Task DeleteAsync(string userId) => 
-            await _repository.DeleteUserAsync(userId);
-
-        public async Task<List<Role>> GetRolesAsync() =>
-            await _repository.GetAllRolesAsync();
+        #endregion
     }
 }
