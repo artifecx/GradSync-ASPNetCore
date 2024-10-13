@@ -99,9 +99,9 @@
                                 </th>
 
                                 <!-- Verified Dropdown Filter -->
-                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                <th class="pl-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
                                     <div class="relative">
-                                        <button class="cursor-pointer uppercase text-black hover:text-[#A53D3D]" id="verifiedDropdown">
+                                        <button class="cursor-pointer uppercase pl-6 text-black hover:text-[#A53D3D]" id="verifiedDropdown">
                                             Verified <i class="fas fa-chevron-down"></i>
                                         </button>
 
@@ -147,23 +147,30 @@
                                 {
                                     await Html.RenderPartialAsync("_EditUserModal", item);
                                     <tr class="hover:bg-gray-100">
-                                        <td class="px-6 py-3 text-sm text-gray-900">
-                                            @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
+                                        <td class="px-6 py-3 whitespace-nowrap text-sm text-gray-900">
+                                            <div class="flex items-center">
+                                                <img src="https://ui-avatars.com/api/?name=@item.FirstName+@item.LastName" alt="Profile Image" class="h-8 w-8 rounded-full mr-3">
+                                                @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
+                                            </div>
                                         </td>
                                         <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.Email)</td>
                                         <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.RoleId)</td>
-                                        <td class="px-6 py-3 text-sm">
+                                        <td class="pl-6 py-3 text-sm">
                                             @if (item.IsVerified)
                                             {
-                                                <span class="text-green-600">&#10004; Verified</span>
+                                                <span class="text-green-600">
+                                                    <i class="fas fa-check-circle"></i> Verified
+                                                </span>
                                             }
                                             else
                                             {
-                                                <span class="text-red-600">&#10006; Not Verified</span>
+                                                <span class="text-red-600">
+                                                    <i class="fas fa-times-circle"></i> Not Verified
+                                                </span>
                                             }
                                         </td>
 
-                                        <td class="px-6 py-3 text-center">
+                                        <td class="pl-6 py-3 text-left">
                                             <div class="relative">
                                                 <button data-userid="@item.UserId" class="actionDropdownBtn cursor-pointer text-black hover:text-[#A53D3D] focus:outline-none px-6">
                                                     <i class="fas fa-ellipsis-v"></i>

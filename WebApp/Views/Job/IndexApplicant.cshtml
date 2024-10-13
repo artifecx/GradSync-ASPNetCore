@@ -1,0 +1,90 @@
+﻿@model IEnumerable<Services.ServiceModels.JobViewModel>
+@using Data.Models;
+
+@{
+    ViewData["Title"] = "Available Jobs";
+}
+
+<div class="min-h-screen bg-[#F5F6F8] px-4 pt-16 text-black md:px-12">
+    <div class="container mx-auto rounded-lg bg-white p-6 shadow-lg">
+        <h1 class="mb-6 text-4xl font-bold text-center">Available Jobs</h1>
+
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+            @foreach (var job in Model)
+            {
+                <div class="rounded-lg border p-4 bg-white shadow-md">
+                    <div class="flex items-center justify-between">
+                        <h2 class="text-2xl font-semibold">@job.Title</h2>
+                        <span class="rounded-lg px-2 py-1 @(job.StatusType.Name == "Open" ? "text-green-700" : "text-red-500")">
+                            @job.StatusType.Name
+                        </span>
+                    </div>
+                    <h3 class="mt-1 text-lg text-gray-600">at @job.Company.Name</h3>
+
+                    <p class="mt-2 text-sm text-gray-500">
+                        <i class="fas fa-map-marker-alt"></i> @job.Location
+                    </p>
+
+                    <div class="mt-3 flex gap-2">
+                        <span class="rounded px-2 py-1 @GetEmploymentTypeClass(job.EmploymentTypeId)">
+                            @job.EmploymentType.Name
+                        </span>
+                        <span class="rounded px-2 py-1 bg-gray-200 text-gray-800">
+                            @job.SetupType.Name
+                        </span>
+                    </div>
+
+                    <p class="mt-3 text-sm">
+                        <strong>Available Slots:</strong> @job.AvailableSlots
+                    </p>
+
+                    <div class="mt-4 flex justify-between">
+                        <button onclick="saveJobHandler('@job.JobId')" 
+                                class="flex items-center gap-1 rounded-md bg-[#E5E8ED] px-4 py-2 text-sm font-bold text-[#7A1515] hover:bg-gray-300">
+                            <i class="fas fa-book"></i> Save Job
+                        </button>
+
+                        <button onclick="applyJobHandler('@job.JobId')" 
+                                class="flex items-center gap-1 rounded-md bg-[#7A1515] px-6 py-2 text-sm font-bold text-white hover:bg-[#5e0f0f]">
+                            <i class="fas fa-paper-plane"></i> Apply Now
+                        </button>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script>
+        function saveJobHandler(jobId) {
+            // Logic to save the job (redirection).
+            toastr.success('Job saved successfully!');
+        }
+
+        function applyJobHandler(jobId) {
+            // Logic to apply to the job (redirection).
+            toastr.success('Application submitted!');
+        }
+    </script>
+}
+
+@functions {
+    public string GetEmploymentTypeClass(string type)
+    {
+        switch (type.ToLower())
+        {
+            case "full-time":
+                return "bg-green-200 text-green-800";
+            case "part-time":
+                return "bg-orange-200 text-orange-800";
+            case "contract":
+                return "bg-yellow-200 text-yellow-800";
+            default:
+                return "bg-gray-200 text-gray-800";
+        }
+    }
+}
