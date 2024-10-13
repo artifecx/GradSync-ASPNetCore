@@ -1,8 +1,0 @@
-﻿.card {
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-}
-
-.preserve-whitespace {
-    white-space: pre-line;
-}
