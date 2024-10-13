@@ -23,7 +23,7 @@ namespace WebApp.Authentication
     {
         private readonly IConfiguration _configuration;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IAdminRepository _adminRepository;
+        private readonly IUserRepository _userRepository;
 
         /// <summary>
         /// Gets or sets the user.
@@ -37,11 +37,11 @@ namespace WebApp.Authentication
         /// <param name="accountService">The account service.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         public SignInManager(IConfiguration configuration,
-                             IHttpContextAccessor httpContextAccessor, IAdminRepository adminRepository)
+                             IHttpContextAccessor httpContextAccessor, IUserRepository userRepository)
         {
             this._configuration = configuration;
             this._httpContextAccessor = httpContextAccessor;
-            this._adminRepository = adminRepository;
+            this._userRepository = userRepository;
 
             user = new LoginUser();
         }
@@ -65,7 +65,7 @@ namespace WebApp.Authentication
             }
 
             user.userData = userData;
-            bool isSuper = _adminRepository.IsSuperAdmin(userData.UserId);
+            bool isSuper = _userRepository.IsSuperAdmin(userData.UserId);
             claimsIdentity = CreateClaimsIdentity(userData, isSuper);
             return Task.FromResult(claimsIdentity);
         }
@@ -122,7 +122,7 @@ namespace WebApp.Authentication
         /// <param name="isPersistent">if set to <c>true</c> [is persistent].</param>
         public async Task SignInAsync(User user, bool isPersistent = false)
         {
-            bool isSuper = _adminRepository.IsSuperAdmin(user.UserId);
+            bool isSuper = _userRepository.IsSuperAdmin(user.UserId);
             var claimsIdentity = this.CreateClaimsIdentity(user, isSuper);
             var principal = this.CreateClaimsPrincipal(claimsIdentity);
             await this.SignInAsync(principal, isPersistent);

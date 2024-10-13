@@ -35,6 +35,7 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}");
 app.MapControllers();
 app.MapRazorPages();
+app.UseRateLimiter();
 
 // Run application
 app.Run();

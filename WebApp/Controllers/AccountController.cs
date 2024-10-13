@@ -11,15 +11,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System;
-using System.IO;
 using System.Threading.Tasks;
 using static Resources.Constants.Enums;
-using WebApp.Extensions.Configuration;
-using NuGet.Protocol;
-using System.Drawing.Printing;
-using System.Globalization;
-using Resources.Messages;
+using static Resources.Constants.UserRoles;
+using static Resources.Messages.SuccessMessages;
+using static Resources.Messages.ErrorMessages;
+using static Resources.Constants.Routes;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace WebApp.Controllers
 {
@@ -36,23 +34,26 @@ namespace WebApp.Controllers
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
         /// <param name="signInManager">The sign in manager.</param>
-        /// <param name="localizer">The localizer.</param>
-        /// <param name="userService">The user service.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="configuration">The configuration.</param>
         /// <param name="mapper">The mapper.</param>
+        /// <param name="userService">The user service.</param>"
         /// <param name="tokenValidationParametersFactory">The token validation parameters factory.</param>
         /// <param name="tokenProviderOptionsFactory">The token provider options factory.</param>
-        public AccountController(
-                            SignInManager signInManager,
-                            IHttpContextAccessor httpContextAccessor,
-                            ILoggerFactory loggerFactory,
-                            IConfiguration configuration,
-                            IMapper mapper,
-                            IAccountService userService,
-                            TokenValidationParametersFactory tokenValidationParametersFactory,
-                            TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+
+        public AccountController
+            (
+                SignInManager signInManager,
+                IHttpContextAccessor httpContextAccessor,
+                ILoggerFactory loggerFactory,
+                IConfiguration configuration,
+                IMapper mapper,
+                IAccountService userService,
+                TokenValidationParametersFactory tokenValidationParametersFactory,
+                TokenProviderOptionsFactory tokenProviderOptionsFactory
+            ) : 
+            base (httpContextAccessor, loggerFactory, configuration, mapper)
         {
             this._sessionManager = new SessionManager(this._session);
             this._signInManager = signInManager;
@@ -62,67 +63,35 @@ namespace WebApp.Controllers
             this._userService = userService;
         }
 
+        /// <summary>
+        /// Gets the login view.
+        /// </summary>
+        /// <param name="returnUrl">The return URL.</param>
+        /// <returns></returns>
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> Login()
+        public async Task<IActionResult> Login(string returnUrl)
         {
             if (User.Identity.IsAuthenticated)
             {
-                bool isAdminOrNLO = User.IsInRole("Admin") || User.IsInRole("NLO");
-                bool isRecruiter = User.IsInRole("Recruiter");
-                if (isAdminOrNLO) 
-                    return RedirectToAction("Dashboard", "Home");
-                return isRecruiter ? RedirectToAction("GetAllJobsRecruiter", "Job") : RedirectToAction("Index", "Home");
+                bool isAdminOrNLO = User.IsInRole(Role_Admin) || User.IsInRole(Role_NLO);
+                if (isAdminOrNLO) return RedirectToAction(Home_Dashboard, Controller_Home);
+
+                bool isRecruiter = User.IsInRole(Role_Recruiter);
+                return isRecruiter ? 
+                    RedirectToAction(Job_RecruiterGetAllJobs, Controller_Job) : 
+                    RedirectToAction(Home_Index, Controller_Home);
             }
 
             return await HandleExceptionAsync(async () =>
             {
-                TempData["returnUrl"] = System.Net.WebUtility.UrlDecode(HttpContext.Request.Query["ReturnUrl"]);
+                TempData["returnUrl"] = returnUrl;
                 this._sessionManager.Clear();
                 this._session.SetString("SessionId", System.Guid.NewGuid().ToString());
                 return this.View();
             }, "Login");
         }
 
-        [HttpGet]
-        [AllowAnonymous]
-        public IActionResult Register()
-        {
-            if (User.Identity.IsAuthenticated)
-            {
-                return RedirectToAction("Index", "Home");
-            }
-            return View();
-        }
-
-        [HttpPost]
-        [AllowAnonymous]
-        public async Task<IActionResult> Register(AccountServiceModel model)
-        {
-            return await HandleExceptionAsync(async () =>
-            {
-                if (model != null || string.IsNullOrEmpty(UserId))
-                {
-                    _userService.RegisterUser(model);
-                    TempData["SuccessMessage"] = "User registered successfully!";
-                    return Json(new { success = true });
-                }
-                TempData["ErrorMessage"] = "An has error occurred while registering user.";
-                return Json(new { success = false });
-            }, "Register");
-        }
-
-        /// <summary>
-        /// Forgots the password.
-        /// </summary>
-        [HttpGet]
-        [AllowAnonymous]
-        public ActionResult ForgotPassword() {
-
-            return View();
-
-        }
-        
         /// <summary>
         /// Authenticate user and signs the user in when successful.
         /// </summary>
@@ -133,29 +102,62 @@ namespace WebApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
-            this._session.SetString("HasSession", "Exist");
-
-            User user = null;
-            var loginResult = _userService.AuthenticateUser(model.Email, model.Password, ref user);
-            if (loginResult == LoginResult.Success)
+            return await HandleExceptionAsync(async () =>
             {
-                await this._signInManager.SignInAsync(user);
-                this._session.SetString("Email", user.Email);
-                this._session.SetString("UserId", user.UserId);
+                if (ModelState.IsValid)
+                {
+                    if (!string.IsNullOrEmpty(model.Username))
+                    {
+                        TempData["ErrorMessageLogin"] = Error_UserLoginDefault;
+                        return View(model);
+                    }
 
-                bool isAdminOrNLO = string.Equals(user.RoleId, "Admin") || string.Equals(user.RoleId, "NLO");
-                bool isRecruiter = string.Equals(user.RoleId, "Recruiter"); 
+                    this._session.SetString("HasSession", "Exist");
 
-                if(isAdminOrNLO)
-                    return RedirectToAction("Dashboard", "Home");
-                else
-                    return isRecruiter ? RedirectToAction("GetAllJobsRecruiter", "Job")  : RedirectToAction("Index", "Home");
-            }
-            else
-            {
-                TempData["ErrorMessageLogin"] = "Incorrect Email or Password";
+                    User user = null;
+                    var loginResult = _userService.AuthenticateUser(model.Email, model.Password, ref user);
+                    if (loginResult == LoginResult.Success)
+                    {
+                        await this._signInManager.SignInAsync(user);
+                        this._session.SetString("Email", user.Email);
+                        this._session.SetString("UserId", user.UserId);
+
+                        bool isAdminOrNLO = string.Equals(user.RoleId, Role_Admin) || string.Equals(user.RoleId, Role_NLO);
+                        if (isAdminOrNLO) return RedirectToAction(Home_Dashboard, Controller_Home);
+
+                        bool isRecruiter = string.Equals(user.RoleId, Role_Recruiter);
+                        return isRecruiter ?
+                            RedirectToAction(Job_RecruiterGetAllJobs, Controller_Job) :
+                            RedirectToAction(Home_Index, Controller_Home);
+                    }
+                    else
+                    {
+                        TempData["ErrorMessageLogin"] = Error_UserIncorrectLoginDetails;
+                        return View(model);
+                    }
+                }
+                TempData["ErrorMessageLogin"] = Error_UserLoginDefault;
                 return View(model);
-            }
+            }, "Login");
+        }
+
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> Register(AccountServiceModel model, string FormLoadTime)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                CheckFormSubmissionTime(FormLoadTime);
+
+                if (ModelState.IsValid && (string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(UserId)))
+                {
+                    _userService.RegisterUser(model);
+                    TempData["SuccessMessage"] = Success_UserRegistrationSuccess;
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = Error_UserRegistrationDefault;
+                return Json(new { success = false });
+            }, "Register");
         }
 
         /// <summary>
@@ -166,7 +168,19 @@ namespace WebApp.Controllers
         public async Task<IActionResult> SignOutUser()
         {
             await this._signInManager.SignOutAsync();
-            return RedirectToAction("Login", "Account");
+            return RedirectToAction(Account_Login, Controller_Account);
+        }
+
+        /// <summary>
+        /// Shows the forgot password view.
+        /// </summary>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("forgotpassword")]
+        [EnableRateLimiting("GeneralApiPolicy")]
+        public ActionResult ForgotPassword()
+        {
+            return View();
         }
     }
 }

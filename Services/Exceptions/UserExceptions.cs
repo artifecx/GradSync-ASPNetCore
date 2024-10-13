@@ -17,5 +17,15 @@ namespace Services.Exceptions
                 Id = id;
             }
         }
+
+        public class UserNotVerifiedException : Exception
+        {
+            public string Id { get; }
+            public UserNotVerifiedException(string message) : base(message) { }
+            public UserNotVerifiedException(string message, string id) : base(message)
+            {
+                Id = id;
+            }
+        }
     }
 }

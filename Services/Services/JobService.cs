@@ -89,8 +89,14 @@ namespace Services.Services
         {
             if (!string.IsNullOrEmpty(search))
             {
-                // TODO: Add more search filters
-                jobs = jobs.Where(job => job.Title.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                jobs = jobs
+                    .Where(job => 
+                        job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        job.EmploymentTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        job.SetupTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        job.StatusTypeId.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
 
             if (!string.IsNullOrEmpty(filterByCompany))

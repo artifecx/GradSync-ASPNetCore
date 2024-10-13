@@ -5,14 +5,11 @@ using Services.Manager;
 using Services.ServiceModels;
 using AutoMapper;
 using System;
-using System.IO;
-using System.Linq;
 using static Resources.Constants.Enums;
 using static Services.Exceptions.UserExceptions;
-using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
-using Data.Repositories;
 using Microsoft.AspNetCore.Http;
+using static Resources.Messages.ErrorMessages;
+using static Resources.Constants.UserRoles;
 
 namespace Services.Services
 {
@@ -37,12 +34,12 @@ namespace Services.Services
         public void RegisterUser(AccountServiceModel model)
         {
             if (UserExists(model.Email))
-                throw new UserException("User already exists!");
+                throw new UserException(Error_UserExists);
 
             var user = _mapper.Map<User>(model);
             user.UserId = Guid.NewGuid().ToString();
             user.Password = PasswordManager.EncryptPassword(model.Password);
-            user.RoleId = model.AsRecruiter ? "Recruiter" : "Applicant";
+            user.RoleId = model.AsRecruiter ? Role_Recruiter : Role_Applicant;
             user.JoinDate = DateTime.Now;
 
             _repository.AddUser(user);
@@ -58,7 +55,7 @@ namespace Services.Services
             _repository.AddAdmin(new Admin
             {
                 UserId = user.UserId,
-                IsSuper = user.RoleId == "Admin",
+                IsSuper = user.RoleId == Role_Admin,
             });
         }
 
@@ -86,6 +83,9 @@ namespace Services.Services
             
             if(user != null)
             {
+                if (!user.IsVerified)
+                    throw new UserNotVerifiedException(Error_UserNotVerified);
+
                 user.LastLoginDate = DateTime.Now;
                 _repository.UpdateUserAsync(user).Wait();
                 return LoginResult.Success;

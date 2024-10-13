@@ -7,8 +7,18 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Compile Update="Messages\UserRoles.Designer.cs">
+    <Compile Update="Constants\Routes.Designer.cs">
+      <DependentUpon>Routes.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Constants\UserRoles.Designer.cs">
       <DependentUpon>UserRoles.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Messages\SuccessMessages.Designer.cs">
+      <DependentUpon>SuccessMessages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
@@ -17,8 +27,8 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="Messages\Errors.Designer.cs">
-      <DependentUpon>Errors.resx</DependentUpon>
+    <Compile Update="Messages\ErrorMessages.Designer.cs">
+      <DependentUpon>ErrorMessages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
@@ -60,16 +70,24 @@
   </ItemGroup>
 
   <ItemGroup>
-    <EmbeddedResource Update="Messages\UserRoles.resx">
+    <EmbeddedResource Update="Constants\Routes.resx">
+      <LastGenOutput>Routes.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Constants\UserRoles.resx">
       <LastGenOutput>UserRoles.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Messages\SuccessMessages.resx">
+      <LastGenOutput>SuccessMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Messages\UserPreferences.resx">
       <LastGenOutput>UserPreferences.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Messages\Errors.resx">
-      <LastGenOutput>Errors.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Messages\ErrorMessages.resx">
+      <LastGenOutput>ErrorMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Messages\Common.resx">

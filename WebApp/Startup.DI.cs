@@ -39,10 +39,10 @@ namespace WebApp
             this._services.AddScoped<IJobService, JobService>();
             this._services.AddScoped<ICompanyService, CompanyService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
+            this._services.AddTransient<IEmailService, EmailService>();
 
             // Repositories
             this._services.AddScoped<IUserRepository, UserRepository>();
-            this._services.AddScoped<IAdminRepository, AdminRepository>();
             this._services.AddScoped<IJobRepository, JobRepository>();
             this._services.AddScoped<ICompanyRepository, CompanyRepository>();
 
