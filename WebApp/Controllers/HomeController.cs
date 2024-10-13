@@ -42,7 +42,7 @@ namespace WebApp.Controllers
         /// Returns Home View.
         /// </summary>
         /// <returns> Home View </returns>
-        [Route("/")]
+        [Route("/main")]
         [Authorize(Policy = "Applicant")]
         public IActionResult Index()
         {
