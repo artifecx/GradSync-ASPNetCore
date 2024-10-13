@@ -26,11 +26,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <_ContentIncludedByDefault Remove="wwwroot\css\dashboard.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\css\ticket.css" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="AutoMapper" Version="13.0.1" />
     <PackageReference Include="BCrypt.Net-Next" Version="4.0.3" />
     <PackageReference Include="Humanizer" Version="2.14.1" />
