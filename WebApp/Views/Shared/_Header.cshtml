@@ -20,20 +20,20 @@
                     </a>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:space-x-8">
-                    <a href="@Url.Action("Index", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] text-base font-bold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("Index", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
                         Home
                     </a>
                     @* Conditionally render 'Jobs' link based on user role *@
                     @if (!isAdmin)
                     {
-                        <a href="@Url.Action("GetAllJobsApplicant", "Job")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] text-base font-bold hover:text-[#A53D3D] hover:underline">
+                        <a href="@Url.Action("GetAllJobsApplicant", "Job")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
                             Find Job
                         </a>
                     }
-                    <a href="@Url.Action("Contact", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] text-base font-bold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("Contact", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
                         Contact
                     </a>
-                    <a href="@Url.Action("About", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] text-base font-bold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("About", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
                         About
                     </a>
                 </div>
