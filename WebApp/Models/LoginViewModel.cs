@@ -8,6 +8,7 @@ namespace WebApp.Models
     /// </summary>
     public class LoginViewModel
     {
+        [Display(Name = "Email Address")]
         [Required(ErrorMessage = "Email is required.")]
         public string Email { get; set; }
 

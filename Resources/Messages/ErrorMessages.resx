@@ -121,7 +121,9 @@
     <value>User already exists!</value>
   </data>
   <data name="Error_UserNotVerified" xml:space="preserve">
-    <value>Please check your registered email and spam folder for the verification link. If you haven't received it, contact us at info.gradsync@gmail.com.</value>
+    <value>Please check your registered email and spam folder for the verification link. If your link has expired, a new one will be automatically sent shortly.
+
+If you have not received anything, contact us at support@gradsync.org</value>
   </data>
   <data name="Error_UserRegistrationDefault" xml:space="preserve">
     <value>An has error occurred while registering user.</value>
@@ -137,5 +139,29 @@
   </data>
   <data name="Error_UserIllegalRoleSwitch" xml:space="preserve">
     <value>Illegal switch from {0} to {1}.</value>
+  </data>
+  <data name="Error_UserTokenInvalid" xml:space="preserve">
+    <value>Provided token is invalid!</value>
+  </data>
+  <data name="Error_TokenInvalidDefault" xml:space="preserve">
+    <value>Token has either expired or is invalid. If you think this is a mistake, contact us at support@gradsync.org</value>
+  </data>
+  <data name="Error_UserTokenExpired" xml:space="preserve">
+    <value>Your token has expired, a new one will be automatically sent to your email shortly.</value>
+  </data>
+  <data name="Error_UserUnverifiedPasswordReset" xml:space="preserve">
+    <value>Verify your email first before requesting a password reset.</value>
+  </data>
+  <data name="Error_UserPasswordTokenExpired" xml:space="preserve">
+    <value>Your password reset token has expired, request a new one through the forgot password link.</value>
+  </data>
+  <data name="Error_Default" xml:space="preserve">
+    <value>An error has occurred.</value>
+  </data>
+  <data name="Error_UserActionError" xml:space="preserve">
+    <value>An error occurred while {0} user.</value>
+  </data>
+  <data name="Error_UserPasswordResetDefault" xml:space="preserve">
+    <value>An error occurred while resetting password.</value>
   </data>
 </root>

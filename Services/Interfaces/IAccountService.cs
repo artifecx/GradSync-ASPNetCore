@@ -14,5 +14,8 @@ namespace Services.Interfaces
         void AddAdmin(User user);
         void AddApplicant(User user);
         void AddRecruiter(User user);
+        Task ResetUserPasswordAsync(string id, string type = null);
+        Task<string> VerifyUserEmail(string token);
+        Task<string> CompleteUserPasswordRequestAsync(string token);
     }
 }

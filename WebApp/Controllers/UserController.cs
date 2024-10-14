@@ -9,7 +9,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
-using Microsoft.IdentityModel.Tokens;
+using static Resources.Messages.SuccessMessages;
+using static Resources.Messages.ErrorMessages;
 
 namespace WebApp.Controllers
 {
@@ -92,10 +93,10 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid)
                 {
                     await _userService.AddUserAsync(model);
-                    TempData["SuccessMessage"] = "Successfully added user!";
+                    TempData["SuccessMessage"] = string.Format(Success_UserActionSuccess, "added");
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "An error occurred while adding user.";
+                TempData["ErrorMessage"] = string.Format(Error_UserActionError, "adding");
                 return Json(new { success = false });
             }, "Create");
         }
@@ -115,16 +116,16 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid)
                 {
                     await _userService.UpdateUserAsync(model);
-                    TempData["SuccessMessage"] = "User updated successfully!";
+                    TempData["SuccessMessage"] = string.Format(Success_UserActionSuccess, "updated");
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "An error occurred while updating user.";
+                TempData["ErrorMessage"] = string.Format(Error_UserActionError, "updating");
                 return Json(new { success = false });
             }, "Update");
         }
 
         /// <summary>
-        /// Resets a user's password
+        /// Resets a user's password through the admin panel.
         /// </summary>
         /// <param name="id">The user identifier.</param>
         /// <returns>A task that represents the asynchronous operation. 
@@ -135,13 +136,13 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (!id.IsNullOrEmpty())
+                if (ModelState.IsValid)
                 {
                     await _userService.ResetUserPasswordAsync(id);
-                    TempData["SuccessMessage"] = "Password reset successfully!";
+                    TempData["SuccessMessage"] = Success_UserPasswordReset;
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "An error occurred while resetting password.";
+                TempData["ErrorMessage"] = Error_UserPasswordResetDefault;
                 return Json(new { success = false });
             }, "ResetPassword");
         }
@@ -161,10 +162,10 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid)
                 {
                     await _userService.DeleteUserAsync(id);
-                    TempData["SuccessMessage"] = "User deleted successfully!";
+                    TempData["SuccessMessage"] = string.Format(Success_UserActionSuccess, "deleted");
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "An error has occured while deleting user.";
+                TempData["ErrorMessage"] = TempData["ErrorMessage"] = string.Format(Error_UserActionError, "deleting");
                 return Json(new { success = false });
             }, "Delete");
         }

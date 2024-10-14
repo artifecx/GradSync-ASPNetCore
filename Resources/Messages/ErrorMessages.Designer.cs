@@ -61,11 +61,38 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error has occurred..
+        /// </summary>
+        public static string Error_Default {
+            get {
+                return ResourceManager.GetString("Error_Default", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to No changes detected..
         /// </summary>
         public static string Error_NoChanges {
             get {
                 return ResourceManager.GetString("Error_NoChanges", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Token has either expired or is invalid. If you think this is a mistake, contact us at support@gradsync.org.
+        /// </summary>
+        public static string Error_TokenInvalidDefault {
+            get {
+                return ResourceManager.GetString("Error_TokenInvalidDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while {0} user..
+        /// </summary>
+        public static string Error_UserActionError {
+            get {
+                return ResourceManager.GetString("Error_UserActionError", resourceCulture);
             }
         }
         
@@ -106,11 +133,31 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please check your registered email and spam folder for the verification link. If you haven&apos;t received it, contact us at info.gradsync@gmail.com..
+        ///   Looks up a localized string similar to Please check your registered email and spam folder for the verification link. If your link has expired, a new one will be automatically sent shortly.
+        ///
+        ///If you have not received anything, contact us at support@gradsync.org.
         /// </summary>
         public static string Error_UserNotVerified {
             get {
                 return ResourceManager.GetString("Error_UserNotVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while resetting password..
+        /// </summary>
+        public static string Error_UserPasswordResetDefault {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordResetDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your password reset token has expired, request a new one through the forgot password link..
+        /// </summary>
+        public static string Error_UserPasswordTokenExpired {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordTokenExpired", resourceCulture);
             }
         }
         
@@ -120,6 +167,33 @@ namespace Resources.Messages {
         public static string Error_UserRegistrationDefault {
             get {
                 return ResourceManager.GetString("Error_UserRegistrationDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Your token has expired, a new one will be automatically sent to your email shortly..
+        /// </summary>
+        public static string Error_UserTokenExpired {
+            get {
+                return ResourceManager.GetString("Error_UserTokenExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Provided token is invalid!.
+        /// </summary>
+        public static string Error_UserTokenInvalid {
+            get {
+                return ResourceManager.GetString("Error_UserTokenInvalid", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Verify your email first before requesting a password reset..
+        /// </summary>
+        public static string Error_UserUnverifiedPasswordReset {
+            get {
+                return ResourceManager.GetString("Error_UserUnverifiedPasswordReset", resourceCulture);
             }
         }
     }
