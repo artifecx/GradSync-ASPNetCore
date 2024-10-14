@@ -61,11 +61,29 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully {0} user!.
+        /// </summary>
+        public static string Success_UserActionSuccess {
+            get {
+                return ResourceManager.GetString("Success_UserActionSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to If your email is in our system, an email with instructions will be sent to you shortly..
         /// </summary>
         public static string Success_UserPasswordRequestSuccess {
             get {
                 return ResourceManager.GetString("Success_UserPasswordRequestSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Password reset successfully!.
+        /// </summary>
+        public static string Success_UserPasswordReset {
+            get {
+                return ResourceManager.GetString("Success_UserPasswordReset", resourceCulture);
             }
         }
         

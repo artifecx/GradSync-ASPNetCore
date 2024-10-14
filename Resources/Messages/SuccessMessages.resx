@@ -129,4 +129,10 @@
   <data name="Success_UserPasswordRequestSuccess" xml:space="preserve">
     <value>If your email is in our system, an email with instructions will be sent to you shortly.</value>
   </data>
+  <data name="Success_UserActionSuccess" xml:space="preserve">
+    <value>Successfully {0} user!</value>
+  </data>
+  <data name="Success_UserPasswordReset" xml:space="preserve">
+    <value>Password reset successfully!</value>
+  </data>
 </root>
