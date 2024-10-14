@@ -158,4 +158,10 @@ If you have not received anything, contact us at support@gradsync.org</value>
   <data name="Error_Default" xml:space="preserve">
     <value>An error has occurred.</value>
   </data>
+  <data name="Error_UserActionError" xml:space="preserve">
+    <value>An error occurred while {0} user.</value>
+  </data>
+  <data name="Error_UserPasswordResetDefault" xml:space="preserve">
+    <value>An error occurred while resetting password.</value>
+  </data>
 </root>
