@@ -88,6 +88,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occurred while {0} user..
+        /// </summary>
+        public static string Error_UserActionError {
+            get {
+                return ResourceManager.GetString("Error_UserActionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User already exists!.
         /// </summary>
         public static string Error_UserExists {
@@ -131,6 +140,15 @@ namespace Resources.Messages {
         public static string Error_UserNotVerified {
             get {
                 return ResourceManager.GetString("Error_UserNotVerified", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error occurred while resetting password..
+        /// </summary>
+        public static string Error_UserPasswordResetDefault {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordResetDefault", resourceCulture);
             }
         }
         
