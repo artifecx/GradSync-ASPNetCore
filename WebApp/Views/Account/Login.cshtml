@@ -4,6 +4,7 @@
     ViewData["Title"] = "Login Page";
 
     await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.AccountServiceModel());
+    await Html.RenderPartialAsync("_ForgotPasswordModal", new LoginViewModel());
 }
 <div class="relative flex h-screen items-center justify-center">
     <img src="~/img/loginBG.png" alt="loginBG" class="-z-0 absolute inset-0 h-full w-full object-cover" />
@@ -52,7 +53,7 @@
             </div>
 
             <div class="text-right text-sm font-medium text-black">
-                <p><a asp-action="ForgotPassword" class="text-[#7A1515]">Forgot Password?</a></p>
+                <p><a href="" data-toggle="modal" data-target="#resetPasswordModal" class="text-[#7A1515] underline">Forgot Password?</a></p>
             </div>
 
             <div>

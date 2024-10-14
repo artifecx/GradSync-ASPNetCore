@@ -61,15 +61,6 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to C4.
-        /// </summary>
-        public static string AccountCategory {
-            get {
-                return ResourceManager.GetString("AccountCategory", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Looks up a localized string similar to Add Attachment.
         /// </summary>
         public static string AddAttachment {

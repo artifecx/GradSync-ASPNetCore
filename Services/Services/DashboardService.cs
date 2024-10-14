@@ -119,15 +119,15 @@ namespace Services.Services
         {
             if (salary < 10000)
                 return "Php 0 - Php 9,999";
-            else if(salary >= 10000 && salary <= 20000)
+            else if(salary <= 20000)
                 return "Php 10,000 - Php 20,000";
-            else if (salary > 20000 && salary <= 30000)
+            else if (salary <= 30000)
                 return "Php 20,001 - Php 30,000";
-            else if (salary > 30000 && salary <= 40000)
+            else if (salary <= 40000)
                 return "Php 30,001 - Php 40,000";
-            else if (salary > 40000 && salary <= 50000)
+            else if (salary <= 50000)
                 return "Php 40,001 - Php 50,000";
-            else if (salary > 50000 && salary <= 60000)
+            else if (salary <= 60000)
                 return "Php 50,001 - Php 60,000";
             else
                 return "> Php 60,000";

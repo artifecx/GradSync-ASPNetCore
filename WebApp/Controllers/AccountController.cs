@@ -28,7 +28,7 @@ namespace WebApp.Controllers
         private readonly TokenValidationParametersFactory _tokenValidationParametersFactory;
         private readonly TokenProviderOptionsFactory _tokenProviderOptionsFactory;
         private readonly IConfiguration _appConfiguration;
-        private readonly IAccountService _userService;
+        private readonly IAccountService _accountService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
@@ -60,14 +60,15 @@ namespace WebApp.Controllers
             this._tokenProviderOptionsFactory = tokenProviderOptionsFactory;
             this._tokenValidationParametersFactory = tokenValidationParametersFactory;
             this._appConfiguration = configuration;
-            this._userService = userService;
+            this._accountService = userService;
         }
 
         /// <summary>
         /// Gets the login view.
         /// </summary>
         /// <param name="returnUrl">The return URL.</param>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
@@ -115,7 +116,7 @@ namespace WebApp.Controllers
                     this._session.SetString("HasSession", "Exist");
 
                     User user = null;
-                    var loginResult = _userService.AuthenticateUser(model.Email, model.Password, ref user);
+                    var loginResult = _accountService.AuthenticateUser(model.Email, model.Password, ref user);
                     if (loginResult == LoginResult.Success)
                     {
                         await this._signInManager.SignInAsync(user);
@@ -141,8 +142,16 @@ namespace WebApp.Controllers
             }, "Login");
         }
 
+        /// <summary>
+        /// Registers a new user.
+        /// </summary>
+        /// <param name="model">The account service model containing the required data.</param>
+        /// <param name="FormLoadTime">The number of ticks it took to complete and submit the form.</param>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("EmailUsePolicy")]
         public async Task<IActionResult> Register(AccountServiceModel model, string FormLoadTime)
         {
             return await HandleExceptionAsync(async () =>
@@ -151,7 +160,7 @@ namespace WebApp.Controllers
 
                 if (ModelState.IsValid && (string.IsNullOrEmpty(model.Username) && string.IsNullOrEmpty(UserId)))
                 {
-                    _userService.RegisterUser(model);
+                    _accountService.RegisterUser(model);
                     TempData["SuccessMessage"] = Success_UserRegistrationSuccess;
                     return Json(new { success = true });
                 }
@@ -163,7 +172,8 @@ namespace WebApp.Controllers
         /// <summary>
         /// Signs the out user.
         /// </summary>
-        /// <returns></returns>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
         [AllowAnonymous]
         public async Task<IActionResult> SignOutUser()
         {
@@ -172,15 +182,73 @@ namespace WebApp.Controllers
         }
 
         /// <summary>
-        /// Shows the forgot password view.
+        /// Sends a reset password request using the provided email
         /// </summary>
+        /// <param name="email">The email.</param>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
+        [HttpPost]
+        [AllowAnonymous]
+        [EnableRateLimiting("EmailUsePolicy")]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    await _accountService.ResetUserPasswordAsync(email);
+                    TempData["SuccessMessage"] = Success_UserPasswordRequestSuccess;
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = Error_Default;
+                return Json(new { success = false });
+            }, "ForgotPassword");
+        }
+
+        /// <summary>
+        /// Verifies the user using a token
+        /// </summary>
+        /// <param name="token">The token identifier.</param>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpGet]
         [AllowAnonymous]
-        [Route("forgotpassword")]
-        [EnableRateLimiting("GeneralApiPolicy")]
-        public ActionResult ForgotPassword()
+        [Route("/verify")]
+        public async Task<IActionResult> Verify(string token = null)
         {
-            return View();
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    TempData["ErrorMessageLogin"] = await _accountService.VerifyUserEmail(token);
+                    return RedirectToAction(Account_Login);
+                }
+                TempData["ErrorMessageLogin"] = Error_TokenInvalidDefault;
+                return RedirectToAction(Account_Login);
+            }, "Verify");
+        }
+
+        /// <summary>
+        /// Completes a password reset request using the token
+        /// </summary>
+        /// <param name="token">The token identifier.</param>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
+        [HttpGet]
+        [AllowAnonymous]
+        [Route("/resetpassword")]
+        public async Task<IActionResult> ResetPassword(string token = null)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    TempData["ErrorMessageLogin"] = await _accountService.CompleteUserPasswordRequestAsync(token);
+                    return RedirectToAction(Account_Login);
+                }
+                TempData["ErrorMessageLogin"] = Error_TokenInvalidDefault;
+                return RedirectToAction(Account_Login);
+            }, "ResetPassword");
         }
     }
 }

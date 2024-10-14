@@ -21,6 +21,8 @@ using Quartz;
 using Services.ServiceModels;
 using Microsoft.AspNetCore.Http;
 using System.Threading.RateLimiting;
+using System.Linq;
+using Azure;
 
 namespace WebApp
 {
@@ -128,7 +130,7 @@ namespace WebApp
         
             services.AddRateLimiter(options =>
             {
-                options.AddPolicy("PasswordResetPolicy", context =>
+                options.AddPolicy("EmailUsePolicy", context =>
                     RateLimitPartition.GetFixedWindowLimiter(
                         partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
                         factory: partition => new FixedWindowRateLimiterOptions
@@ -163,6 +165,9 @@ namespace WebApp
 
                 options.OnRejected = async (context, cancellationToken) =>
                 {
+                    var request = context.HttpContext.Request;
+                    var acceptsJson = request.Headers["Accept"].Any(h => h.Contains("application/json"));
+
                     context.HttpContext.Response.StatusCode = 429;
                     context.HttpContext.Response.ContentType = "application/json";
 
@@ -171,7 +176,10 @@ namespace WebApp
                         Message = "Too many requests. Please try again later."
                     };
 
-                    await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+                    if (acceptsJson)
+                    {
+                        await context.HttpContext.Response.WriteAsJsonAsync(response, cancellationToken);
+                    }
                 };
 
             });
