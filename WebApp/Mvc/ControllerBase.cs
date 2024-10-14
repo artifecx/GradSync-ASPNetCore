@@ -323,7 +323,7 @@ namespace WebApp.Mvc
             {
                 var loadTime = new DateTime(ticks);
                 var timeTaken = DateTime.UtcNow - loadTime;
-                if (timeTaken.TotalSeconds < 10)
+                if (timeTaken.TotalSeconds < 8)
                 {
                     throw new UserException(Error_UserRegistrationDefault);
                 }
