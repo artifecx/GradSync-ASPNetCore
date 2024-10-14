@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using Microsoft.IdentityModel.Tokens;
+using System;
 
 namespace WebApp.Controllers
 {
@@ -124,7 +125,7 @@ namespace WebApp.Controllers
         }
 
         /// <summary>
-        /// Resets a user's password
+        /// Resets a user's password through the admin panel.
         /// </summary>
         /// <param name="id">The user identifier.</param>
         /// <returns>A task that represents the asynchronous operation. 
@@ -135,7 +136,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (!id.IsNullOrEmpty())
+                if (ModelState.IsValid)
                 {
                     await _userService.ResetUserPasswordAsync(id);
                     TempData["SuccessMessage"] = "Password reset successfully!";
