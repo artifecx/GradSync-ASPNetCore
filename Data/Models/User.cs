@@ -35,6 +35,8 @@ public partial class User
 
     public DateTime? TokenExpiry { get; set; }
 
+    public string Preferences { get; set; }
+
     public virtual Admin Admin { get; set; }
 
     public virtual Applicant Applicant { get; set; }
