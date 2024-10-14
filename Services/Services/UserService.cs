@@ -1,19 +1,19 @@
-﻿using Data.Interfaces;
+﻿using AutoMapper;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
+using Data.Interfaces;
 using Data.Models;
 using Services.Interfaces;
 using Services.Manager;
 using Services.ServiceModels;
-using AutoMapper;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
-using System.Threading.Tasks;
-using static Services.Exceptions.UserExceptions;
 using static Resources.Constants.UserRoles;
 using static Resources.Messages.ErrorMessages;
-using System.Text;
+using static Services.Exceptions.UserExceptions;
+
 
 namespace Services.Services
 {
@@ -26,7 +26,6 @@ namespace Services.Services
         private readonly IAccountService _accountService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IEmailService _emailService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
@@ -35,21 +34,18 @@ namespace Services.Services
         /// <param name="accountService">The account service.</param>
         /// <param name="mapper">The mapper.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        /// <param name="emailService">The email service.</param>
         public UserService
             (
                 IUserRepository repository, 
                 IAccountService accountService,
                 IMapper mapper,
-                IHttpContextAccessor httpContextAccessor,
-                IEmailService emailService
+                IHttpContextAccessor httpContextAccessor
             )
         {
             _repository = repository;
             _accountService = accountService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
-            _emailService = emailService;
         }
 
         #region Get Methods
@@ -136,11 +132,11 @@ namespace Services.Services
 
         #region CRUD Methods
         /// <summary>
-        /// Retrieves all <see cref="Role"/> asynchronously.
+        /// Adds a new user asynchronously.
         /// </summary>
-        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
-        /// The task result contains the <see cref="List{T}"/> of <see cref="Role"/>.</returns>
-        /// <exception cref="UserException">Thrown when a similar user already exists</exception>
+        /// <param name="model">The user view model.</param>
+        /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
+        /// <exception cref="UserException">Thrown when a similar user already exists.</exception>
         public async Task AddUserAsync(UserViewModel model)
         {
             var userModel = _mapper.Map<AccountServiceModel>(model);
@@ -229,26 +225,8 @@ namespace Services.Services
         /// </summary>
         /// <param name="id">The user identifier.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task ResetUserPasswordAsync(string id)
-        {
-            var user = await _repository.GetUserByIdAsync(id);
-            string newPassword = PasswordGenerator.GeneratePassword();
-            user.Password = PasswordManager.EncryptPassword(newPassword);
-
-            await _repository.UpdateUserAsync(user);
-
-            string subject = "Your Password Has Been Reset";
-            string body = $"Hello {user.FirstName},\n\n" +
-                          "Your password has been successfully reset. " +
-                          "Please use the following temporary password to log in and change your password immediately:\n\n" +
-                          $"Temporary Password: {newPassword}\n\n" +
-                          "If you did not request this change, please reply to this email immediately.\n\n" +
-                          "Best regards,\n" +
-                          "GradSync";
-
-            //TODO: uncomment
-            //await _emailService.SendEmailAsync(user.Email, subject, body);
-        }
+        public async Task ResetUserPasswordAsync(string id) =>
+            await _accountService.ResetUserPasswordAsync(id, "id");
 
         /// <summary>
         /// Sets a user <see cref="Role"/> asynchronously. 
