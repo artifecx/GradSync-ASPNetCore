@@ -17,6 +17,11 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
+    <Compile Update="Messages\EmailMessages.Designer.cs">
+      <DependentUpon>EmailMessages.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Messages\SuccessMessages.Designer.cs">
       <DependentUpon>SuccessMessages.resx</DependentUpon>
       <DesignTime>True</DesignTime>
@@ -76,6 +81,10 @@
     </EmbeddedResource>
     <EmbeddedResource Update="Constants\UserRoles.resx">
       <LastGenOutput>UserRoles.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Messages\EmailMessages.resx">
+      <LastGenOutput>EmailMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Messages\SuccessMessages.resx">
