@@ -1,0 +1,129 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+
+@{
+    var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
+}
+
+<!-- Sidebar Filter -->
+<div class="bg-white w-80 h-screen p-6 rounded-lg shadow-md border-gray-200">
+    <div class="flex justify-between items-center mb-6">
+        <div class="text-xl font-semibold text-gray-800">Filter Jobs</div>
+        <button type="reset" form="filterForm"
+                class="text-sm text-gray-500 hover:text-[#991b1b] transition-colors duration-200 font-medium">
+            Clear all
+        </button>
+    </div>
+
+    <form id="filterForm" method="get">
+        <!-- Date Post Filter -->
+        <div class="pt-2 pb-3 text-sm">
+            <label for="datePostFilter" class="block font-medium text-sm text-[#7A1515] mb-2">DATE POSTED</label>
+            <select name="datePostFilter" id="datePostFilter"
+                    class="w-full rounded-lg bg-gray-50 border border-gray-300 py-2 px-4 transition-all duration-200
+                    focus:ring-[#991b1b] focus:border-[#991b1b]">
+                <option value="">Anytime</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+            </select>
+        </div>
+
+        <!-- Job Type Filter -->
+        <div class="pt-2 pb-3 text-sm">
+            <label for="typeFilter" class="block font-medium text-sm text-[#7A1515] mb-2">JOB TYPE</label>
+            <div class="grid grid-cols-2 gap-2">
+                @foreach (var jobType in new[] { "full-time", "part-time", "contractual", "internship" })
+                {
+                    <div class="flex items-center">
+                        
+                        <input type="checkbox" class="h-4 w-4 rounded border-red-500 text-red-600 focus:ring-red-500"
+                               id="@jobType" name="jobType" value="@jobType"
+                               class="mr-2 h-3 w-3 rounded text-red-900 focus:ring-red-500">
+                        <label for="@jobType" class="text-gray-700 text-sm capitalize pt-2 pl-1">@jobType.Replace("-", " ")</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Salary Range Slider -->
+        <div class="pt-2 pb-3 text-sm   ">
+            <label for="salaryRange" class="block font-medium text-sm text-[#7A1515] mb-2">SALARY RANGE (₱)</label>         
+            <div class="relative">
+                <input type="range" id="salaryRange" name="salaryRange" min="300" max="60000" step="100" value="1500"
+                       class="w-full appearance-none h-2 bg-gray-200 rounded-lg focus:outline-none
+                       focus:ring-2 focus:ring-[#7A1515]">
+                <div class="absolute inset-0 opacity-10 rounded-lg pointer-events-none"></div>
+            </div>
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-2">
+                <span>₱320</span>
+                <span>₱60,000+ </span>
+            </div>
+            <div class="flex justify-center mt-2 text-sm text-gray-600">
+                <input type="number" id="customSalary" name="customSalary" value="1500" min="300" max="60000"
+                       class="w-full text-sm max-w-xs px-3 py-2 border border-red-500 rounded-lg
+                       focus:ring-[#7A1515] focus:border-[#7A1515]" placeholder="Enter salary ₱">
+            </div>
+        </div>
+
+        <!-- Work Mode Filter-->
+        <div class="pt-2 pb-3 text-sm">
+            <label for="workModeFilter" class="block font-medium text-sm text-[#7A1515] mb-2">WORK SET-UP</label>
+            <div class="grid grid-cols-2 gap-2">
+                @foreach (var workMode in new[] { "on-site", "hybrid", "remote" })
+                {
+                    <div class="flex items-center">
+                        <input type="checkbox" class="h-4 w-4 rounded border-red-500 text-red-600 focus:ring-red-500"
+                               id="@workMode" name="workMode" value="@workMode"
+                                   class="mr-2 h-3 w-3 rounded text-red-900 focus:ring-red-500">
+                        <label for="@workMode" class="text-gray-700 capitalize pt-2 pl-1">@workMode</label>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Apply Filtre Button -->
+        <div>
+            <button type="submit"
+                    class="w-full px-3 py-2 rounded-lg bg-[#7A1515] text-white text-sm font-semibold
+                    hover:bg-[#991b1b] transition-all duration-200">
+                Apply Filters
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+    // Sync salary input with slider value
+    document.addEventListener("DOMContentLoaded", function () {
+        const salaryRange = document.getElementById("salaryRange");
+        const customSalaryInput = document.getElementById("customSalary");
+
+       
+        salaryRange.addEventListener("input", () => {
+            customSalaryInput.value = salaryRange.value;
+        });
+
+        customSalaryInput.addEventListener("input", () => {
+            const value = parseInt(customSalaryInput.value);
+            if (value >= 300 && value <= 60000) {
+                salaryRange.value = value;
+            }
+        });
+
+        const filterForm = document.getElementById("filterForm");
+
+        // Prevent default submit behavior for demo purposes
+        filterForm.addEventListener("submit", (e) => {
+            e.preventDefault();
+            console.log("Filters Applied");
+        });
+
+        // Reset all filters to default 
+        filterForm.addEventListener("reset", () => {
+            console.log("Filters Reset");
+            salaryRange.value = 1500;
+            customSalaryInput.value = 1500;
+        });
+    });
+</script>
