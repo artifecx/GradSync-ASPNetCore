@@ -120,4 +120,19 @@
   <data name="Success_UserRegistrationSuccess" xml:space="preserve">
     <value>User already exists!</value>
   </data>
+  <data name="Success_UserVerificationSuccess" xml:space="preserve">
+    <value>User successfully verified!</value>
+  </data>
+  <data name="Success_UserPasswordResetSuccess" xml:space="preserve">
+    <value>An email containing your temporary password will be sent shortly.</value>
+  </data>
+  <data name="Success_UserPasswordRequestSuccess" xml:space="preserve">
+    <value>If your email is in our system, an email with instructions will be sent to you shortly.</value>
+  </data>
+  <data name="Success_UserActionSuccess" xml:space="preserve">
+    <value>Successfully {0} user!</value>
+  </data>
+  <data name="Success_UserPasswordReset" xml:space="preserve">
+    <value>Password reset successfully!</value>
+  </data>
 </root>

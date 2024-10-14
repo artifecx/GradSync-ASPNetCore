@@ -89,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             error: function (xhr, status, error) {
-                var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "Too many requests made, try again later.";
                 toastr.error(errorMessage);
             }
         });
@@ -98,5 +98,50 @@ document.addEventListener('DOMContentLoaded', function () {
     $('#registerUserForm').on('submit', function (e) {
         e.preventDefault();
         registerUser();
+    });
+
+
+    $('#resetPasswordModal').on('hidden.bs.modal', function () {
+        resetPasswordForm.reset();
+        $(".text-red-500").text('');
+    });
+
+    function validateResetForm() {
+        return $(resetPasswordForm).valid();
+    }
+
+    function resetPassword() {
+        if (!validateResetForm()) {
+            return;
+        }
+
+        var formData = new FormData(resetPasswordForm);
+
+        $.ajax({
+            url: '/Account/ForgotPassword',
+            type: 'POST',
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (response) {
+                if (response.success) {
+                    $('#resetPasswordModal').modal('hide');
+                    toastr.success('If your email is in our system, an email with instructions will be sent to you shortly.');
+                } else {
+                    $('#resetPasswordModal').modal('hide');
+                    toastr.error(response.error || "An error occurred.");
+                }
+            },
+            error: function (xhr, status, error) {
+                $('#resetPasswordModal').modal('hide');
+                var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "Too many requests made, try again later.";
+                toastr.error(errorMessage);
+            }
+        });
+    }
+
+    $('#resetPasswordForm').on('submit', function (e) {
+        e.preventDefault();
+        resetPassword();
     });
 });

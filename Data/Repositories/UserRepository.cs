@@ -41,6 +41,27 @@ namespace Data.Repositories
             await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.UserId == id);
 
         /// <summary>
+        /// Retrieves a user with no navigation properties.
+        /// </summary>
+        /// <returns>A <see cref="User"/> with no related data.</returns>
+        public async Task<User> GetUserByEmailAsync(string email) =>
+            await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.Email == email);
+
+        /// <summary>
+        /// Retrieves a user with no navigation properties.
+        /// </summary>
+        /// <returns>A <see cref="User"/> with no related data.</returns>
+        public async Task<User> GetUserByEmailAndPasswordAsync(string email, string passwordKey) =>
+            await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.Email == email && u.Password == passwordKey);
+
+        /// <summary>
+        /// Retrieves a user using the provided token.
+        /// </summary>
+        /// <returns>A <see cref="User"/> with no related data.</returns>
+        public async Task<User> GetUserByTokenAsync(string token) =>
+            await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.Token == token);
+
+        /// <summary>
         /// Retrieves all roles.
         /// </summary>
         /// <returns>A <see cref="List{T}"/> of <see cref="Role"/></returns>

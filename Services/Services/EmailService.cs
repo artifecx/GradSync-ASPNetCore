@@ -1,10 +1,9 @@
-﻿using MailKit.Net.Smtp;
-using MailKit.Security;
+﻿using Microsoft.Extensions.Options;
 using MimeKit;
-using Microsoft.Extensions.Options;
+using MailKit.Net.Smtp;
+using MailKit.Security;
 using Services.Interfaces;
 using Services.ServiceModels;
-using System.Net.Mail;
 using System.Threading.Tasks;
 using System;
 using static Services.Exceptions.EmailExceptions;
@@ -12,10 +11,24 @@ using static Services.Exceptions.EmailExceptions;
 public class EmailService : IEmailService
 {
     private readonly EmailSettings _emailSettings;
+    private readonly IEmailQueue _emailQueue;
 
-    public EmailService(IOptions<EmailSettings> emailSettings)
+    public EmailService(IOptions<EmailSettings> emailSettings, IEmailQueue emailQueue)
     {
         _emailSettings = emailSettings.Value;
+        _emailQueue = emailQueue;
+    }
+
+    public void SendEmail(string toEmail, string subject, string body)
+    {
+        var emailMessage = new EmailMessage
+        {
+            ToEmail = toEmail,
+            Subject = subject,
+            Body = body
+        };
+
+        _emailQueue.EnqueueEmail(emailMessage);
     }
 
     public async Task SendEmailAsync(string toEmail, string subject, string body)
@@ -33,7 +46,7 @@ public class EmailService : IEmailService
         };
         email.Body = builder.ToMessageBody();
 
-        using var smtp = new MailKit.Net.Smtp.SmtpClient();
+        using var smtp = new SmtpClient();
         try
         {
             await smtp.ConnectAsync(_emailSettings.SmtpServer, _emailSettings.SmtpPort, SecureSocketOptions.StartTls);

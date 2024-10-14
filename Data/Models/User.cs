@@ -31,6 +31,12 @@ public partial class User
 
     public bool IsVerified { get; set; }
 
+    public string Token { get; set; }
+
+    public DateTime? TokenExpiry { get; set; }
+
+    public string Preferences { get; set; }
+
     public virtual Admin Admin { get; set; }
 
     public virtual Applicant Applicant { get; set; }

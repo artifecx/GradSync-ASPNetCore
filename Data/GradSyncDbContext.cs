@@ -74,17 +74,17 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.UploadedDate, "IX_AdditionalInformation_UploadedDate");
 
-            entity.Property(e => e.AdditionalInformationId).HasMaxLength(256);
+            entity.Property(e => e.AdditionalInformationId).HasMaxLength(255);
             entity.Property(e => e.FileContent).IsRequired();
             entity.Property(e => e.FileName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.FileType)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Type)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UploadedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -96,7 +96,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.ToTable("Admin");
 
-            entity.Property(e => e.UserId).HasMaxLength(256);
+            entity.Property(e => e.UserId).HasMaxLength(255);
 
             entity.HasOne(d => d.User).WithOne(p => p.Admin)
                 .HasForeignKey<Admin>(d => d.UserId)
@@ -109,11 +109,11 @@ public partial class GradSyncDbContext : DbContext
 
             entity.ToTable("Applicant");
 
-            entity.Property(e => e.UserId).HasMaxLength(256);
+            entity.Property(e => e.UserId).HasMaxLength(255);
             entity.Property(e => e.Address).HasMaxLength(500);
-            entity.Property(e => e.EducationalDetailsId).HasMaxLength(256);
-            entity.Property(e => e.IdNumber).HasMaxLength(256);
-            entity.Property(e => e.ResumeId).HasMaxLength(256);
+            entity.Property(e => e.EducationalDetailsId).HasMaxLength(255);
+            entity.Property(e => e.IdNumber).HasMaxLength(255);
+            entity.Property(e => e.ResumeId).HasMaxLength(255);
 
             entity.HasOne(d => d.EducationalDetails).WithMany(p => p.Applicants)
                 .HasForeignKey(d => d.EducationalDetailsId)
@@ -142,8 +142,8 @@ public partial class GradSyncDbContext : DbContext
                     {
                         j.HasKey("UserId", "SkillsId");
                         j.ToTable("ApplicantSkills");
-                        j.IndexerProperty<string>("UserId").HasMaxLength(256);
-                        j.IndexerProperty<string>("SkillsId").HasMaxLength(256);
+                        j.IndexerProperty<string>("UserId").HasMaxLength(255);
+                        j.IndexerProperty<string>("SkillsId").HasMaxLength(255);
                     });
         });
 
@@ -157,21 +157,21 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.UserId, "IX_Application_UserId");
 
-            entity.Property(e => e.ApplicationId).HasMaxLength(256);
-            entity.Property(e => e.AdditionalInformationId).HasMaxLength(256);
+            entity.Property(e => e.ApplicationId).HasMaxLength(255);
+            entity.Property(e => e.AdditionalInformationId).HasMaxLength(255);
             entity.Property(e => e.ApplicationStatusTypeId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.JobId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.UserId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
 
             entity.HasOne(d => d.ApplicationStatusType).WithMany(p => p.Applications)
                 .HasForeignKey(d => d.ApplicationStatusTypeId)
@@ -194,7 +194,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ApplicationStatusTypeId, "IX_Application_ApplicationStatusTypeId");
 
-            entity.Property(e => e.ApplicationStatusTypeId).HasMaxLength(256);
+            entity.Property(e => e.ApplicationStatusTypeId).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -205,14 +205,14 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("Avatar");
 
-            entity.Property(e => e.AvatarId).HasMaxLength(256);
+            entity.Property(e => e.AvatarId).HasMaxLength(255);
             entity.Property(e => e.FileContent).IsRequired();
             entity.Property(e => e.FileName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.FileType)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UploadedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -228,13 +228,13 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ShortName, "IX_College_ShortName");
 
-            entity.Property(e => e.CollegeId).HasMaxLength(256);
+            entity.Property(e => e.CollegeId).HasMaxLength(255);
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.ShortName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
         });
 
         modelBuilder.Entity<Company>(entity =>
@@ -247,20 +247,20 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.MemorandumOfAgreementId, "IX_Company_MOAId");
 
-            entity.Property(e => e.CompanyId).HasMaxLength(256);
+            entity.Property(e => e.CompanyId).HasMaxLength(255);
             entity.Property(e => e.Address)
                 .IsRequired()
                 .HasMaxLength(500);
-            entity.Property(e => e.CompanyLogoId).HasMaxLength(256);
+            entity.Property(e => e.CompanyLogoId).HasMaxLength(255);
             entity.Property(e => e.ContactEmail)
                 .IsRequired()
-                .HasMaxLength(256);
-            entity.Property(e => e.ContactNumber).HasMaxLength(256);
+                .HasMaxLength(255);
+            entity.Property(e => e.ContactNumber).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
-            entity.Property(e => e.MemorandumOfAgreementId).HasMaxLength(256);
+            entity.Property(e => e.MemorandumOfAgreementId).HasMaxLength(255);
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
 
             entity.HasOne(d => d.CompanyLogo).WithMany(p => p.Companies)
                 .HasForeignKey(d => d.CompanyLogoId)
@@ -277,14 +277,14 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("CompanyLogo");
 
-            entity.Property(e => e.CompanyLogoId).HasMaxLength(256);
+            entity.Property(e => e.CompanyLogoId).HasMaxLength(255);
             entity.Property(e => e.FileContent).IsRequired();
             entity.Property(e => e.FileName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.FileType)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UploadedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -302,16 +302,16 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ShortName, "IX_Department_ShortName");
 
-            entity.Property(e => e.DepartmentId).HasMaxLength(256);
+            entity.Property(e => e.DepartmentId).HasMaxLength(255);
             entity.Property(e => e.CollegeId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.ShortName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
 
             entity.HasOne(d => d.College).WithMany(p => p.Departments)
                 .HasForeignKey(d => d.CollegeId)
@@ -326,23 +326,23 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.IsGraduate, "IX_EducationalDetails_IsGraduate");
 
-            entity.Property(e => e.EducationalDetailsId).HasMaxLength(256);
+            entity.Property(e => e.EducationalDetailsId).HasMaxLength(255);
             entity.Property(e => e.DepartmentId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.IdNumber)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.YearLevelId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
         });
 
         modelBuilder.Entity<EmploymentType>(entity =>
         {
             entity.ToTable("EmploymentType");
 
-            entity.Property(e => e.EmploymentTypeId).HasMaxLength(256);
+            entity.Property(e => e.EmploymentTypeId).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -373,7 +373,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.YearLevelId, "IX_Job_YearLevelId");
 
-            entity.Property(e => e.JobId).HasMaxLength(256);
+            entity.Property(e => e.JobId).HasMaxLength(255);
             entity.Property(e => e.CreatedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -382,32 +382,32 @@ public partial class GradSyncDbContext : DbContext
                 .HasMaxLength(800);
             entity.Property(e => e.EmploymentTypeId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Location)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.PostedById)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Salary)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.ScheduleId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.SetupTypeId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.StatusTypeId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Title)
                 .IsRequired()
                 .HasMaxLength(100);
             entity.Property(e => e.UpdatedDate).HasColumnType("datetime");
             entity.Property(e => e.YearLevelId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
 
             entity.HasOne(d => d.EmploymentType).WithMany(p => p.Jobs)
                 .HasForeignKey(d => d.EmploymentTypeId)
@@ -451,8 +451,8 @@ public partial class GradSyncDbContext : DbContext
                     {
                         j.HasKey("JobId", "DepartmentId");
                         j.ToTable("JobDepartment");
-                        j.IndexerProperty<string>("JobId").HasMaxLength(256);
-                        j.IndexerProperty<string>("DepartmentId").HasMaxLength(256);
+                        j.IndexerProperty<string>("JobId").HasMaxLength(255);
+                        j.IndexerProperty<string>("DepartmentId").HasMaxLength(255);
                     });
 
             entity.HasMany(d => d.Skills).WithMany(p => p.Jobs)
@@ -468,8 +468,8 @@ public partial class GradSyncDbContext : DbContext
                     {
                         j.HasKey("JobId", "SkillsId");
                         j.ToTable("JobSkills");
-                        j.IndexerProperty<string>("JobId").HasMaxLength(256);
-                        j.IndexerProperty<string>("SkillsId").HasMaxLength(256);
+                        j.IndexerProperty<string>("JobId").HasMaxLength(255);
+                        j.IndexerProperty<string>("SkillsId").HasMaxLength(255);
                     });
         });
 
@@ -481,14 +481,14 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.ValidityStart, "IX_MOA_ValidityStart");
 
-            entity.Property(e => e.MemorandumOfAgreementId).HasMaxLength(256);
+            entity.Property(e => e.MemorandumOfAgreementId).HasMaxLength(255);
             entity.Property(e => e.FileContent).IsRequired();
             entity.Property(e => e.FileName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.FileType)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UploadedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -506,9 +506,9 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.CompanyId, "IX_Recruiter_CompanyId");
 
-            entity.Property(e => e.UserId).HasMaxLength(256);
-            entity.Property(e => e.CompanyId).HasMaxLength(256);
-            entity.Property(e => e.Title).HasMaxLength(256);
+            entity.Property(e => e.UserId).HasMaxLength(255);
+            entity.Property(e => e.CompanyId).HasMaxLength(255);
+            entity.Property(e => e.Title).HasMaxLength(255);
 
             entity.HasOne(d => d.Company).WithMany(p => p.Recruiters)
                 .HasForeignKey(d => d.CompanyId)
@@ -526,14 +526,14 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.UploadedDate, "IX_Resume_UploadedDate");
 
-            entity.Property(e => e.ResumeId).HasMaxLength(256);
+            entity.Property(e => e.ResumeId).HasMaxLength(255);
             entity.Property(e => e.FileContent).IsRequired();
             entity.Property(e => e.FileName)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.FileType)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.UploadedDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
@@ -545,7 +545,7 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Name, "IX_Role_Name");
 
-            entity.Property(e => e.RoleId).HasMaxLength(256);
+            entity.Property(e => e.RoleId).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -556,16 +556,16 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("SavedJob");
 
-            entity.Property(e => e.SavedJobId).HasMaxLength(256);
+            entity.Property(e => e.SavedJobId).HasMaxLength(255);
             entity.Property(e => e.JobId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.SaveDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
             entity.Property(e => e.UserId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
 
             entity.HasOne(d => d.Job).WithMany(p => p.SavedJobs)
                 .HasForeignKey(d => d.JobId)
@@ -586,18 +586,18 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Hours, "IX_Schedule_Hours");
 
-            entity.Property(e => e.ScheduleId).HasMaxLength(256);
+            entity.Property(e => e.ScheduleId).HasMaxLength(255);
             entity.Property(e => e.Days)
                 .IsRequired()
-                .HasMaxLength(256);
-            entity.Property(e => e.Hours).HasMaxLength(256);
+                .HasMaxLength(255);
+            entity.Property(e => e.Hours).HasMaxLength(255);
         });
 
         modelBuilder.Entity<SetupType>(entity =>
         {
             entity.ToTable("SetupType");
 
-            entity.Property(e => e.SetupTypeId).HasMaxLength(256);
+            entity.Property(e => e.SetupTypeId).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -612,20 +612,20 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Type, "IX_Skills_Type");
 
-            entity.Property(e => e.SkillsId).HasMaxLength(256);
+            entity.Property(e => e.SkillsId).HasMaxLength(255);
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Type)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
         });
 
         modelBuilder.Entity<StatusType>(entity =>
         {
             entity.ToTable("StatusType");
 
-            entity.Property(e => e.StatusTypeId).HasMaxLength(256);
+            entity.Property(e => e.StatusTypeId).HasMaxLength(255);
             entity.Property(e => e.Description).HasMaxLength(500);
             entity.Property(e => e.Name)
                 .IsRequired()
@@ -650,8 +650,10 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.RoleId, "IX_User_RoleId");
 
-            entity.Property(e => e.UserId).HasMaxLength(256);
-            entity.Property(e => e.AvatarId).HasMaxLength(256);
+            entity.HasIndex(e => e.Token, "IX_User_Token");
+
+            entity.Property(e => e.UserId).HasMaxLength(255);
+            entity.Property(e => e.AvatarId).HasMaxLength(255);
             entity.Property(e => e.Email)
                 .IsRequired()
                 .HasMaxLength(100);
@@ -668,11 +670,13 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.MiddleName).HasMaxLength(100);
             entity.Property(e => e.Password)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.RoleId)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
             entity.Property(e => e.Suffix).HasMaxLength(100);
+            entity.Property(e => e.Token).HasMaxLength(255);
+            entity.Property(e => e.TokenExpiry).HasColumnType("datetime");
 
             entity.HasOne(d => d.Avatar).WithMany(p => p.Users)
                 .HasForeignKey(d => d.AvatarId)
@@ -693,10 +697,10 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Year, "IX_YearLevel_Year");
 
-            entity.Property(e => e.YearLevelId).HasMaxLength(256);
+            entity.Property(e => e.YearLevelId).HasMaxLength(255);
             entity.Property(e => e.Name)
                 .IsRequired()
-                .HasMaxLength(256);
+                .HasMaxLength(255);
         });
 
         OnModelCreatingPartial(modelBuilder);
