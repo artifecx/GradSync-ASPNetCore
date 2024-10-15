@@ -11,7 +11,7 @@
             "Part-time" => "#fdbf77",
             "Full-time" => "#54eba2",
             "Contract" => "#ee6d6b",
-            "Internship" => "#82b8f1",
+            "On-the-Job Training" => "#82b8f1",
             _ => "#gray-300",
         };
     }
@@ -89,7 +89,7 @@
 
                                 <!-- Salary and Job Description -->
                                 <div>
-                                    <span class="text-sm text-gray-700 font-bold">$@job.Salary </span>
+                                    <span class="text-sm text-gray-700 font-bold">@job.Salary </span>
                                 </div>
                                 <p class="pt-2 text-sm text-gray-600">@job.Description</p>
 
@@ -110,10 +110,12 @@
 
                                     <!-- Details and Application Button -->
                                     <div class="flex space-x-4">
-                                        <button onclick="location.href='@Url.Action("JobDetails", new { id = job.JobId })'"
+                                        <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
                                                 class="px-4 py-2 rounded-md bg-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-300 transition-colors">
                                             See Details
                                         </button>
+
+
 
                                         <button onclick="applyJobHandler('@job.JobId')"
                                                 class="px-6 py-2 rounded-md bg-[#7A1515] text-white text-sm font-bold hover:bg-[#991b1b] transition-colors">

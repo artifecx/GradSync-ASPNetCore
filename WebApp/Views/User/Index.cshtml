@@ -50,7 +50,7 @@
                     <table class="min-w-full table-auto rounded-lg bg-white">
                         <thead class="bg-gray-100">
                             <tr>
-                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-3 text-sm font-medium uppercase tracking-wider text-gray-500">
                                     <a asp-action="@aspAction"
                                        asp-route-sortBy="@sortByName"
                                        asp-route-search="@search"
@@ -155,7 +155,7 @@
                                         </td>
                                         <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.Email)</td>
                                         <td class="px-6 py-3 text-sm text-gray-500">@Html.DisplayFor(modelItem => item.RoleId)</td>
-                                        <td class="pl-6 py-3 text-sm">
+                                        <td class="pl-12 py-3 text-sm text-left">
                                             @if (item.IsVerified)
                                             {
                                                 <span class="text-green-600">
