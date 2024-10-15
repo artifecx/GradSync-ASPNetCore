@@ -97,6 +97,24 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Password updated successfully!.
+        /// </summary>
+        public static string Success_UserPasswordUpdate {
+            get {
+                return ResourceManager.GetString("Success_UserPasswordUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Successfully updated your preferences!.
+        /// </summary>
+        public static string Success_UserPreferencesUpdate {
+            get {
+                return ResourceManager.GetString("Success_UserPreferencesUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to User already exists!.
         /// </summary>
         public static string Success_UserRegistrationSuccess {

@@ -144,6 +144,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your old password is incorrect..
+        /// </summary>
+        public static string Error_UserPasswordMismatch {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordMismatch", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error occurred while resetting password..
         /// </summary>
         public static string Error_UserPasswordResetDefault {
@@ -153,11 +162,38 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Your new password cannot be the same as your current one..
+        /// </summary>
+        public static string Error_UserPasswordSimilar {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordSimilar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Your password reset token has expired, request a new one through the forgot password link..
         /// </summary>
         public static string Error_UserPasswordTokenExpired {
             get {
                 return ResourceManager.GetString("Error_UserPasswordTokenExpired", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error has occurred while updating password..
+        /// </summary>
+        public static string Error_UserPasswordUpdateDefault {
+            get {
+                return ResourceManager.GetString("Error_UserPasswordUpdateDefault", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An error has occurred while updating preferences..
+        /// </summary>
+        public static string Error_UserPreferenceUpdateDefault {
+            get {
+                return ResourceManager.GetString("Error_UserPreferenceUpdateDefault", resourceCulture);
             }
         }
         

@@ -1,5 +1,6 @@
-﻿@model IEnumerable<Services.ServiceModels.JobViewModel>
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
 @using Data.Models;
+@using Humanizer;
 
 @{
     ViewData["Title"] = "Available Jobs";
@@ -16,118 +17,240 @@
         };
     }
 
-    // string GetSetupTypeBorderColor(string setupType)
-    // {
-    //     return setupType switch
-    //     {
-    //         "Remote" => "#82b8f1",
-    //         "Face-to-Face" => "#54eba2",
-    //         "Hybrid" => "#fdbf77",
-    //         _ => "#gray-300",
-    //     };
-    // }
+    int pageIndex = Model.PageIndex;
+    var dropdownPopulation = new JobDropdownPopulationModel
+    {
+        EmploymentTypes = ViewBag.EmploymentTypes as List<EmploymentType>,
+        SetupTypes = ViewBag.WorkSetups as List<SetupType>
+    };
+
+    string search = ViewData["Search"] as string;
+    string filterByDatePosted = ViewData["FilterByDatePosted"] as string;
+    string filterBySalary = ViewData["FilterBySalary"] as string;
+    List<string> filterByEmploymentType = ViewData["FilterByEmploymentType"] as List<string>;
+    List<string> filterByWorkSetup = ViewData["FilterByWorkSetup"] as List<string>;
+
+    string sortBy = ViewData["SortBy"] as string;
+    string sortByDefault = sortBy == "match" || string.IsNullOrEmpty(sortBy) ? "match" : null;
+    string sortBySalary = sortBy == "salary_asc" ? "salary_desc" : "salary_asc";
+    string sortByDate = sortBy == "created_asc" ? "created_desc" : "created_asc";
 }
 
-<div class="min-h-screen min-w-full mx-auto bg-[#F5F6F8] pt-16 text-gray-900">
-    <div class="bg-[#7A1515] min-w-full py-4 shadow-sm flex justify-center items-center">
-        <div class="flex items-center w-1/2 bg-white rounded-lg shadow-md px-2 py-1">
-            <input type="text" name="searchQuery" placeholder="Search by job title, position, keyword..."
-                   class="w-full py-2 px-2 text-gray-700 bg-transparent focus:outline-none" />
-            <button class="flex items-center bg-gray-200 px-1 py-1 rounded-lg text-gray-700 hover:bg-gray-300 transition-colors">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pr-2" viewBox="0 0 20 20" fill="currentColor">
-                    <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 11-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-sm">Search</span>
-            </button>
+<div class="mx-auto min-h-screen min-w-full bg-[#F5F6F8] pt-16 text-gray-900">
+    <form method="get" asp-action="GetAllJobsApplicant">
+        <div class="flex min-w-full items-center justify-center bg-[#7A1515] py-4 shadow-sm">
+            <div class="flex w-1/2 items-center rounded-lg bg-white px-2 py-1 shadow-md">
+                <input type="text" name="search" value="@search" placeholder="Search by job title, position, keyword..."
+                       class="w-full bg-transparent px-2 py-2 text-gray-700 focus:outline-none" />
+                <button class="flex items-center rounded-lg bg-gray-200 px-1 py-1 text-gray-700 transition-colors hover:bg-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 pr-2" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M12.9 14.32a8 8 0 111.414-1.414l4.387 4.387a1 1 0 11-1.414 1.414l-4.387-4.387zM14 8a6 6 0 11-12 0 6 6 0 0112 0z" clip-rule="evenodd" />
+                    </svg>
+                    <span class="text-sm">Search</span>
+                </button>
+                <input type="hidden" name="sortBy" value="@sortBy" />
+                <input type="hidden" name="filterBySalary" value="@filterBySalary" />
+                <input type="hidden" name="filterByDatePosted" value="@filterByDatePosted" />
+                @foreach (var etFilter in filterByEmploymentType)
+                {
+                    <input type="hidden" name="filterByEmploymentType" value="@etFilter" />
+                }
+                @foreach (var wsFilter in filterByWorkSetup)
+                {
+                    <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
+                }
+            </div>
         </div>
-    </div>
+    </form>
 
-    <div class="max-w-7xl mx-auto px-6 mt-6 flex gap-6">
+    <div class="mx-auto mt-6 flex max-w-7xl gap-6 px-6">
         <!-- Filter Sidebar -->
-        @await Html.PartialAsync("Filter")
+        @await Html.PartialAsync("Filter", dropdownPopulation)
         
         <!-- Job Listings Section -->
-        <div class="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Recommended Jobs</h2>
+        <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="mb-4 flex items-center justify-between">
+                <h2 class="text-3xl font-bold text-gray-800">Recommended Jobs</h2>
+                
+                <form asp-action="GetAllJobsApplicant" method="get" class="flex items-center space-x-2">
+                    <label for="sortBy" class="text-sm font-medium text-gray-700">Sort By:</label>
+                    <select id="sortBy" name="sortBy" onchange="this.form.submit()" class="rounded-md border border-gray-300 p-2">
+                        <option value="match" selected=@(sortBy == "match" || string.IsNullOrEmpty(sortBy))>Match Percent (Default)</option>
+                        <option value="salary_asc" selected=@(sortBy == "salary_asc")>Salary (Lowest First)</option>
+                        <option value="salary_desc" selected=@(sortBy == "salary_desc")>Salary (Highest First)</option>
+                        <option value="created_asc" selected=@(sortBy == "created_asc")>Posted Date (Oldest First)</option>
+                        <option value="created_desc" selected=@(sortBy == "created_desc")>Posted Date (Newest First)</option>
+                    </select>
+                    <input type="hidden" name="search" value="@search" />
+                    <input type="hidden" name="filterBySalary" value="@filterBySalary" />
+                    <input type="hidden" name="filterByDatePosted" value="@filterByDatePosted" />
+                    @foreach (var etFilter in filterByEmploymentType)
+                    {
+                        <input type="hidden" name="filterByEmploymentType" value="@etFilter" />
+                    }
+                    @foreach (var wsFilter in filterByWorkSetup)
+                    {
+                        <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
+                    }
+                </form>
+            </div>
 
             <div>
-                @foreach (var job in Model)
+                @if (!Model.Any())
                 {
-                    <div class="py-2">
-                        <div class="p-1 bg-gray-100 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">
-                            <div class="px-3 py-2 bg-white rounded-xl">
-                                <!-- Company and Date Created -->
-                                <div class="flex justify-between pt-2 text-sm text-gray-600">
-                                    <span>@job.Company.Name - @job.Location</span>
-                                    <div class="flex items-center space-x-2">
-                                        <span>
-                                            @(string.IsNullOrEmpty(job.CreatedDate) ? "Date Not Available" : DateTime.Parse(job.CreatedDate).ToString("MMM dd, yyyy"))
-                                        </span>
+                    @(string.IsNullOrEmpty(search) ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
+                }
+                else
+                {
+                    @foreach (var job in Model)
+                    {
+                        <div class="py-2">
+                            <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                                <div class="rounded-xl bg-white px-3 py-2">
+                                    <!-- Company and Date Created -->
+                                    <div class="flex justify-between pt-2 text-sm text-gray-600">
+                                        <span>@job.Company.Name - @job.Location</span>
+                                        <div class="flex items-center space-x-2">
+                                            <span title="@job.CreatedDate">
+                                                @(job.CreatedDate == DateTime.MinValue ? "Date Not Available" : job.CreatedDate.ToUniversalTime().Humanize())
+                                            </span>
 
-                                        <!-- Bookmark Button Placeholder -->
-                                        <form method="post" asp-controller="Job" asp-action="Bookmark" asp-route-id="@job.JobId" class="ml-2">
-                                            <button type="submit" class="text-gray-500 hover:text-gray-700 transition-colors px-2">
-                                                <i class="fa-regular fa-bookmark"></i>
+                                            <!-- Bookmark Button Placeholder -->
+                                            <form method="post" asp-controller="Job" asp-action="Bookmark" asp-route-id="@job.JobId" class="ml-2">
+                                                <button type="submit" class="px-2 text-gray-500 transition-colors hover:text-gray-700">
+                                                    <i class="fa-regular fa-bookmark"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </div>
+
+                                    @*Job Title, Employment Type, and Work Setup *@
+                                    <div class="flex items-center space-x-4">
+                                        <div class="text-xl font-semibold text-[#7A1515]">@job.Title
+                                            <span class="ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900"
+                                                  style="background-color:@GetEmploymentTypeColor(job.EmploymentType.Name);">
+                                                @job.EmploymentType.Name
+                                            </span>
+
+                                            <span class="ml-1 rounded-md border px-2 py-1 text-xs font-normal text-gray-900"
+                                                  style="border: 2px solid"> @job.SetupType.Name
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <!-- Salary and Job Description -->
+                                    <div>
+                                        <span class="text-sm font-bold text-gray-700">@job.Salary </span>
+                                    </div>
+                                    <p class="pt-2 text-sm text-gray-600">@job.Description</p>
+
+                                    <!-- Job Skills -->
+                                    <div class="mb-1 flex flex-wrap space-x-2">
+                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 1</span>
+                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 2</span>
+                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 3</span>
+                                    </div>
+
+                                    <div class="mb-2 flex items-center justify-between">
+                                        <!-- Job Match Percentage Placeholder -->
+                                        <div class="flex items-center space-x-1 text-sm font-semibold text-gray-700">
+                                            <span class="pr-1 text-xs font-bold">Job Match:</span>
+                                            <span class="rounded-full border border-red-500 px-2 py-1 text-xs text-green-600">85%</span> <!--placeholder sheesh-->
+                                        </div>
+
+                                        <!-- Details and Application Button -->
+                                        <div class="flex space-x-4">
+                                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
+                                                    class="rounded-md bg-gray-200 px-4 py-2 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-300">
+                                                See Details
                                             </button>
-                                        </form>
-                                    </div>
-                                </div>
 
-                                <!-- Job Title, Employment Type, and Work Setup -->
-                                <div class="flex items-center space-x-4">
-                                    <div class="text-xl font-semibold text-[#7A1515]">@job.Title
-                                        <span class="text-gray-900 px-2 py-1 rounded-md text-xs font-medium ml-1"
-                                              style="background-color:@GetEmploymentTypeColor(job.EmploymentType.Name);">
-                                            @job.EmploymentType.Name
-                                        </span>
-
-                                        <span class="text-gray-900 font-normal text-xs px-2 py-1 rounded-md border ml-1"
-                                              style="border: 2px solid"> @job.SetupType.Name
-                                        </span>
-                                    </div>
-                                </div>
-
-                                <!-- Salary and Job Description -->
-                                <div>
-                                    <span class="text-sm text-gray-700 font-bold">@job.Salary </span>
-                                </div>
-                                <p class="pt-2 text-sm text-gray-600">@job.Description</p>
-
-                                <!-- Job Skills -->
-                                <div class="flex flex-wrap space-x-2 mb-1">
-                                    <span class="px-2 py-1 text-xs rounded-full border">Skill 1</span>
-                                    <span class="px-2 py-1 text-xs rounded-full border">Skill 2</span>
-                                    <span class="px-2 py-1 text-xs rounded-full border">Skill 3</span>
-                                </div>
-
-                                <div class="flex justify-between items-center mb-2">
-
-                                    <!-- Job Match Percentage Placeholder -->
-                                    <div class="flex items-center space-x-1 text-sm font-semibold text-gray-700">
-                                        <span class="text-xs font-bold pr-1">Job Match:</span>
-                                        <span class="px-2 py-1 text-xs text-green-600 border border-red-500 rounded-full">85%</span> <!--placeholder sheesh-->
-                                    </div>
-
-                                    <!-- Details and Application Button -->
-                                    <div class="flex space-x-4">
-                                        <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
-                                                class="px-4 py-2 rounded-md bg-gray-200 text-sm font-bold text-gray-700 hover:bg-gray-300 transition-colors">
-                                            See Details
-                                        </button>
-
-
-
-                                        <button onclick="applyJobHandler('@job.JobId')"
-                                                class="px-6 py-2 rounded-md bg-[#7A1515] text-white text-sm font-bold hover:bg-[#991b1b] transition-colors">
-                                            Send Application
-                                        </button>
+                                            <button onclick="applyJobHandler('@job.JobId')"
+                                                    class="rounded-md bg-[#7A1515] px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-[#991b1b]">
+                                                Send Application
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    }
                 }
             </div>
+        
+            <nav class="flex justify-center pt-3">
+                <ul class="pagination flex items-center">
+                    @if (Model.HasPreviousPage)
+                    {
+                        <li class="page-item">
+                            <form method="get" asp-action="GetAllJobsApplicant">
+                                <input type="hidden" name="pageIndex" value="@(Model.PageIndex - 1)" />
+                                <input type="hidden" name="sortBy" value="@sortBy" />
+                                <input type="hidden" name="search" value="@search" />
+                                <input type="hidden" name="filterBySalary" value="@filterBySalary" />
+                                <input type="hidden" name="filterByDatePosted" value="@filterByDatePosted" />
+                                @foreach (var etFilter in filterByEmploymentType)
+                                {
+                                    <input type="hidden" name="filterByEmploymentType" value="@etFilter" />
+                                }
+                                @foreach (var wsFilter in filterByWorkSetup)
+                                {
+                                    <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
+                                }
+                                <button class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" type="submit">
+                                    <i class="fas fa-chevron-left"></i>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    @for (int i = 1; i <= Model.TotalPages; i++)
+                    {
+                        <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                            <form method="get" asp-action="GetAllJobsApplicant">
+                                <input type="hidden" name="pageIndex" value="@i" />
+                                <input type="hidden" name="sortBy" value="@sortBy" />
+                                <input type="hidden" name="search" value="@search" />
+                                <input type="hidden" name="filterBySalary" value="@filterBySalary" />
+                                <input type="hidden" name="filterByDatePosted" value="@filterByDatePosted" />
+                                @foreach (var etFilter in filterByEmploymentType)
+                                {
+                                    <input type="hidden" name="filterByEmploymentType" value="@etFilter" />
+                                }
+                                @foreach (var wsFilter in filterByWorkSetup)
+                                {
+                                    <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
+                                }
+                                <button class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" type="submit">
+                                    @i
+                                </button>
+                            </form>
+                        </li>
+                    }
+                    @if (Model.HasNextPage)
+                    {
+                        <li class="page-item">
+                            <form method="get" asp-action="GetAllJobsApplicant">
+                                <input type="hidden" name="pageIndex" value="@(Model.PageIndex + 1)" />
+                                <input type="hidden" name="sortBy" value="@sortBy" />
+                                <input type="hidden" name="search" value="@search" />
+                                <input type="hidden" name="filterBySalary" value="@filterBySalary" />
+                                <input type="hidden" name="filterByDatePosted" value="@filterByDatePosted" />
+                                @foreach (var etFilter in filterByEmploymentType)
+                                {
+                                    <input type="hidden" name="filterByEmploymentType" value="@etFilter" />
+                                }
+                                @foreach (var wsFilter in filterByWorkSetup)
+                                {
+                                    <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
+                                }
+                                <button class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" type="submit">
+                                    <i class="fas fa-chevron-right"></i>
+                                </button>
+                            </form>
+                        </li>
+                    }
+                </ul>
+            </nav>
         </div>
     </div>
 </div>
