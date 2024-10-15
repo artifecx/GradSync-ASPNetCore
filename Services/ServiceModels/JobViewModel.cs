@@ -25,10 +25,10 @@ namespace Services.ServiceModels
         public List<Department> Departments { get; set; }
 
         [Display(Name = "Date Created")]
-        public string CreatedDate { get; set; }
+        public DateTime CreatedDate { get; set; }
 
         [Display(Name = "Date Updated")]
-        public string UpdatedDate { get; set; }
+        public DateTime UpdatedDate { get; set; }
 
         [Display(Name = "Available Slots")]
         public string AvailableSlots { get; set; }

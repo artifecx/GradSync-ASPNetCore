@@ -53,10 +53,10 @@ namespace WebApp.Controllers
         public async Task<IActionResult> GetAllJobsAdmin(
             string sortBy, 
             string search, 
-            string filterByCompany, 
-            string filterByEmploymentType, 
-            string filterByStatusType, 
-            string filterByWorkSetup, 
+            string filterByCompany,
+            List<string> filterByEmploymentType, 
+            string filterByStatusType,
+            List<string> filterByWorkSetup, 
             int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
@@ -77,9 +77,9 @@ namespace WebApp.Controllers
             string sortBy,
             string search,
             string filterByCompany,
-            string filterByEmploymentType,
+            List<string> filterByEmploymentType,
             string filterByStatusType,
-            string filterByWorkSetup,
+            List<string> filterByWorkSetup,
             int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
@@ -99,16 +99,21 @@ namespace WebApp.Controllers
             string sortBy,
             string search,
             string filterByCompany,
-            string filterByEmploymentType,
+            List<string> filterByEmploymentType,
             string filterByStatusType,
-            string filterByWorkSetup,
-            int pageIndex = 1)
+            List<string> filterByWorkSetup,
+            int pageIndex = 1,
+            string filterByDatePosted = null,
+            string filterBySalary = null)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, 
+                    filterByStatusType, filterByWorkSetup, pageIndex, 3, filterByDatePosted, filterBySalary);
 
-                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+                await InitializeValues(sortBy, search, filterByCompany, 
+                    filterByEmploymentType, filterByStatusType, 
+                    filterByWorkSetup, filterByDatePosted, filterBySalary);
 
                 return View("IndexApplicant", jobs);
             }, "GetAllJobsApplicant");
@@ -118,9 +123,11 @@ namespace WebApp.Controllers
             string sortBy,
             string search,
             string filterByCompany,
-            string filterByEmploymentType,
+            List<string> filterByEmploymentType,
             string filterByStatusType,
-            string filterByWorkSetup)
+            List<string> filterByWorkSetup,
+            string filterByDatePosted = null,
+            string filterBySalary = null)
         {
             ViewData["SortBy"] = sortBy;
             ViewData["Search"] = search;
@@ -128,6 +135,8 @@ namespace WebApp.Controllers
             ViewData["FilterByEmploymentType"] = filterByEmploymentType;
             ViewData["FilterByStatusType"] = filterByStatusType;
             ViewData["FilterByWorkSetup"] = filterByWorkSetup;
+            ViewData["FilterByDatePosted"] = filterByDatePosted;
+            ViewData["FilterBySalary"] = filterBySalary;
 
             await PopulateViewBagsAsync();
         }
