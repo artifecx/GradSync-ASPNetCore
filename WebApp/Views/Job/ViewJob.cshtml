@@ -13,7 +13,7 @@
         </h2>
     </a>
 </div>
-<div class="min-h-screen bg-[#F5F6F8] px-4 pt-16 text-black md:px-12">
+<div class="min-h-screen bg-[#F5F6F8] px-4  text-black md:px-12">
     <div class="container mx-auto rounded-lg bg-white p-6 shadow-lg">
         <!-- Header Section -->
         <div class="flex flex-col items-center justify-between md:flex-row md:items-start">
@@ -63,25 +63,25 @@
                 <!-- Applicant Buttons -->
                 @if (User.IsInRole("Applicant"))
                 {
-                    <!-- Save Job Button -->
-                    <button onclick="saveJobHandler('@Model.JobId')"
-                            class="flex items-center gap-1 rounded-md bg-[#E5E8ED] px-6 py-2 font-bold text-[#7A1515] hover:text-lg">
-                        <i class="fas fa-book"></i>
-                    </button>
-                    <!-- Apply Button -->
-                    <button onclick="applyJobHandler('@Model.JobId')"
-                            class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
-                        <i class="fas fa-paper-plane pl-2"></i> <text class="px-2">Apply</text>
-                    </button>
+                        <!-- Save Job Button -->
+                        <button onclick="saveJobHandler('@Model.JobId')"
+                                class="flex items-center gap-1 rounded-md bg-[#E5E8ED] px-6 py-2 font-bold text-[#7A1515] hover:text-lg">
+                            <i class="fas fa-book"></i>
+                        </button>
+                        <!-- Apply Button -->
+                        <button onclick="applyJobHandler('@Model.JobId')"
+                                class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
+                            <i class="fas fa-paper-plane pl-2"></i> <text class="px-2">Apply</text>
+                        </button>
                 } 
                 @*Recruiter Buttons*@
-                else if(User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
+                else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
                 {
-                    <!-- Edit Button -->
-                    <button onclick="applyJobHandler('@Model.JobId')"
-                            class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
-                        <i class="fas fa-edit action-icon pl-2"></i> <text class="px-2">Edit</text>
-                    </button>
+                        <!-- Edit Button -->
+                        <button onclick="applyJobHandler('@Model.JobId')"
+                                class="flex items-center gap-1 rounded-md bg-[#7A1515] px-8 py-2 font-bold text-white hover:text-lg">
+                            <i class="fas fa-edit action-icon pl-2"></i> <text class="px-2">Edit</text>
+                        </button>
                 }
             </div>
         </div>
@@ -152,31 +152,31 @@
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 
 @section Scripts {
-    <script src="~/js/toastrNotification.js"></script>
-    <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-        sessionStorage.setItem('filterByCompany', urlParams.get('filterByCompany') || '');
-        sessionStorage.setItem('filterByEmploymentType', urlParams.get('filterByEmploymentType') || '');
-        sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
-        sessionStorage.setItem('filterByWorkSetup', urlParams.get('filterByWorkSetup') || '');
-        sessionStorage.setItem('search', urlParams.get('search') || '');
-        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+        <script src="~/js/toastrNotification.js"></script>
+        <script>
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+            sessionStorage.setItem('filterByCompany', urlParams.get('filterByCompany') || '');
+            sessionStorage.setItem('filterByEmploymentType', urlParams.get('filterByEmploymentType') || '');
+            sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
+            sessionStorage.setItem('filterByWorkSetup', urlParams.get('filterByWorkSetup') || '');
+            sessionStorage.setItem('search', urlParams.get('search') || '');
+            sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
 
-        document.querySelector('.back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            const baseUrl = '@Url.Action($"{aspAction}", "Job")';
-            const params = new URLSearchParams();
-            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-            params.set('filterByCompany', sessionStorage.getItem('filterByCompany') || '');
-            params.set('filterByEmploymentType', sessionStorage.getItem('filterByEmploymentType') || '');
-            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
-            params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
-            params.set('search', sessionStorage.getItem('search') || '');
-            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            window.location.href = `${baseUrl}?${params.toString()}`;
-        });
-    </script>
+            document.querySelector('.back-button').addEventListener('click', function (event) {
+                event.preventDefault();
+                const baseUrl = '@Url.Action($"{aspAction}", "Job")';
+                const params = new URLSearchParams();
+                params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+                params.set('filterByCompany', sessionStorage.getItem('filterByCompany') || '');
+                params.set('filterByEmploymentType', sessionStorage.getItem('filterByEmploymentType') || '');
+                params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
+                params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
+                params.set('search', sessionStorage.getItem('search') || '');
+                params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+                window.location.href = `${baseUrl}?${params.toString()}`;
+            });
+        </script>
 }
 
 @functions {
