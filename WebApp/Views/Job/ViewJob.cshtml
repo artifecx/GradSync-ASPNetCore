@@ -8,13 +8,6 @@
     var userId = ViewBag.UserId;
     string aspAction = User.IsInRole("Recruiter") ? "GetAllJobsRecruiter" : "GetAllJobsAdmin";
 }
-<div class="d-flex justify-content-between nav-header">
-    <a href="#" class="back-button m-2 text-black">
-        <h2 class="font-weight-bold">
-            <i class="fa-solid fa-arrow-left mx-2"></i>
-        </h2>
-    </a>
-</div>
 
 
 <div class="min-h-screen bg-gray-100 text-black">
@@ -52,8 +45,8 @@
                         {
                             <!-- Edit -->
                             <button onclick="editJobHandler('@Model.JobId')"
-                                    class="text-gray-900 hover:text-gray-700 transition-all px-4 py-2 rounded-lg flex items-center">
-                                <i class="fas fa-edit"></i> Edit
+                                    class="btn-primary py-2 px-4 rounded-lg flex items-center justify-center transition-all hover:bg-[#991b1b] hover:text-white">
+                                <i class="fas fa-edit pr-2"></i> Edit
                             </button>
                         }
                     </div>
