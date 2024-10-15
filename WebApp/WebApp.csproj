@@ -12,6 +12,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Compile Remove="Views\Job\JobList.cshtml.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Remove="Views\Job\JobList.cshtml" />
     <Content Remove="wwwroot\js\chart.cs" />
     <Content Remove="wwwroot\js\chart.js" />
   </ItemGroup>
