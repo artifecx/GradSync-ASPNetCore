@@ -70,6 +70,11 @@ namespace Services.Services
 
             await _repository.UpdateCompanyAsync(company);
         }
+        public async Task<CompanyViewModel> GetRecruiterCompanyAsync(string userId)
+        {
+            var company = await _repository.GetRecruiterCompanyAsync(userId);
+            return _mapper.Map<CompanyViewModel>(company);
+        }
 
         #region Get Methods        
         public async Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(
@@ -82,11 +87,6 @@ namespace Services.Services
             var items = companies.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return new PaginatedList<CompanyViewModel>(items, count, pageIndex, pageSize);
-        }
-
-        public async Task<PaginatedList<CompanyViewModel>> GetRecruiterCompanyAsync(string userId)
-        {
-            throw new NotImplementedException();
         }
 
         private async Task<List<CompanyViewModel>> FilterAndSortCompanies(List<CompanyViewModel> companies, string sortBy, string search, bool? verified, bool? hasValidMOA)
