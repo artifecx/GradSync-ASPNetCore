@@ -1,4 +1,26 @@
-﻿$(document).ready(function () {
+﻿document.addEventListener('click', function (e) {
+    const actionBtn = e.target.closest('.actionDropdownJobBtn');
+    if (actionBtn) {
+        const JobId = actionBtn.dataset.jobid;
+        const menu = document.getElementById(`actionDropdownJobMenu-${JobId}`);
+        menu.classList.toggle('hidden');
+
+        document.querySelectorAll('.actionDropdownJobMenu').forEach(m => {
+            if (m.id !== `actionDropdownJobMenu-${JobId}`) {
+                m.classList.add('hidden');
+            }
+        });
+        return;
+    }
+
+    if (!e.target.closest('.actionDropdownJobMenu') && !e.target.closest('.actionDropdownJobBtn')) {
+        document.querySelectorAll('.actionDropdownJobMenu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    }
+});
+
+$(document).ready(function () {
     var url = new URL(window.location);
     var showModal = url.searchParams.get('showModal');
 
