@@ -65,25 +65,16 @@ else
                                 <i class="fas fa-info-circle mr-2"></i> Job Details
                             </button>
 
-
-                            @* <button type="button"
-                                    onclick="ViewJob('@item.JobId', '@item.Title')"
-                                    class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
-                                <i class="fas fa-info-circle mr-2"></i> Job Details
-                            </button> *@
-
                             <!-- Edit Job -->
-                            <button type="button"
-                                    onclick="EditJobModal('@item.JobId', '@item.Title')"
+                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = item.JobId })'"
                                     class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
                                 <i class="fas fa-edit -circle mr-2"></i> Edit Job Info
                             </button>
 
                             <!-- Archive Job -->
-                            <button type="button"
-                                    onclick="displayDeleteModal('@item.JobId', '@item.Title')"
+                            <button onclick=" displayDeleteModal('@item.JobId' , '@item.PostedBy)"
                                     class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
-                                <i class="fas fa-archive mr-2"></i> Archive Job
+                                <i class="fas fa-info-circle mr-2"></i> Archive Chat
                             </button>
                         </div>
                     </div>
@@ -93,9 +84,13 @@ else
     }
 }
 
+<!-- Values passed to the js files -->
+<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Job")" />
+
  @section Scripts {
     <script src="~/js/delete.js"></script>
     <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/archive.js"></script>
     <script src="~/js/job.js"></script>
 }
         
