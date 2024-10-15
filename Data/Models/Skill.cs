@@ -5,11 +5,9 @@ namespace Data.Models;
 
 public partial class Skill
 {
-    public string SkillsId { get; set; }
+    public string SkillId { get; set; }
 
     public string Name { get; set; }
-
-    public string Type { get; set; }
 
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 
