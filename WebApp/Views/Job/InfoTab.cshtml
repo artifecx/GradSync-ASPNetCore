@@ -1,0 +1,91 @@
+﻿@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
+@using Data.Models 
+
+@{
+    string GetEmploymentTypeColor(string employmentType)
+    {
+        return employmentType switch
+        {
+            "Part-time" => "#fdbf77",
+            "Full-time" => "#54eba2",
+            "Contract" => "#ee6d6b",
+            "Internship" => "#82b8f1",
+            _ => "#DCDDDF",
+        };
+    }
+    var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
+}
+
+<div class="bg-white p-6 rounded-lg shadow-md border border-gray-200">
+    <div class="font-normal pb-2 text-sm flex justify-between items-center">
+        <div>
+            <i class="fas fa-map-marker-alt pr-1 text-sm"></i>
+            @Model.Location
+        </div>
+
+        <!-- Status and Employment Type Badge -->
+        <div class="text-gray-900 justify-between">
+            <span class="text-gray-900 px-2 py-1 pr-2 rounded-md text-xs font-medium ml-1 border-2 border-green-500">
+                @Model.StatusType.Name </span>
+            <span class="text-gray-900 px-2 py-1 border-2 rounded-md text-xs font-medium ml-1"
+                  style="background-color:@GetEmploymentTypeColor(Model.EmploymentType.Name);">
+                @Model.EmploymentType.Name
+            </span>   
+        </div>
+    </div>
+
+    <div class="text-lg font-bold">@Model.Salary</div>
+        <span class="font-semibold text-sm text-gray-700">Available Slots: @Model.AvailableSlots</span>
+
+        <hr class=" border-gray-300" />
+        <h3 class="text-sm font-semibold text-gray-500 mb-3">Details</h3>
+
+        <ul class="space-y-4 text-sm text-gray-700">
+            <li class="gap-2">
+                <i class="fas fa-clock text-lg"></i>
+                <span class="pl-2 font-semibold">Schedule:</span>
+                <span>@Model.Schedule.Days, @Model.Schedule.Hours</span>
+            </li>
+            <li class="gap-2">
+                <i class="fas fa-graduation-cap text-lg"></i>
+                <span class="pl-1 font-semibold">Year Level:</span>
+                <span>@Model.YearLevel.Name</span>
+            </li>
+            <li class="gap-2">
+                <i class="fas fa-university text-lg"></i>
+                <span class="font-semibold pl-2">Departments:</span>
+                <div class=" pl-8">@string.Join(", ", (Model.Departments as List<Department>).Select(department => department.Name))</div>
+            </li>
+        </ul>
+
+        <hr class="border-gray-300" />
+        <h3 class="text-sm font-semibold text-gray-500 mb-3">Contact Information</h3>
+
+        <ul class="space-y-4 text-sm text-gray-700">
+            <li class="flex pr-2">
+                <span class="font-semibold pr-2">Email: </span>
+                <span>@Model.Company.ContactEmail</span>
+            </li>
+            <li class="flex pr-2">
+                <span class="font-semibold pr-2">Phone: </span>
+                <span>@Model.Company.ContactNumber</span>
+            </li>
+        </ul>
+</div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script>
+        function goBack() {
+            const baseUrl = '@Url.Action("Index", "Job")'; // Use your actual action name here
+            const params = new URLSearchParams();
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('filterByCompany', sessionStorage.getItem('filterByCompany') || '');
+            params.set('filterByEmploymentType', sessionStorage.getItem('filterByEmploymentType') || '');
+            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
+            params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        }
+    </script>
+}

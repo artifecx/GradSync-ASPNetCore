@@ -23,7 +23,7 @@
 @if (!Model.Any())
 {
     <tr>
-        <td colspan="13" class="whitespace-nowrap px-6 py-4 text-center text-sm text-gray-500">
+        <td colspan="13" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
             @(noResult ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
         </td>
     </tr>
@@ -32,46 +32,65 @@ else
 {
     @foreach (var item in Model)
     {
-        <tr>
-            <td class="whitespace-nowrap px-6 py-4">
-                @Html.DisplayFor(modelItem => item.Title)
-            </td>
+        <tr class="hover:bg-gray-100">
+            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Title)</td>
             @if (!User.IsInRole("Recruiter"))
             {
-                <td class="whitespace-nowrap px-6 py-4">
-                    @Html.DisplayFor(modelItem => item.Company.Name)
-                </td>
+                <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>
             }
             else
             {
-                <td class="whitespace-nowrap px-6 py-4">
-                    @Html.DisplayFor(modelItem => item.AvailableSlots)
-                </td>
+                <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.AvailableSlots)</td>
             }
-            <td class="whitespace-nowrap px-6 py-4">
-                @Html.DisplayFor(modelItem => item.EmploymentType.Name)
-            </td>
-            <td class="whitespace-nowrap px-6 py-4">
-                @Html.DisplayFor(modelItem => item.StatusType.Name)
-            </td>
-            <td class="whitespace-nowrap px-6 py-4">
-                @Html.DisplayFor(modelItem => item.SetupType.Name)
-            </td>
-            <td class="whitespace-nowrap px-6 py-4">
-                @Html.DisplayFor(modelItem => item.CreatedDate)
-            </td>
-            <td>
-                @Html.ActionLink("", "GetJob", new { 
-                    id = item.JobId, sortBy = sortBy, filterByCompany = filterByCompany, filterByEmploymentType = filterByEmploymentType, 
-                    filterByStatusType = filterByStatusType, filterByWorkSetup = filterByWorkSetup, search = search, pageIndex = Model.PageIndex 
-                }, new { @class = "fas fa-info-circle action-icon" }) |
-                @Html.ActionLink("", "GetJob", new { id = item.JobId, showModal = "editJob" }, new { @class = "fas fa-edit action-icon" }) |
-                <button type="button" onclick="displayDeleteModal('@item.JobId', '@item.Title')" class="action-icon mx-1">
-                    <i class="fa fa-archive" aria-hidden="true"></i>
-                    <span class="sr-only">Archive</span>
-                </button>
+            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.EmploymentType.Name)</td>
+            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.StatusType.Name)</td>
+            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.SetupType.Name)</td>
+            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+            <td class="pl-6 py-3 text-left">
+                <div class="relative">
+                    <!-- Dropdown Button -->
+                    <button data-jobid="@item.JobId"
+                            class="actionDropdownJobBtn cursor-pointer text-black hover:text-[#A53D3D] focus:outline-none px-6">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+
+                    <div id="actionDropdownJobMenu-@item.JobId"
+                         class="actionDropdownJobMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right
+                                rounded-md bg-white text-left shadow-lg ring-black">
+                        <div class="space-y-1 py-1">
+
+                            <!-- Job Details -->
+                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = item.JobId })'"
+                                    class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
+                                <i class="fas fa-info-circle mr-2"></i> Job Details
+                            </button>
+
+                            <!-- Edit Job -->
+                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = item.JobId })'"
+                                    class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
+                                <i class="fas fa-edit -circle mr-2"></i> Edit Job Info
+                            </button>
+
+                            <!-- Archive Job -->
+                            <button onclick=" displayDeleteModal('@item.JobId' , '@item.PostedBy)"
+                                    class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
+                                <i class="fas fa-info-circle mr-2"></i> Archive Chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </td>
         </tr>
     }
+}
+
+<!-- Values passed to the js files -->
+<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Job")" />
+
+ @section Scripts {
+    <script src="~/js/delete.js"></script>
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/archive.js"></script>
+    <script src="~/js/job.js"></script>
 }
         
