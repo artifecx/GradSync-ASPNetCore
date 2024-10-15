@@ -4,76 +4,88 @@
     ViewData["Title"] = "Company Details";
 }
 
-<div class="d-flex justify-content-between nav-header">
-    <a href="#" class="back-button m-2 text-black">
-        <h2 class="font-weight-bold">
-            <i class="fa-solid fa-arrow-left mx-2"></i>
-        </h2>
-    </a>
-
-    <div class="flex items-center">
-        <h4 class="text-xl font-semibold">
-          <a href="javascript:void(0);" onclick="enableEditMode()" class="fas fa-edit ml-2 text-[#7A1515] hover:text-[#A53D3D]"></a>
-
-        </h4>
-    </div>
-</div>
-
 <div class="min-h-screen bg-[#F5F6F8] px-4 text-black md:px-12">
-    <div class="container mx-auto rounded-lg bg-white p-6 shadow-lg">
-        <!-- Header Section -->
-        <div class="flex flex-col items-center justify-between md:flex-row md:items-start">
-            <!-- Left Side -->
-            <div class="flex items-center">
-                <div class="md:ml-6">
-                    <!-- Company Name and Details -->
-                    <div class="flex space-x-3">
-                        <h1 class="text-3xl font-bold md:text-4xl">@Model.Name</h1>
+    <div class="container mx-auto p-4">
+        <div class="mb-4 rounded bg-white px-5 py-4 shadow-md">
+            <div class="grid-cols-1 grid gap-4 md:grid-cols-2">
+                <!-- Company Details Section -->
+                <div>
+                    <div class="mb-4 flex items-center">
+                        <!-- Back Button -->
+                        <a href="#" class="back-button mr-4 text-black">
+                            <h2 class="font-bold">
+                                <i class="fa-solid fa-arrow-left mx-2"></i>
+                            </h2>
+                        </a>
+
+                        <!-- Title and Edit Icon Container -->
+                        <div class="flex items-center">
+                            <h4 class="text-xl font-semibold">
+                                Company Details
+                                <a href="javascript:void(0);" onclick="enableEditMode()" class="fas fa-edit ml-2 text-[#7A1515] hover:text-[#A53D3D]"></a>
+                            </h4>
+                        </div>
                     </div>
-                    <h2 class="mt-2 text-lg font-medium md:text-xl">@Model.Address</h2>
-                    <text class="w-20 rounded-lg text-center font-semibold uppercase">
-                        Contact: @Model.ContactNumber
-                    </text>
+                    <div class="text-red-500">
+                        <div asp-validation-summary="ModelOnly"></div>
+                    </div>
+                    <form id="editCompanyForm">
+                        <input type="hidden" name="CompanyId" id="companyId" value="@Model.CompanyId" />
+                        <div class="mb-4">
+                            <label asp-for="Name" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                            <input asp-for="Name" id="companyName" value="@Model.Name" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                            <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                        <div class="mb-4 flex space-x-4">
+                            <div class="w-1/2">
+                                <label asp-for="ContactEmail" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                                <input asp-for="ContactEmail" id="companyEmail" value="@Model.ContactEmail" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                                <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
+                            </div>
+                            <div class="w-1/2">
+                                <label asp-for="ContactNumber" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                                <input asp-for="ContactNumber" id="companyNumber" value="@Model.ContactNumber" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                                <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
+                            </div>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Address" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                            <input asp-for="Address" id="companyAddress" value="@Model.Address" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly />
+                            <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                        <div class="mb-4">
+                            <label asp-for="Description" class="mb-2 block text-sm font-bold text-gray-700"></label>
+                            <textarea asp-for="Description" id="companyDescription" class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-gray-500" readonly>@(string.IsNullOrEmpty(Model.Description) ? "No description." : Model.Description)</textarea>
+                            <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
+                        </div>
+                    </form>
+
+                    <!-- Save and Cancel Buttons -->
+                    <div id="editButtons" class="hidden pb-5">
+                        <button type="button" class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600" onclick="cancelEdit()">Cancel</button>
+                        <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" onclick="submitChanges()">Save Changes</button>
+                    </div>
                 </div>
-            </div>
-        </div>
-        <div class="mb-6 mt-4 border-b"></div>
 
-        <div class="grid-cols-1 grid gap-6 md:grid-cols-2">
-            <!-- Company Information -->
-            <div class="rounded-lg border p-4">
-                <h3 class="mb-4 text-2xl font-bold">Company Information</h3>
-                <ul class="space-y-4">
-                    <li>
-                        <strong>Description:</strong> @Model.Description
-                    </li>
-                    <li>
-                        <strong>Address:</strong> @Model.Address
-                    </li>
-                    <li>
-                        <strong>Contact Number:</strong> @Model.ContactNumber
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Recruiter Information -->
-            <div class="rounded-lg border p-4">
-                <h3 class="mb-4 text-2xl font-bold">Recruiter Information</h3>
-                @if (Model.Recruiters != null && Model.Recruiters.Any())
-                {
-                    <ul class="space-y-4">
-                        @foreach (var recruiter in Model.Recruiters)
-                        {
-                            <li>
-                                <strong>Recruiter Email:</strong> @recruiter.User.Email
-                            </li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-gray-600">No recruiters assigned to this company.</p>
-                }
+                <!-- Recruiter Information -->
+                <div class="rounded-lg border p-4">
+                    <h3 class="mb-4 text-2xl font-bold">Recruiter Information</h3>
+                    @if (Model.Recruiters != null && Model.Recruiters.Any())
+                    {
+                        <ul class="space-y-4">
+                            @foreach (var recruiter in Model.Recruiters)
+                            {
+                                <li>
+                                    <strong>Recruiter Email:</strong> @recruiter.User.Email
+                                </li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <p class="text-gray-600">No recruiters assigned to this company.</p>
+                    }
+                </div>
             </div>
         </div>
     </div>
@@ -83,6 +95,7 @@
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 
 @section Scripts {
+    <script src="~/js/company.js"></script>
     <script>
         document.querySelector('.back-button').addEventListener('click', function (event) {
             event.preventDefault();
