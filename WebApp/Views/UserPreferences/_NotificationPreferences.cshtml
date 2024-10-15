@@ -1,0 +1,30 @@
+﻿@model Services.ServiceModels.UserPreferencesViewModel
+
+<!-- Application Notifications Section -->
+<h5 class="mb-4 font-semibold text-gray-800">Application Notifications</h5>
+<div class="grid-cols-1 grid gap-6 md:grid-cols-3">
+    <div class="form-group">
+        <label for="notifyCreation" class="mb-2 block text-gray-700">Creation</label>
+        <select id="notifyCreation" name="Preferences[notifyCreation]" class="w-full rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="yes" selected="@(string.IsNullOrEmpty(Model.Preferences.GetValueOrDefault("notifyCreation")) ||
+                    Model.Preferences.GetValueOrDefault("notifyCreation") == "yes")">Notify</option>
+            <option value="no" selected="@(Model.Preferences.GetValueOrDefault("notifyCreation") == "no")">Don't Notify</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="notifyDetailsUpdate" class="mb-2 block text-gray-700">Details Update</label>
+        <select id="notifyDetailsUpdate" name="Preferences[notifyDetailsUpdate]" class="w-full rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="yes" selected="@(string.IsNullOrEmpty(Model.Preferences.GetValueOrDefault("notifyDetailsUpdate")) ||
+                    Model.Preferences.GetValueOrDefault("notifyDetailsUpdate") == "yes")">Notify</option>
+            <option value="no" selected="@(Model.Preferences.GetValueOrDefault("notifyDetailsUpdate") == "no")">Don't Notify</option>
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="notifyAssignmentUpdate" class="mb-2 block text-gray-700">Assignment Update</label>
+        <select id="notifyAssignmentUpdate" name="Preferences[notifyAssignmentUpdate]" class="w-full rounded border border-gray-300 p-2 focus:outline-none focus:ring-2 focus:ring-blue-500">
+            <option value="yes" selected="@(string.IsNullOrEmpty(Model.Preferences.GetValueOrDefault("notifyAssignmentUpdate")) ||
+                    Model.Preferences.GetValueOrDefault("notifyAssignmentUpdate") == "yes")">Notify</option>
+            <option value="no" selected="@(Model.Preferences.GetValueOrDefault("notifyAssignmentUpdate") == "no")">Don't Notify</option>
+        </select>
+    </div>
+</div>

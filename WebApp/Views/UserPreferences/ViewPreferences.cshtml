@@ -1,0 +1,354 @@
+﻿@model Services.ServiceModels.UserPreferencesViewModel
+
+@{
+    ViewData["Title"] = "Settings";
+}
+
+<div class="flex min-h-screen items-center justify-center bg-[#F5F7F8]">
+    <div class="h-[48vh] w-full max-w-7xl rounded-lg p-6">
+        <div class="grid-cols-1 grid h-full gap-6 lg:grid-cols-2">
+            <div class="flex-1 overflow-y-auto rounded-lg bg-white p-6 shadow">
+                <form id="preferences-form">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="mb-4 text-2xl font-semibold">Preferences</h2>
+                        <div class="flex space-x-2">
+                            <button type="button" id="cancel-preferences-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
+                                Cancel
+                            </button>
+                            <button type="button" id="save-preferences-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Debug view all preferences -->
+                    @*@await Html.PartialAsync("_DisplayAllPreferences", Model)*@
+
+                    @if (!User.IsInRole("Admin"))
+                    {
+                        <!-- Notification Preferences Section -->
+                        <div class="mb-4">
+                            <button type="button" class="toggle-preferences flex w-full items-center justify-between rounded-md bg-gray-100 px-4 py-2 focus:outline-none" data-target="#notification-preferences-content" data-icon="#notification-icon">
+                                <span class="text-xl font-medium">Notifications</span>
+                                <svg id="notification-icon" class="h-6 w-6 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div id="notification-preferences-content" class="mt-1 hidden rounded-md border border-gray-200 bg-gray-50 p-4">
+                                @await Html.PartialAsync("_NotificationPreferences", Model)
+                            </div>
+                        </div>
+
+                        <!-- Default Sort and Filters -->
+                        <div class="mb-4">
+                            <button type="button" class="toggle-preferences flex w-full items-center justify-between rounded-md bg-gray-100 px-4 py-2 focus:outline-none" data-target="#filterandsort-preferences-content" data-icon="#filterandsort-icon">
+                                <span class="text-xl font-medium">Filter and Sort</span>
+                                <svg id="filterandsort-icon" class="h-6 w-6 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+
+                            <div id="filterandsort-preferences-content" class="mt-1 hidden rounded-md border border-gray-200 bg-gray-50 p-4">
+                                @await Html.PartialAsync("_NotificationPreferences", Model)
+                            </div>
+                        </div>
+                    }
+                </form>
+            </div>
+
+            <!-- Update Password Section -->
+            <div class="rounded-lg bg-white p-6 shadow">
+                <div class="mb-4 flex items-center justify-between">
+                    <h2 class="mb-4 text-2xl font-semibold">Update Password</h2>
+                    <div class="flex space-x-2">
+                        <button type="button" id="cancel-password-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
+                            Cancel
+                        </button>
+                        <button type="button" id="save-password-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                            Update
+                        </button>
+                    </div>
+                </div>
+                
+                <form id="password-form">
+                    <div class="mb-4">
+                        <label for="oldPassword" class="mb-2 block text-gray-700">Old Password</label>
+                        <input 
+                            type="password" 
+                            class="w-full rounded-md border border-gray-300 p-2 pr-10 hover:border-[#7A1515] focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent" 
+                            id="oldPassword" 
+                            name="OldPassword" />
+                        <span id="old-password-validation-message" class="hidden text-sm text-red-600"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label for="newPassword" class="mb-2 block text-gray-700">New Password</label>
+                        <input 
+                            type="password" 
+                            class="w-full rounded-md border border-gray-300 p-2 pr-10 hover:border-[#7A1515] focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent" 
+                            id="newPassword" 
+                            name="NewPassword" />
+                        <span id="new-password-validation-message" class="hidden text-sm text-red-600"></span>
+                    </div>
+                    <div class="mb-4">
+                        <label for="confirmNewPassword" class="mb-2 block text-gray-700">Confirm New Password</label>
+                        <input 
+                            type="password" 
+                            class="w-full rounded-md border border-gray-300 p-2 pr-10 hover:border-[#7A1515] focus:outline-none focus:ring-2 focus:ring-[#991b1b] focus:border-transparent" 
+                            id="confirmNewPassword" 
+                            name="ConfirmNewPassword" />
+                        <span id="confirm-password-validation-message" class="hidden text-sm text-red-600"></span>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Values passed to the JS files -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action("GetAllUsers", "User")" />
+<input type="hidden" id="resetUrl" value="@Url.Action("ResetPassword", "User")" />
+<input type="hidden" id="deleteUrl" value="@Url.Action("Delete", "User")" />
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script>
+        function formChanged(formId) {
+            const form = document.getElementById(formId);
+            const initialFormData = new FormData(form);
+            let initialValues = {};
+            initialFormData.forEach((value, key) => {
+                initialValues[key] = value;
+            });
+
+            return function () {
+                const currentFormData = new FormData(form);
+                for (let [key, value] of currentFormData.entries()) {
+                    if (initialValues[key] !== value) {
+                        return true;
+                    }
+                }
+                return false;
+            };
+        }
+
+        const hasPreferencesFormChanged = formChanged('preferences-form');
+        const hasPasswordFormChanged = formChanged('password-form');
+
+        // Preferences Form Change Detection
+        document.querySelectorAll('#preferences-form input, #preferences-form select, #preferences-form textarea').forEach(input => {
+            input.addEventListener('input', function () {
+                const saveButton = document.getElementById('save-preferences-btn');
+                const cancelButton = document.getElementById('cancel-preferences-btn');
+                if (hasPreferencesFormChanged()) {
+                    saveButton.classList.remove('hidden');
+                    cancelButton.classList.remove('hidden');
+                } else {
+                    saveButton.classList.add('hidden');
+                    cancelButton.classList.add('hidden');
+                }
+            });
+        });
+
+        document.getElementById('cancel-preferences-btn').addEventListener('click', function () {
+            const form = document.getElementById('preferences-form');
+            form.reset();
+
+            const initialFormData = new FormData(form);
+            let initialValues = {};
+            initialFormData.forEach((value, key) => {
+                initialValues[key] = value;
+            });
+
+            for (let [key, value] of Object.entries(initialValues)) {
+                const element = form.querySelector(`[name="${key}"]`);
+                if (element && (element.tagName === 'SELECT' || element.tagName === 'INPUT' || element.tagName === 'TEXTAREA')) {
+                    element.value = value;
+                }
+            }
+
+            document.getElementById('save-preferences-btn').classList.add('hidden');
+            document.getElementById('cancel-preferences-btn').classList.add('hidden');
+            toastr.info("No changes were made");
+        });
+
+        document.getElementById('save-preferences-btn').addEventListener('click', function () {
+            const form = document.getElementById('preferences-form');
+            const formData = new FormData(form);
+
+            fetch('@Url.Action("UpdateUserPreferences")', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        toastr.error('Failed to update preferences.');
+                    }
+                })
+                .catch(error => {
+                    toastr.error('An error occurred. Please try again.');
+                });
+        });
+
+        // Password Form Validation and Change Detection
+        const passwordForm = document.getElementById('password-form');
+        const oldPasswordInput = passwordForm.querySelector('#oldPassword');
+        const newPasswordInput = passwordForm.querySelector('#newPassword');
+        const confirmNewPasswordInput = passwordForm.querySelector('#confirmNewPassword');
+        const oldPasswordValidation = document.getElementById('old-password-validation-message');
+        const newPasswordValidation = document.getElementById('new-password-validation-message');
+        const confirmPasswordValidation = document.getElementById('confirm-password-validation-message');
+
+        let oldPasswordTouched = false;
+        let newPasswordTouched = false;
+        let confirmPasswordTouched = false;
+
+        function validatePasswordInput(input) {
+            let isValid = true;
+            const oldPasswordValue = oldPasswordInput.value;
+            const newPasswordValue = newPasswordInput.value;
+            const confirmNewPasswordValue = confirmNewPasswordInput.value;
+
+            if (input === oldPasswordInput || oldPasswordTouched) {
+                if (!oldPasswordValue) {
+                    oldPasswordValidation.textContent = 'Old password cannot be empty.';
+                    oldPasswordValidation.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    oldPasswordValidation.classList.add('hidden');
+                }
+            }
+
+            if ((input === newPasswordInput || newPasswordTouched) && oldPasswordTouched) {
+                if (!newPasswordValue) {
+                    newPasswordValidation.textContent = 'New password cannot be empty.';
+                    newPasswordValidation.classList.remove('hidden');
+                    isValid = false;
+                } else if (newPasswordValue.length < 6) {
+                    newPasswordValidation.textContent = 'New password must be at least 6 characters long.';
+                    newPasswordValidation.classList.remove('hidden');
+                    isValid = false;
+                } else if (newPasswordValue === oldPasswordValue) {
+                    newPasswordValidation.textContent = 'Cannot be the same as the old password.';
+                    newPasswordValidation.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    newPasswordValidation.classList.add('hidden');
+                }
+            }
+
+            if ((input === confirmNewPasswordInput || confirmPasswordTouched) && newPasswordTouched) {
+                if (newPasswordValue !== confirmNewPasswordValue) {
+                    confirmPasswordValidation.textContent = 'Does not match with new password.';
+                    confirmPasswordValidation.classList.remove('hidden');
+                    isValid = false;
+                } else {
+                    confirmPasswordValidation.classList.add('hidden');
+                }
+            }
+
+            return isValid;
+        }
+
+        oldPasswordInput.addEventListener('input', () => {
+            oldPasswordTouched = true;
+            validatePasswordInput(oldPasswordInput);
+            togglePasswordButtons();
+        });
+
+        newPasswordInput.addEventListener('input', () => {
+            newPasswordTouched = true;
+            validatePasswordInput(newPasswordInput);
+            togglePasswordButtons();
+        });
+
+        confirmNewPasswordInput.addEventListener('input', () => {
+            confirmPasswordTouched = true;
+            validatePasswordInput(confirmNewPasswordInput);
+            togglePasswordButtons();
+        });
+
+        function togglePasswordButtons() {
+            const saveButton = document.getElementById('save-password-btn');
+            const cancelButton = document.getElementById('cancel-password-btn');
+            if (hasPasswordFormChanged()) {
+                saveButton.classList.remove('hidden');
+                cancelButton.classList.remove('hidden');
+            } else {
+                saveButton.classList.add('hidden');
+                cancelButton.classList.add('hidden');
+            }
+        }
+
+        document.getElementById('cancel-password-btn').addEventListener('click', function () {
+            passwordForm.reset();
+            oldPasswordValidation.classList.add('hidden');
+            newPasswordValidation.classList.add('hidden');
+            confirmPasswordValidation.classList.add('hidden');
+
+            oldPasswordTouched = false;
+            newPasswordTouched = false;
+            confirmPasswordTouched = false;
+
+            document.getElementById('save-password-btn').classList.add('hidden');
+            document.getElementById('cancel-password-btn').classList.add('hidden');
+            toastr.info("No changes were made");
+        });
+
+        document.getElementById('save-password-btn').addEventListener('click', function () {
+            const isOldPasswordValid = validatePasswordInput(oldPasswordInput);
+            const isNewPasswordValid = validatePasswordInput(newPasswordInput);
+            const isConfirmPasswordValid = validatePasswordInput(confirmNewPasswordInput);
+
+            if (!isOldPasswordValid || !isNewPasswordValid || !isConfirmPasswordValid) {
+                return;
+            }
+
+            const formData = new FormData(passwordForm);
+
+            fetch('@Url.Action("UpdatePassword")', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (response.ok) {
+                        location.reload();
+                    } else {
+                        toastr.error('Failed to update password.');
+                    }
+                })
+                .catch(error => {
+                    toastr.error('An error occurred. Please try again.');
+                });
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const toggleButtons = document.querySelectorAll('.toggle-preferences');
+
+            toggleButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const targetContent = document.querySelector(this.dataset.target);
+                    const targetIcon = document.querySelector(this.dataset.icon);
+
+                    if (targetContent.classList.contains('hidden')) {
+                        targetContent.classList.remove('hidden');
+                        targetIcon.style.transform = 'rotate(180deg)';
+                    } else {
+                        targetContent.classList.add('hidden');
+                        targetIcon.style.transform = 'rotate(0deg)';
+                    }
+                });
+            });
+        });
+    </script>
+}
