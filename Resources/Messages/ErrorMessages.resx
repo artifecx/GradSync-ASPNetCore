@@ -164,4 +164,16 @@ If you have not received anything, contact us at support@gradsync.org</value>
   <data name="Error_UserPasswordResetDefault" xml:space="preserve">
     <value>An error occurred while resetting password.</value>
   </data>
+  <data name="Error_UserPasswordMismatch" xml:space="preserve">
+    <value>Your old password is incorrect.</value>
+  </data>
+  <data name="Error_UserPasswordSimilar" xml:space="preserve">
+    <value>Your new password cannot be the same as your current one.</value>
+  </data>
+  <data name="Error_UserPasswordUpdateDefault" xml:space="preserve">
+    <value>An error has occurred while updating password.</value>
+  </data>
+  <data name="Error_UserPreferenceUpdateDefault" xml:space="preserve">
+    <value>An error has occurred while updating preferences.</value>
+  </data>
 </root>

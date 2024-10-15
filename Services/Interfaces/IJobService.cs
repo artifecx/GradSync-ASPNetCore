@@ -13,13 +13,14 @@ namespace Services.Interfaces
         Task UpdateJobAsync(JobViewModel model);
         Task DeleteJobAsync(string id);
         Task<PaginatedList<JobViewModel>> GetAllJobsAsync(
-            string sortBy, string search, string filterByCompany, 
-            string filterByEmploymentType, string filterByStatusType, 
-            string filterByWorkSetup, int pageIndex, int pageSize);
+            string sortBy, string search, string filterByCompany,
+            List<string> filterByEmploymentType, string filterByStatusType,
+            List<string> filterByWorkSetup, int pageIndex, int pageSize,
+            string filterByDatePosted = null, string filterBySalary = null);
         Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
             string sortBy, string search, string filterByCompany,
-            string filterByEmploymentType, string filterByStatusType,
-            string filterByWorkSetup, int pageIndex, int pageSize);
+            List<string> filterByEmploymentType, string filterByStatusType,
+            List<string> filterByWorkSetup, int pageIndex, int pageSize);
         Task<JobViewModel> GetJobByIdAsync(string id);
         Task<List<Company>> GetCompaniesWithListingsAsync();
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
