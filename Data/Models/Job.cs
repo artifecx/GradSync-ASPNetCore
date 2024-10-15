@@ -35,9 +35,13 @@ public partial class Job
 
     public bool IsArchived { get; set; }
 
+    public string EmbeddingJson { get; set; }
+
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
     public virtual EmploymentType EmploymentType { get; set; }
+
+    public virtual ICollection<JobApplicantMatch> JobApplicantMatches { get; set; } = new List<JobApplicantMatch>();
 
     public virtual Recruiter PostedBy { get; set; }
 

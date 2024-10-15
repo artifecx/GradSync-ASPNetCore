@@ -11,5 +11,7 @@ public partial class YearLevel
 
     public int Year { get; set; }
 
+    public virtual ICollection<EducationalDetail> EducationalDetails { get; set; } = new List<EducationalDetail>();
+
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 }

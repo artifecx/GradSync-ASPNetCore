@@ -17,5 +17,7 @@ public partial class Department
 
     public virtual College College { get; set; }
 
+    public virtual ICollection<EducationalDetail> EducationalDetails { get; set; } = new List<EducationalDetail>();
+
     public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
 }
