@@ -12,8 +12,8 @@
             "Part-time" => "#fdbf77",
             "Full-time" => "#54eba2",
             "Contract" => "#ee6d6b",
-            "On-the-Job Training" => "#82b8f1",
-            _ => "#gray-300",
+            "Internship" => "#82b8f1",
+            _ => "#DCDDDF",
         };
     }
 
@@ -73,8 +73,8 @@
                 <h2 class="text-3xl font-bold text-gray-800">Recommended Jobs</h2>
                 
                 <form asp-action="GetAllJobsApplicant" method="get" class="flex items-center space-x-2">
-                    <label for="sortBy" class="text-sm font-medium text-gray-700">Sort By:</label>
-                    <select id="sortBy" name="sortBy" onchange="this.form.submit()" class="rounded-md border border-gray-300 p-2">
+                    <label for="sortBy" class="text-sm font-medium text-gray-700 pt-2">Sort By:</label>                   
+                        <select id="sortBy" name="sortBy" onchange="this.form.submit()" class="rounded-md border border-gray-300 p-2">
                         <option value="match" selected=@(sortBy == "match" || string.IsNullOrEmpty(sortBy))>Match Percent (Default)</option>
                         <option value="salary_asc" selected=@(sortBy == "salary_asc")>Salary (Lowest First)</option>
                         <option value="salary_desc" selected=@(sortBy == "salary_desc")>Salary (Highest First)</option>
@@ -127,7 +127,7 @@
                                     @*Job Title, Employment Type, and Work Setup *@
                                     <div class="flex items-center space-x-4">
                                         <div class="text-xl font-semibold text-[#7A1515]">@job.Title
-                                            <span class="ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900"
+                                            <span class="ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900 border"
                                                   style="background-color:@GetEmploymentTypeColor(job.EmploymentType.Name);">
                                                 @job.EmploymentType.Name
                                             </span>
