@@ -53,12 +53,14 @@ namespace Services.Services
         #region Get Methods        
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(
             string sortBy, string search, string filterByCompany,
-            string filterByEmploymentType, string filterByStatusType,
-            string filterByWorkSetup, int pageIndex, int pageSize)
+            List<string> filterByEmploymentType, string filterByStatusType,
+            List<string> filterByWorkSetup, int pageIndex, int pageSize, 
+            string filterByDatePosted = null, string filterBySalary = null)
         {
             var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
             jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
-                filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+                filterByEmploymentType, filterByStatusType, filterByWorkSetup,
+                filterByDatePosted, filterBySalary);
 
             var count = jobs.Count;
             var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
@@ -68,8 +70,8 @@ namespace Services.Services
 
         public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
             string sortBy, string search, string filterByCompany,
-            string filterByEmploymentType, string filterByStatusType,
-            string filterByWorkSetup, int pageIndex, int pageSize)
+            List<string> filterByEmploymentType, string filterByStatusType,
+            List<string> filterByWorkSetup, int pageIndex, int pageSize)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
@@ -84,14 +86,16 @@ namespace Services.Services
 
         private async Task<List<JobViewModel>> FilterAndSortJobs(
             List<JobViewModel> jobs, string sortBy, string search, 
-            string filterByCompany, string filterByEmploymentType, 
-            string filterByStatusType, string filterByWorkSetup)
+            string filterByCompany, List<string> filterByEmploymentType, 
+            string filterByStatusType, List<string> filterByWorkSetup, 
+            string filterByDatePosted = null, string filterBySalary = null)
         {
             if (!string.IsNullOrEmpty(search))
             {
                 jobs = jobs
                     .Where(job => 
                         job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        job.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                         job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                         job.EmploymentTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                         job.SetupTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
@@ -99,14 +103,35 @@ namespace Services.Services
                     .ToList();
             }
 
+            if (!string.IsNullOrEmpty(filterByDatePosted))
+            {
+                DateTime today = DateTime.Today;
+                DateTime tomorrow = today.AddDays(1);
+
+                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                DateTime weekStart = today.AddDays(-1 * diff).Date;
+                DateTime weekEnd = weekStart.AddDays(7);
+
+                DateTime monthStart = new DateTime(today.Year, today.Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+
+                jobs = filterByDatePosted switch
+                {
+                    "today" => jobs.Where(job => job.CreatedDate >= today && job.CreatedDate < tomorrow).ToList(),
+                    "week" => jobs.Where(job => job.CreatedDate >= weekStart && job.CreatedDate < weekEnd).ToList(),
+                    "month" => jobs.Where(job => job.CreatedDate >= monthStart && job.CreatedDate < monthEnd).ToList(),
+                    _ => jobs
+                };
+            }
+
             if (!string.IsNullOrEmpty(filterByCompany))
             {
                 jobs = jobs.Where(job => job.Company.Name == filterByCompany).ToList();
             }
 
-            if (!string.IsNullOrEmpty(filterByEmploymentType))
+            if (filterByEmploymentType.Any())
             {
-                jobs = jobs.Where(job => job.EmploymentType.Name == filterByEmploymentType).ToList();
+                jobs = jobs.Where(job => filterByEmploymentType.Contains(job.EmploymentType.Name)).ToList();
             }
 
             if (!string.IsNullOrEmpty(filterByStatusType))
@@ -114,15 +139,19 @@ namespace Services.Services
                 jobs = jobs.Where(job => job.StatusType.Name == filterByStatusType).ToList();
             }
 
-            if (!string.IsNullOrEmpty(filterByWorkSetup))
+            if (filterByWorkSetup.Any())
             {
-                jobs = jobs.Where(job => job.SetupType.Name == filterByWorkSetup).ToList();
+                jobs = jobs.Where(job => filterByWorkSetup.Contains(job.SetupType.Name)).ToList();
             }
 
             jobs = sortBy switch
             {
                 "created_desc" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
-                _ => jobs.OrderBy(j => j.CreatedDate).ToList(),
+                "created_asc" => jobs.OrderBy(j => j.CreatedDate).ToList(),
+                "salary_desc" => jobs.OrderByDescending(j => GetLowerSalary(j.Salary)).ThenByDescending(j => GetUpperSalary(j.Salary)).ToList(),
+                "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
+                //"match" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
+                _ => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
             };
 
             return jobs;
@@ -158,5 +187,49 @@ namespace Services.Services
             await _repository.GetYearLevelsAsync();
 
         #endregion Get Methods
+
+        /// <summary>
+        /// Extracts the lower salary from the salary range string.
+        /// </summary>
+        private static int GetLowerSalary(string salaryRange)
+        {
+            if (string.IsNullOrWhiteSpace(salaryRange))
+                return 0;
+
+            var parts = salaryRange.Split('-');
+            if (parts.Length == 0)
+                return 0;
+
+            var lowerPart = parts[0].Trim();
+
+            var lowerSalaryStr = lowerPart.Replace("Php", "").Replace(",", "").Trim();
+
+            if (int.TryParse(lowerSalaryStr, out int lowerSalary))
+                return lowerSalary;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Extracts the upper salary from the salary range string.
+        /// </summary>
+        private static int GetUpperSalary(string salaryRange)
+        {
+            if (string.IsNullOrWhiteSpace(salaryRange))
+                return 0;
+
+            var parts = salaryRange.Split('-');
+            if (parts.Length < 2)
+                return 0;
+
+            var upperPart = parts[1].Trim();
+
+            var upperSalaryStr = upperPart.Replace("Php", "").Replace(",", "").Trim();
+
+            if (int.TryParse(upperSalaryStr, out int upperSalary))
+                return upperSalary;
+
+            return 0;
+        }
     }
 }

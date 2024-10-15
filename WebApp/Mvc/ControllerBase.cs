@@ -12,6 +12,7 @@ using static Services.Exceptions.CompanyExceptions;
 using static Services.Exceptions.UserExceptions;
 using static Services.Exceptions.EmailExceptions;
 using static Resources.Messages.ErrorMessages;
+using Services.Interfaces;
 
 namespace WebApp.Mvc
 {
@@ -32,6 +33,8 @@ namespace WebApp.Mvc
         /// <summary>Session</summary>
         protected ISession _session => _httpContextAccessor.HttpContext.Session;
 
+        protected IUserPreferencesService _userPreferences { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the ControllerBase{TController} class.
         /// </summary>
@@ -44,13 +47,15 @@ namespace WebApp.Mvc
                                 IHttpContextAccessor httpContextAccessor,
                                 ILoggerFactory loggerFactory,
                                 IConfiguration configuration,
-                                IMapper mapper = null)
+                                IMapper mapper = null,
+                                IUserPreferencesService userPreferences = null)
         {
             this._httpContextAccessor = httpContextAccessor;
             this._configuration = configuration;
             this._logger = loggerFactory.CreateLogger<TController>();
             this._configuration = configuration;
             this._mapper = mapper;
+            this._userPreferences = userPreferences;
         }
 
         /// <summary>Mapper</summary>
