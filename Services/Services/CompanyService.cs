@@ -93,7 +93,13 @@ namespace Services.Services
         {
             if (!string.IsNullOrEmpty(search))
             {
-                companies = companies.Where(c => c.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                companies = companies
+                            .Where(c => 
+                                c.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.Address.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.ContactNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.ContactEmail.Contains(search, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
             }
 
             if (verified.HasValue)
@@ -143,5 +149,41 @@ namespace Services.Services
 
         public async Task ArchiveCompanyAsync(string companyId) =>
             await _repository.ArchiveCompanyAsync(companyId);
+
+        public async Task VerifyCompanyAsync(string companyId)
+        {
+            var company = await _repository.GetCompanyByIdAsync(companyId);
+            if (company.IsVerified)
+                throw new CompanyException("Company is already verified.");
+
+            company.IsVerified = true;
+            await _repository.UpdateCompanyAsync(company);
+        }
+
+        public async Task InvalidateCompanyAsync(string companyId)
+        {
+            var company = await _repository.GetCompanyByIdAsync(companyId);
+            if (!company.IsVerified)
+                throw new CompanyException("Company is currently unverified.");
+
+            company.IsVerified = false;
+            await _repository.UpdateCompanyAsync(company);
+        }
+
+        public async Task UpdateMOAStatusAsync(IFormFile file, string type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdateCompanyLogoAsync(IFormFile file, string type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task ReassignRecruiterAsync(string companyId, string recruiterId) =>
+            throw new NotImplementedException();
+
+        public async Task AssignRecruiterAsync(string companyId, string recruiterId) =>
+            throw new NotImplementedException();
     }
 }
