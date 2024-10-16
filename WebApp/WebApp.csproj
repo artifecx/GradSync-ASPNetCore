@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Company\Index1.cshtml" />
     <Content Remove="Views\Job\JobList.cshtml" />
     <Content Remove="wwwroot\js\chart.cs" />
     <Content Remove="wwwroot\js\chart.js" />
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <None Remove="appsettings.json.rej" />
+    <None Remove="Views\Company\htmlpage.html" />
   </ItemGroup>
 
   <ItemGroup>

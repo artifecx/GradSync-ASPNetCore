@@ -14,6 +14,7 @@ using System.Threading.Tasks;
 using Resources.Messages;
 using System.Collections.Generic;
 using Services.Services;
+using System.Security.Claims;
 
 namespace WebApp.Controllers
 {
@@ -104,6 +105,23 @@ namespace WebApp.Controllers
 
                 return View("ViewCompany", company);
             }, "GetCompany");
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "Recruiter")]
+        [Route("details")]
+        public async Task<IActionResult> GetRecruiterCompany()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var company = await _companyService.GetRecruiterCompanyAsync(userId);
+
+            if (company == null)
+            {
+                TempData["ErrorMessage"] = "Company not found!";
+                return RedirectToAction("GetAllCompanies");
+            }
+
+            return View("CompanyDetails", company);
         }
 
         [HttpPost]

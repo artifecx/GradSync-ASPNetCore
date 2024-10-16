@@ -141,6 +141,13 @@ namespace Data.Repositories
 
             return false;
         }
+        public async Task<Company> GetRecruiterCompanyAsync(string userId)
+        {
+            return await this.GetDbSet<Company>()
+                .Include(c => c.Recruiters)
+                .ThenInclude(r => r.User)
+                .FirstOrDefaultAsync(c => c.Recruiters.Any(r => r.UserId == userId));
+        }
 
         private static string NormalizeCompanyName(string name)
         {
