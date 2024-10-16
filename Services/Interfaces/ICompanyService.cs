@@ -16,5 +16,6 @@ namespace Services.Interfaces
         Task AddCompanyAsync(CompanyViewModel model);
         Task UpdateCompanyAsync(CompanyViewModel model);
         Task ArchiveCompanyAsync(string companyId);
+        Task<CompanyViewModel> GetRecruiterCompanyAsync(string userId);
     }
 }
