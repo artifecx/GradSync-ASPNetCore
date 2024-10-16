@@ -16,5 +16,6 @@ namespace Data.Interfaces
         Task<Company> GetCompanyByIdAsync(string id);
         bool HasChanges(Company company);
         bool CompanyExists(Company company, string excludeCompanyId = null);
+        Task<Company> GetRecruiterCompanyAsync(string userId);
     }
 }

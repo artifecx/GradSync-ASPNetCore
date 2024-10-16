@@ -3,9 +3,8 @@
 @using Humanizer
 
 @{
-    ViewData["Title"] = "All Jobs";
+    ViewData["Title"] = "Recruiter Job Management";
     await Html.RenderPartialAsync("_CreateJobModal", new Services.ServiceModels.JobViewModel());
-    // await Html.RenderPartialAsync("_DeleteModal");
 
     string filterByCompany = ViewData["FilterByCompany"] as string;
     string filterByEmploymentType = ViewData["FilterByEmploymentType"] as string;
@@ -15,94 +14,103 @@
     string sortBy = ViewData["SortBy"] as string;
     string search = ViewData["Search"] as string;
 
-    var employmentTypeDefault = string.Empty;
-    var statusTypeDefault = string.Empty;
-    var workSetupDefault = string.Empty;
-    var sortByDefault = string.Empty;
-
     int pageIndex = Model.PageIndex;
-    string aspAction = User.IsInRole("Recruiter") ? "GetAllJobsRecruiter" : "GetAllJobsAdmin";
-
-    bool noResult = string.IsNullOrEmpty(search) && 
-        string.IsNullOrEmpty(filterByCompany) && 
-        string.IsNullOrEmpty(filterByEmploymentType) && 
-        string.IsNullOrEmpty(filterByStatusType) && 
-        string.IsNullOrEmpty(filterByWorkSetup);
-
-    string sortByCreatedDate = sortBy == "created_asc" ? "created_desc" : "created_asc";
+    string aspAction = "GetAllJobsRecruiter";
 }
 
-<div class="nav-header flex items-center justify-between">
-    <h1 class="display-6 text-3xl font-semibold text-[#7A1515]">Job Management</h1>
-    <div class="flex items-center">
-        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-pageIndex="@pageIndex" class="flex items-center">
-            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Title, position, keywords" })
-            <input type="hidden" name="sortBy" value="@sortBy" />
-        </form>
-        @if (User.IsInRole("Recruiter"))
-        {
-            <div class="mx-3">
-                <button type="button" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" data-toggle="modal" data-target="#createJobModal">
-                    <i class="fa fa-plus"></i>
-                    New Job
-                </button>
+<div class="bg-[#F5F7F8] flex min-h-screen">
+    <div class="flex-1 flex items-center justify-center p-3">
+        <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
+            <div class="flex items-center justify-between">
+                <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
+                    Recruiter Job Management
+                </h1>
+
+                <!-- Search and Add Job Button -->
+                <div class="flex items-center pb-8 space-x-2">
+                    <div class="flex items-center space-x-2">
+                        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
+                            <input type="hidden" name="sortBy" value="@sortBy" />
+                        </form>
+                    </div>
+                    <div class="flex items-center space-x-2">
+                        <button type="button"
+                                class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                                data-toggle="modal"
+                                data-target="#createJobModal">
+                            <i class="fas fa-plus pr-1"></i> Add Job
+                        </button>
+                    </div>
+                </div>
             </div>
-        }
+
+            <!-- Table -->
+            <div class="min-w-full bg-whit rounded-lg">
+                <table class="min-w-full table-auto border rounded-lg bg-white">
+                    <thead class="bg-gray-100 border rounded-lg">
+                        @await Html.PartialAsync("_JobTableHeader", Model)
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 border rounded-lg bg-white">
+                        @await Html.PartialAsync("_JobTableBody", Model)
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <nav class="flex justify-center pt-3">
+                    <ul class="pagination flex items-center">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@(Model.PageIndex - 1)"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@i"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@(Model.PageIndex + 1)"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
     </div>
 </div>
-
-<div class="container-fluid px-4 py-3">
-    <table class="min-w-full table-auto divide-y divide-gray-200 text-left shadow-lg">
-        <thead class="bg-gray-50">
-            @await Html.PartialAsync("_JobTableHeader", Model)
-        </thead>
-        <tbody class="divide-y divide-gray-200 bg-white">
-            @await Html.PartialAsync("_JobTableBody", Model)
-        </tbody>
-    </table>
-
-    <nav class="mt-4 flex justify-end">
-        <ul class="pagination flex items-center">
-            @if (Model.HasPreviousPage)
-            {
-                <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" 
-                        asp-route-pageIndex="@(Model.PageIndex - 1)" asp-route-sortBy="@sortBy" asp-route-search="@search"
-                        asp-route-filterByCompany="@filterByCompany" asp-route-filterByEmploymentType="@filterByEmploymentType" 
-                        asp-route-filterByStatusType="@filterByStatusType" asp-route-filterByWorkSetup="@filterByWorkSetup"
-                    >Previous</a>
-                </li>
-            }
-            @for (int i = 1; i <= Model.TotalPages; i++)
-            {
-                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link border border-gray-300 px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" asp-action="@aspAction" 
-                        asp-route-pageIndex="@i" asp-route-sortBy="@sortBy" asp-route-search="@search"
-                        asp-route-filterByCompany="@filterByCompany" asp-route-filterByEmploymentType="@filterByEmploymentType" 
-                        asp-route-filterByStatusType="@filterByStatusType" asp-route-filterByWorkSetup="@filterByWorkSetup"
-                    >@i</a>
-                </li>
-            }
-            @if (Model.HasNextPage)
-            {
-                <li class="page-item">
-                    <a class="page-link border border-gray-300 px-3 py-1 text-gray-700 hover:bg-gray-200" asp-action="@aspAction" 
-                        asp-route-pageIndex="@(Model.PageIndex + 1)" asp-route-sortBy="@sortBy" asp-route-search="@search"
-                        asp-route-filterByCompany="@filterByCompany" asp-route-filterByEmploymentType="@filterByEmploymentType" 
-                        asp-route-filterByStatusType="@filterByStatusType" asp-route-filterByWorkSetup="@filterByWorkSetup"
-                    >Next</a>
-                </li>
-            }
-        </ul>
-    </nav>
-</div>
-
-<!-- Values passed to the js files -->
-<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
-<input type="hidden" id="baseUrl" value="@Url.Action($"{aspAction}", "Job")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/job.js"></script>
+    <script>
+        function debounceSearch(query) {
+            clearTimeout(window.searchTimeout);
+            window.searchTimeout = setTimeout(function () {
+                window.location.href = '@Url.Action("GetAllJobsRecruiter")?search=' + query;
+            }, 300);
+        }
+    </script>
 }
-
