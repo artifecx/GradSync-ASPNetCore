@@ -112,8 +112,7 @@ namespace WebApp.Controllers
         [Route("details")]
         public async Task<IActionResult> GetRecruiterCompany()
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var company = await _companyService.GetRecruiterCompanyAsync(userId);
+            var company = await _companyService.GetRecruiterCompanyAsync(UserId);
 
             if (company == null)
             {
