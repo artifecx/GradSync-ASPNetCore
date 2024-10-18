@@ -17,24 +17,33 @@ namespace Data.Repositories
         {
             return this.GetDbSet<Job>()
                         .Where(j => !j.IsArchived)
-                        .Include(j => j.Skills)
+                        .Include(j => j.JobSkills)
+                            .ThenInclude(j => j.Skill)
+                            .AsNoTracking()
                         .Include(j => j.YearLevel)
-                        .Include(j => j.Departments)
+                            .AsNoTracking()
+                        .Include(j => j.JobDepartments)
+                            .ThenInclude(j => j.Department)
+                            .AsNoTracking()
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.Company)
+                            .AsNoTracking()
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.User)
+                            .AsNoTracking()
                         .Include(j => j.EmploymentType)
-                        .Include(j => j.Schedule)
+                            .AsNoTracking()
                         .Include(j => j.SetupType)
-                        .Include(j => j.StatusType);
+                            .AsNoTracking()
+                        .Include(j => j.StatusType)
+                            .AsNoTracking();
         }
 
         public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
             await this.GetDbSet<Application>().AsNoTracking().ToListAsync();
 
         public async Task<List<Job>> GetAllJobsDepartmentsIncludeAsync() =>
-            await this.GetDbSet<Job>().Include(j => j.Departments).AsNoTracking().ToListAsync();
+            await this.GetDbSet<Job>().Include(j => j.JobDepartments).ThenInclude(j => j.Department).AsNoTracking().ToListAsync();
 
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
@@ -62,13 +71,13 @@ namespace Data.Repositories
         }
 
         public async Task<Job> GetJobByIdAsync(string id) =>
-            await GetJobsWithIncludes().FirstOrDefaultAsync(j => j.JobId == id);
+            await GetJobsWithIncludes().AsNoTracking().FirstOrDefaultAsync(j => j.JobId == id);
 
         public async Task<List<Company>> GetCompaniesWithListingsAsync()
         {
             var companies = await this.GetDbSet<Company>()
                 .Include(c => c.Recruiters)
-                .ThenInclude(r => r.Jobs)
+                .ThenInclude(r => r.Jobs).AsNoTracking()
                 .Where(Company => Company.Recruiters.Any(r => r.Jobs.Any()))
                 .AsNoTracking()
                 .ToListAsync();
@@ -77,21 +86,21 @@ namespace Data.Repositories
         }
 
         public async Task<List<EmploymentType>> GetEmploymentTypesAsync() =>
-            await this.GetDbSet<EmploymentType>().ToListAsync();
+            await this.GetDbSet<EmploymentType>().AsNoTracking().ToListAsync();
 
         public async Task<List<StatusType>> GetStatusTypesAsync() =>
-            await this.GetDbSet<StatusType>().ToListAsync();
+            await this.GetDbSet<StatusType>().AsNoTracking().ToListAsync();
 
         public async Task<List<SetupType>> GetWorkSetupsAsync() =>
-            await this.GetDbSet<SetupType>().ToListAsync();
+            await this.GetDbSet<SetupType>().AsNoTracking().ToListAsync();
 
         public async Task<List<YearLevel>> GetYearLevelsAsync() =>
-            await this.GetDbSet<YearLevel>().ToListAsync();
+            await this.GetDbSet<YearLevel>().AsNoTracking().ToListAsync();
 
         public async Task<List<Department>> GetDepartmentsAsync() =>
-            await this.GetDbSet<Department>().Include(d => d.College).ToListAsync();
+            await this.GetDbSet<Department>().AsNoTracking().Include(d => d.College).ToListAsync();
 
         public async Task<List<Skill>> GetSkillsAsync() =>
-            await this.GetDbSet<Skill>().ToListAsync();
+            await this.GetDbSet<Skill>().AsNoTracking().ToListAsync();
     }
 }
