@@ -20,11 +20,15 @@ namespace Data.Repositories
             return this.GetDbSet<Company>()
                         .Where(c => !c.IsArchived)
                         .Include(c => c.MemorandumOfAgreement)
+                            .AsNoTracking()
                         .Include(c => c.CompanyLogo)
+                            .AsNoTracking()
                         .Include(c => c.Recruiters)
                             .ThenInclude(r => r.Jobs)
+                            .AsNoTracking()
                         .Include(c => c.Recruiters)
-                            .ThenInclude(r => r.User);
+                            .ThenInclude(r => r.User)
+                            .AsNoTracking();
         }
 
         public async Task<List<Company>> GetAllCompaniesNoFilesAsync()
@@ -32,10 +36,13 @@ namespace Data.Repositories
             return await this.GetDbSet<Company>()
                 .Where(c => !c.IsArchived)
                 .Include(c => c.MemorandumOfAgreement)
+                    .AsNoTracking()
                 .Include(c => c.Recruiters)
                     .ThenInclude(r => r.Jobs)
+                    .AsNoTracking()
                 .Include(c => c.Recruiters)
                     .ThenInclude(r => r.User)
+                    .AsNoTracking()
                 .Select(c => new Company
                 {
                     CompanyId = c.CompanyId,
@@ -97,7 +104,7 @@ namespace Data.Repositories
             var recruiterIds = await GetDbSet<Recruiter>()
                 .Where(r => r.CompanyId == companyId)
                 .Select(r => r.UserId)
-                .ToListAsync();
+                .AsNoTracking().ToListAsync();
 
             await GetDbSet<Job>()
                 .Where(j => recruiterIds.Contains(j.PostedById))
@@ -120,14 +127,13 @@ namespace Data.Repositories
         public bool CompanyExists(Company company, string excludeCompanyId = null)
         {
             var dbSet = this.GetDbSet<Company>();
-
             string normalizedInputName = NormalizeCompanyName(company.Name);
-
             string prefix = company.Name.Substring(0, Math.Min(3, company.Name.Length)).ToLowerInvariant();
-
             var companies = dbSet
                 .Where(c => !c.IsArchived && c.CompanyId != excludeCompanyId && c.Name.ToLower().StartsWith(prefix))
+                .AsNoTracking()
                 .Select(c => new { c.CompanyId, c.Name })
+                .AsNoTracking()
                 .ToList();
 
             foreach (var c in companies)
@@ -138,16 +144,12 @@ namespace Data.Repositories
                     return true;
                 }
             }
-
             return false;
         }
-        public async Task<Company> GetRecruiterCompanyAsync(string userId)
-        {
-            return await this.GetDbSet<Company>()
-                .Include(c => c.Recruiters)
-                .ThenInclude(r => r.User)
-                .FirstOrDefaultAsync(c => c.Recruiters.Any(r => r.UserId == userId));
-        }
+
+        public async Task<Recruiter> GetRecruiterByIdAsync(string userId) =>
+            await this.GetDbSet<Recruiter>().AsNoTracking()
+                .FirstOrDefaultAsync(c => c.UserId == userId);
 
         private static string NormalizeCompanyName(string name)
         {
@@ -162,7 +164,6 @@ namespace Data.Repositories
         private static bool AreNamesSimilar(string name1, string name2)
         {
             int similarityRatio = Fuzz.TokenSetRatio(name1, name2);
-
             return similarityRatio >= 80;
         }
     }

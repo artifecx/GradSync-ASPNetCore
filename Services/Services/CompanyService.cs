@@ -1,20 +1,15 @@
-﻿using Data.Interfaces;
+﻿using AutoMapper;
+using Data.Interfaces;
 using Data.Models;
 using Services.Interfaces;
 using Services.ServiceModels;
-using AutoMapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using Resources.Messages;
-using System.Globalization;
-using static Services.Exceptions.UserExceptions;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
 using static Services.Exceptions.CompanyExceptions;
-using Services.Manager;
 
 namespace Services.Services
 {
@@ -72,7 +67,8 @@ namespace Services.Services
         }
         public async Task<CompanyViewModel> GetRecruiterCompanyAsync(string userId)
         {
-            var company = await _repository.GetRecruiterCompanyAsync(userId);
+            var recruiter = await _repository.GetRecruiterByIdAsync(userId);
+            var company = await _repository.GetCompanyByIdAsync(recruiter.CompanyId);
             return _mapper.Map<CompanyViewModel>(company);
         }
 
@@ -89,11 +85,17 @@ namespace Services.Services
             return new PaginatedList<CompanyViewModel>(items, count, pageIndex, pageSize);
         }
 
-        private async Task<List<CompanyViewModel>> FilterAndSortCompanies(List<CompanyViewModel> companies, string sortBy, string search, bool? verified, bool? hasValidMOA)
+        private static async Task<List<CompanyViewModel>> FilterAndSortCompanies(List<CompanyViewModel> companies, string sortBy, string search, bool? verified, bool? hasValidMOA)
         {
             if (!string.IsNullOrEmpty(search))
             {
-                companies = companies.Where(c => c.Name.Contains(search, StringComparison.OrdinalIgnoreCase)).ToList();
+                companies = companies
+                            .Where(c => 
+                                c.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.Address.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.ContactNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                                c.ContactEmail.Contains(search, StringComparison.OrdinalIgnoreCase))
+                            .ToList();
             }
 
             if (verified.HasValue)
@@ -143,5 +145,41 @@ namespace Services.Services
 
         public async Task ArchiveCompanyAsync(string companyId) =>
             await _repository.ArchiveCompanyAsync(companyId);
+
+        public async Task VerifyCompanyAsync(string companyId)
+        {
+            var company = await _repository.GetCompanyByIdAsync(companyId);
+            if (company.IsVerified)
+                throw new CompanyException("Company is already verified.");
+
+            company.IsVerified = true;
+            await _repository.UpdateCompanyAsync(company);
+        }
+
+        public async Task InvalidateCompanyAsync(string companyId)
+        {
+            var company = await _repository.GetCompanyByIdAsync(companyId);
+            if (!company.IsVerified)
+                throw new CompanyException("Company is currently unverified.");
+
+            company.IsVerified = false;
+            await _repository.UpdateCompanyAsync(company);
+        }
+
+        public async Task UpdateMOAStatusAsync(IFormFile file, string type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task UpdateCompanyLogoAsync(IFormFile file, string type)
+        {
+            throw new NotImplementedException();
+        }
+
+        public async Task ReassignRecruiterAsync(string companyId, string recruiterId) =>
+            throw new NotImplementedException();
+
+        public async Task AssignRecruiterAsync(string companyId, string recruiterId) =>
+            throw new NotImplementedException();
     }
 }

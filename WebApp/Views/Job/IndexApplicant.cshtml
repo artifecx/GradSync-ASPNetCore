@@ -73,7 +73,7 @@
                 <h2 class="text-3xl font-bold text-gray-800">Recommended Jobs</h2>
                 
                 <form asp-action="GetAllJobsApplicant" method="get" class="flex items-center space-x-2">
-                    <label for="sortBy" class="text-sm font-medium text-gray-700 pt-2">Sort By:</label>                   
+                    <label for="sortBy" class="pt-2 text-sm font-medium text-gray-700">Sort By:</label>                   
                         <select id="sortBy" name="sortBy" onchange="this.form.submit()" class="rounded-md border border-gray-300 p-2">
                         <option value="match" selected=@(sortBy == "match" || string.IsNullOrEmpty(sortBy))>Match Percent (Default)</option>
                         <option value="salary_asc" selected=@(sortBy == "salary_asc")>Salary (Lowest First)</option>
@@ -128,7 +128,7 @@
                                     @*Job Title, Employment Type, and Work Setup *@
                                     <div class="flex items-center space-x-4">
                                         <div class="text-xl font-semibold text-[#7A1515]">@job.Title
-                                            <span class="ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900 border"
+                                            <span class="ml-1 rounded-md border px-2 py-1 text-xs font-medium text-gray-900"
                                                   style="background-color:@GetEmploymentTypeColor(job.EmploymentType.Name);">
                                                 @job.EmploymentType.Name
                                             </span>
@@ -161,7 +161,17 @@
 
                                         <!-- Details and Application Button -->
                                         <div class="flex space-x-4">
-                                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
+                                            <button onclick="location.href='@Url.Action("GetJob", "Job", 
+                                                    new {
+                                                        id = job.JobId,
+                                                        sortBy = sortBy,
+                                                        search = search,
+                                                        pageIndex = Model.PageIndex,
+                                                        filterByDatePosted = filterByDatePosted,
+                                                        filterBySalary = filterBySalary,
+                                                        filterByWorkSetup = filterByWorkSetup,
+                                                        filterByEmploymentType = filterByEmploymentType,
+                                                    })'"
                                                     class="rounded-md bg-gray-200 px-4 py-2 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-300">
                                                 See Details
                                             </button>

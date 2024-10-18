@@ -10,8 +10,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using Resources.Messages;
-using System.Globalization;
 
 namespace Services.Services
 {
@@ -37,7 +35,61 @@ namespace Services.Services
 
         public async Task AddJobAsync(JobViewModel model)
         {
-            throw new NotImplementedException();
+            var job = _mapper.Map<Job>(model);
+            job.JobId = Guid.NewGuid().ToString();
+            job.CreatedDate = DateTime.Now;
+            job.UpdatedDate = DateTime.Now;
+            job.StatusTypeId = "Open";
+
+            job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
+            job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
+            job.JobSkills = model.Skills.Select(skill => new JobSkill
+            {
+                JobSkillId = Guid.NewGuid().ToString(),
+                JobId = job.JobId,
+                SkillId = skill.SkillId
+            }).ToList();
+
+            job.JobDepartments = model.Departments.Select(department => new JobDepartment
+            {
+                JobDepartmentId = Guid.NewGuid().ToString(),
+                JobId = job.JobId,
+                DepartmentId = department.DepartmentId
+            }).ToList();
+
+            await _repository.AddJobAsync(job);
+        }
+
+        private static string SetSalaryRange(double? lower, double? upper)
+        {
+            var salary = string.Empty;
+            if(lower.HasValue && upper.HasValue)
+            {
+                var lowerValue = lower.Value;
+                var upperValue = upper.Value;
+
+                if (lowerValue > upperValue)
+                    salary = $"Php {upperValue.ToString("N0")} - Php {lowerValue.ToString("N0")}";
+                else
+                    salary = $"Php {lowerValue.ToString("N0")} - Php {upperValue.ToString("N0")}";
+
+                return salary;
+            }
+            throw new InvalidOperationException("Invalid salary range!");
+        }
+
+        private static string SetSchedule(int? days, int? hours)
+        {
+            if(days.HasValue && hours.HasValue)
+            {
+                var daysValue = days.Value == 0 ? "Flexible" : days.Value.ToString();
+                var hoursValue = hours.Value == 0 ? "Flexible" : hours.Value.ToString();
+                var daysString = days.Value == 1 ? "day" : "days";
+                var hoursString = hours.Value == 1 ? "hour" : "hours";
+
+                return $"{daysValue} {daysString}, {hoursValue} {hoursString}";
+            }
+            throw new InvalidOperationException("Invalid schedule!");
         }
 
         public async Task UpdateJobAsync(JobViewModel model)
@@ -115,7 +167,7 @@ namespace Services.Services
                 DateTime weekStart = today.AddDays(-1 * diff).Date;
                 DateTime weekEnd = weekStart.AddDays(7);
 
-                DateTime monthStart = new DateTime(today.Year, today.Month, 1);
+                DateTime monthStart = new (today.Year, today.Month, 1);
                 DateTime monthEnd = monthStart.AddMonths(1);
 
                 jobs = filterByDatePosted switch
@@ -147,11 +199,16 @@ namespace Services.Services
                 jobs = jobs.Where(job => filterByWorkSetup.Contains(job.SetupType.Name)).ToList();
             }
 
+            if (int.TryParse(filterBySalary, out int salary))
+            {
+                jobs = jobs.Where(j => GetLowerSalary(j.Salary) <= salary).ToList();
+            }
+
             jobs = sortBy switch
             {
                 "created_desc" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
                 "created_asc" => jobs.OrderBy(j => j.CreatedDate).ToList(),
-                "salary_desc" => jobs.OrderByDescending(j => GetLowerSalary(j.Salary)).ThenByDescending(j => GetUpperSalary(j.Salary)).ToList(),
+                "salary_desc" => jobs.OrderByDescending(j => GetUpperSalary(j.Salary)).ThenByDescending(j => GetLowerSalary(j.Salary)).ToList(),
                 "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
                 //"match" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
                 _ => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
@@ -165,8 +222,19 @@ namespace Services.Services
         /// </summary>
         /// <param name="id">The team identifier.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the team view model.</returns>
-        public async Task<JobViewModel> GetJobByIdAsync(string id) =>
-            _mapper.Map<JobViewModel>(await _repository.GetJobByIdAsync(id));
+        public async Task<JobViewModel> GetJobByIdAsync(string id) 
+        {
+            var job = await _repository.GetJobByIdAsync(id);
+            var model = _mapper.Map<JobViewModel>(job);
+
+            model.SalaryLower = GetLowerSalary(job.Salary);
+            model.SalaryUpper = GetUpperSalary(job.Salary);
+            model.ScheduleDays = GetDaysSchedule(job.Schedule);
+            model.ScheduleHours = GetHoursSchedule(job.Schedule);
+
+            return model;
+        }
+                       
 
         public async Task<List<Company>> GetCompaniesWithListingsAsync() =>
             await _repository.GetCompaniesWithListingsAsync();
@@ -231,6 +299,56 @@ namespace Services.Services
 
             if (int.TryParse(upperSalaryStr, out int upperSalary))
                 return upperSalary;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Extracts the days from the schedule string.
+        /// </summary>
+        private static int GetDaysSchedule(string schedule)
+        {
+            if (string.IsNullOrWhiteSpace(schedule))
+                return 0;
+
+            var parts = schedule.Split(',');
+            if (parts.Length < 2)
+                return 0;
+
+            var daysPart = parts[0].Trim();
+
+            var daysString = daysPart.Replace("days", "").Replace("day", "").Replace(",", "").Trim();
+
+            if (string.Equals(daysString, "Flexible"))
+                return 0;
+
+            if (int.TryParse(daysString, out int days))
+                return days;
+
+            return 0;
+        }
+
+        /// <summary>
+        /// Extracts the hours from the schedule string.
+        /// </summary>
+        private static int GetHoursSchedule(string schedule)
+        {
+            if (string.IsNullOrWhiteSpace(schedule))
+                return 0;
+
+            var parts = schedule.Split(',');
+            if (parts.Length < 2)
+                return 0;
+
+            var hoursPart = parts[1].Trim();
+
+            var hoursString = hoursPart.Replace("hours", "").Replace("hour", "").Replace(",", "").Trim();
+
+            if (string.Equals(hoursString, "Flexible"))
+                return 0;
+
+            if (int.TryParse(hoursString, out int hours))
+                return hours;
 
             return 0;
         }

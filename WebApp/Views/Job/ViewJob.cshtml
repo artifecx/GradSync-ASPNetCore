@@ -1,51 +1,61 @@
 ﻿@model Services.ServiceModels.JobViewModel
 @using Data.Models;
 @using Humanizer;
-
+@using System.Text.Json;
 
 @{
     ViewData["Title"] = Model.Title;
     var userId = ViewBag.UserId;
-    string aspAction = User.IsInRole("Recruiter") ? "GetAllJobsRecruiter" : "GetAllJobsAdmin";
+    string aspAction = string.Empty;
+
+    if (User.IsInRole("Admin") || User.IsInRole("NLO"))
+        aspAction = "GetAllJobsAdmin";
+    else if (User.IsInRole("Recruiter"))
+        aspAction = "GetAllJobsRecruiter";
+    else
+        aspAction = "GetAllJobsApplicant";
+
+    await Html.RenderPartialAsync("_EditJobModal", Model);
+
+    var Departments = ViewBag.Departments as List<Department>;
+    var Skills = ViewBag.Skills as List<Skill>;
 }
 
-
-<div class="min-h-screen bg-[#F5F7F8] text-black mt-12">
-    <div class="bg-[#F5F7F8] max-w-7xl mx-auto rounded-lg px-6 mt-6 flex gap-6">
-        <div class="justify-between w-full">
-
-            <div class="bg-white w-full px-12 p-6 rounded-lg shadow-sm">
-                <div class="flex justify-between">
-                    <!-- Back Button with Arrow -->
-                    <button class="flex items-center font-semibold text-xs text-[#7A1515] hover-[#991b1b]" onclick="goBack()">
+<div class="min-h-screen bg-gray-100 text-black">
+    <div class="mx-auto mt-10 flex max-w-7xl gap-6 rounded-lg bg-gray-100 px-6">
+        <div class="w-full justify-between">
+            <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+                <div class="flex justify-between">         
+                    <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
                         <i class="fas fa-arrow-left mr-2"></i> Back
-                    </button>                      
+                    </a>
                 </div>
 
                 <div class="flex justify-between">
-                    <div class="text-[40px] font-bold">@Model.Title</div>
+                    <div class="font-bold text-[40px]">@Model.Title</div>
 
                     <!-- Action Buttons Placeholders Only-->
-                    <div class="flex justify-between p-2 space-x-4">
+                    <div class="flex justify-between space-x-4 p-2">
                         @if (User.IsInRole("Applicant"))
                         {
                             <!-- Save -->
                             <button onclick="saveJobHandler('@Model.JobId')"
-                                    class="btn-primary py-2 px-4 rounded-lg flex items-center justify-center transition-all hover:bg-[#991b1b] hover:text-white">
+                                    class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
                                 <i class="fa-regular fa-bookmark"></i>
                             </button>
 
                             <!-- Apply -->
                             <button onclick="applyJobHandler('@Model.JobId')"
-                                    class="btn-primary py-2 px-4 rounded-lg flex items-center justify-center transition-all hover:bg-[#991b1b] hover:text-white">
+                                    class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
                                 <i class="fa-regular fa-paper-plane pr-1"></i> Apply
                             </button>
                         }
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
                         {
                             <!-- Edit -->
-                            <button onclick="editJobHandler('@Model.JobId')"
-                                    class="btn-primary py-2 px-4 rounded-lg flex items-center justify-center transition-all hover:bg-[#991b1b] hover:text-white">
+                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white"
+                                    data-toggle="modal"
+                                    data-target="#editJobModal">
                                 <i class="fas fa-edit pr-2"></i> Edit
                             </button>
                         }
@@ -60,7 +70,7 @@
                       </span>
 
                        <!-- Date Created -->
-                      <div class="text-xs text-gray-500"> Posted
+                      <div class="text-xs text-gray-500" title="@Model.CreatedDate"> Posted
                             @(Model.CreatedDate == DateTime.MinValue ? "Date Not Available" : Model.CreatedDate.ToUniversalTime().Humanize())
                       </div>
                    </div>
@@ -70,31 +80,39 @@
     </div>     
 
     <!--MAIN CONTENT W/SIDEBAR-->
-     <div class="max-w-7xl mx-auto px-6 mt-6 flex gap-6">
+     <div class="mx-auto mt-6 flex max-w-7xl gap-6 px-6">
          <!-- Job Listings Section -->
-         <div class="w-full bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-           <h2 class="text-2xl font-bold text-gray-500 mb-2 pl-4">Job Details</h2>
+         <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+           <h2 class="mb-2 pl-4 text-2xl font-bold text-gray-500">Job Details</h2>
 
                  <!-- Main Content -->
-            <div class="gap-6 pb-4 px-4">
+            <div class="gap-6 px-4 pb-4">
                  <!-- Skills Required -->
-                 <div class="p-1 bg-gray-100 rounded-xl shadow-md mb-3 hover:shadow-lg transition-shadow duration-300">
-                    <div class="bg-white rounded-xl border p-4">
+                 <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                    <div class="rounded-xl border bg-white p-4">
                           <h3 class="mb-4 text-xl font-bold">Skills Required</h3>
-                          <p>@string.Join(", ", (Model.Skills as List<Skill>).Select(skill => skill.Name))</p>
+                        @*<p>@string.Join(", ", (Model.Skills as List<Skill>).Select(skill => skill.Name))</p>*@
 
                         <!--Skill Placeholder Only-->
                         <div class="mb-1 flex flex-wrap space-x-3">
-                            <span class="rounded-full outline outline-offset-1 outline-[#7A1515] px-2 py-1 text-xs">Skill 1</span>
-                            <span class="rounded-full outline outline-offset-1 outline-[#7A1515] px-2 py-1 text-xs">Skill 2</span>
-                            <span class="rounded-full outline outline-offset-1 outline-[#7A1515] px-2 py-1 text-xs">Skill 3</span>
+                            @if (Model.Skills.Any())
+                            {
+                                @foreach (var skill in Model.Skills)
+                                {
+                                    <span class="outline-offset-1 rounded-full px-2 py-1 text-xs font-semibold outline outline-[#7A1515]">@skill.Name.ToUpper()</span>
+                                }
+                            }
+                            else
+                            {
+                                <text>No skills listed</text>
+                            }
                         </div>
                     </div>
                  </div>
 
-                 <div class="p-1 bg-gray-100 rounded-xl shadow-md hover:shadow-lg transition-shadow duration-300">   
-                <!-- About the Job -->
-                    <div class="bg-white rounded-xl border p-4">
+                 <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">   
+                    <!-- About the Job -->
+                    <div class="rounded-xl border bg-white p-4">
                          <h3 class="mb-4 text-xl font-bold">About the Job</h3>
                          <p class="whitespace-pre-wrap text-base text-gray-600">@Model.Description</p>
                     </div>
@@ -105,28 +123,157 @@
             @await Html.PartialAsync("InfoTab")
         </div>
     </div>
-</div>
 
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 
 @section Scripts {
-            <script src="~/js/toastrNotification.js"></script>
-            <script>
-                document.querySelector('.back-button').addEventListener('click', function (event) {
-                    event.preventDefault();
-                    const baseUrl = '@Url.Action(aspAction, "Job")';
-                    const params = new URLSearchParams();
-                    params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-                    params.set('filterByCompany', sessionStorage.getItem('filterByCompany') || '');
-                    params.set('filterByEmploymentType', sessionStorage.getItem('filterByEmploymentType') || '');
-                    params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
-                    params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
-                    params.set('search', sessionStorage.getItem('search') || '');
-                    params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-                    window.location.href = ${baseUrl}?${params.toString()};
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/job.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+        sessionStorage.setItem('filterByEmploymentType', JSON.stringify(urlParams.getAll('filterByEmploymentType')) || '[]');
+        sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
+        sessionStorage.setItem('filterByWorkSetup', JSON.stringify(urlParams.getAll('filterByWorkSetup')) || '[]');
+        sessionStorage.setItem('search', urlParams.get('search') || '');
+        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+        sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '1');
+        sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '1');
+
+        document.querySelector('#back-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            const baseUrl = '@Url.Action($"{aspAction}", "Job")';
+            const params = new URLSearchParams();
+            const filterByEmploymentType = JSON.parse(sessionStorage.getItem('filterByEmploymentType') || '[]');
+            const filterByWorkSetup = JSON.parse(sessionStorage.getItem('filterByWorkSetup') || '[]');
+            filterByEmploymentType.forEach(employmentType => {
+                params.append('filterByEmploymentType', employmentType);
+            });
+            filterByWorkSetup.forEach(workSetup => {
+                params.append('filterByWorkSetup', workSetup);
+            });
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
+            params.set('search', sessionStorage.getItem('search') || '');
+            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+            params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '1');
+            params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '1');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var existingSkills = @Html.Raw(JsonSerializer.Serialize(Model.Skills.Select(s => new { value = s.Name, id = s.SkillId })));
+            var existingDepartments = @Html.Raw(JsonSerializer.Serialize(Model.Departments.Select(d => new { value = d.Name, id = d.DepartmentId })));
+
+            var cancelClicked = false;
+            document.getElementById("closeEditJobModal").addEventListener("click", function () {
+                cancelClicked = true;
+            });
+            document.getElementById("cancelEditJob").addEventListener("click", function () {
+                cancelClicked = true;
+            });
+            $('#editJobModal').on('hidden.bs.modal', function () {
+                if(cancelClicked){
+                    editJobForm.reset();
+                    $(".text-red-500").text('');
+                    $("#remainingTitleChars").text('100 characters remaining');
+                    $("#remainingDescriptionChars").text('800 characters remaining');
+                    tagifySkills.addTags(existingSkills);
+                    tagifyDepartments.addTags(existingDepartments);
+                }
+                cancelClicked = false;
+            });
+
+            var skillsInput = document.querySelector('#editJobSkillsInput');
+            var skillsHiddenInputs = document.getElementById('skillsHiddenInputs');
+
+            var skillsList = @Html.Raw(JsonSerializer.Serialize(Skills.Select(s => new { value = s.Name, id = s.SkillId })));
+            var tagifySkills = new Tagify(skillsInput, {
+                whitelist: skillsList,
+                enforceWhitelist: true,
+                searchKeys: ['value'],
+                pattern: null,
+                dropdown: {
+                    classname: "color-blue",
+                    enabled: 0,
+                    maxItems: 5,
+                    position: 'top'
+                },
+            });
+
+            tagifySkills.DOM.scope.classList.add(
+                'block',
+                'w-full',
+                'rounded-lg',
+                'border',
+                'border-gray-300',
+                'p-2',
+                'focus:ring-blue-500',
+                'focus:border-blue-500',
+                'overflow-y-auto',
+                'max-h-16'
+            );
+
+            tagifySkills.addTags(existingSkills);
+
+            tagifySkills.on('change', function () {
+                var selectedValues = tagifySkills.value;
+                skillsHiddenInputs.innerHTML = '';
+                selectedValues.forEach(function (item, index) {
+                    var hiddenInputId = document.createElement('input');
+                    hiddenInputId.type = 'hidden';
+                    hiddenInputId.name = 'Skills[' + index + '].SkillId';
+                    hiddenInputId.value = item.id;
+                    skillsHiddenInputs.appendChild(hiddenInputId);
                 });
-            </script>
+            });
+
+            var departmentsInput = document.querySelector('#editJobDepartmentsInput');
+            var departmentsHiddenInputs = document.getElementById('departmentsHiddenInputs');
+            var departmentsList = @Html.Raw(JsonSerializer.Serialize(Departments.Select(d => new { value = d.Name, id = d.DepartmentId })));
+            var tagifyDepartments = new Tagify(departmentsInput, {
+                whitelist: departmentsList,
+                enforceWhitelist: true,
+                searchKeys: ['value'],
+                pattern: null,
+                dropdown: {
+                    classname: "color-blue",
+                    enabled: 0,
+                    maxItems: 5,
+                    position: 'top'
+                },
+            });
+
+            tagifyDepartments.DOM.scope.classList.add(
+                'block',
+                'w-full',
+                'rounded-lg',
+                'border',
+                'border-gray-300',
+                'p-2',
+                'focus:ring-blue-500',
+                'focus:border-blue-500',
+                'overflow-y-auto',
+                'max-h-16'
+            );
+
+            tagifyDepartments.addTags(existingDepartments);
+
+            tagifyDepartments.on('change', function () {
+                var selectedValues = tagifyDepartments.value;
+                departmentsHiddenInputs.innerHTML = '';
+                selectedValues.forEach(function (item, index) {
+                    var hiddenInputId = document.createElement('input');
+                    hiddenInputId.type = 'hidden';
+                    hiddenInputId.name = 'Departments[' + index + '].DepartmentId';
+                    hiddenInputId.value = item.id;
+                    departmentsHiddenInputs.appendChild(hiddenInputId);
+                });
+            });
+        });
+    </script>
 }
 
 @functions {

@@ -37,7 +37,7 @@
         <!-- Company Column (with dropdown) -->
         <th class="px-6 py-3 text-sm font-medium uppercase tracking-wider text-gray-900">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="cursor-pointer text-black" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @if (filterByCompany == null)
                     {
                         @Html.DisplayNameFor(model => model.First().Company)
@@ -79,7 +79,7 @@
     <!-- Employment Type Column (with dropdown) -->
     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-gray-900 hover:text-blue-500" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-gray-900" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByEmploymentType))
                 {
                     @Html.DisplayNameFor(model => model.First().EmploymentType)
@@ -120,7 +120,7 @@
     <!-- Status Type Column (with dropdown) -->
     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-black" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByStatusType))
                 {
                     @Html.DisplayNameFor(model => model.First().StatusType)
@@ -161,7 +161,7 @@
     <!-- Work Setup Column (with dropdown) -->
     <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-black hover:text-blue-500" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-black" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByWorkSetup))
                 {
                     @Html.DisplayNameFor(model => model.First().SetupType)
@@ -208,7 +208,7 @@
            asp-route-filterByEmploymentType="@filterByEmploymentType"
            asp-route-filterByStatusType="@filterByStatusType"
            asp-route-filterByWorkSetup="@filterByWorkSetup"
-           class="text-black hover:text-blue-500">
+           class="text-black">
             @Html.DisplayNameFor(model => model.First().CreatedDate)
             @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
         </a>
