@@ -32,8 +32,13 @@ else
 {
     @foreach (var item in Model)
     {
-        <tr class="hover:bg-gray-100">
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Title)</td>
+        <tr class="hover:bg-gray-100 ">
+            <td class="px-6 py-3 text-sm text-gray-700">
+                <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
+                   class="hover:text-[#A53D3D] hover:underline">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </a>
+            </td>
             @if (!User.IsInRole("Recruiter"))
             {
                 <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>

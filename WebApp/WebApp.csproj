@@ -20,6 +20,7 @@
     <Content Remove="Views\Job\JobList.cshtml" />
     <Content Remove="wwwroot\js\chart.cs" />
     <Content Remove="wwwroot\js\chart.js" />
+    <Content Remove="wwwroot\js\homepage.js" />
   </ItemGroup>
 
   <ItemGroup>
