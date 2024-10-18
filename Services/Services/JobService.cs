@@ -68,6 +68,9 @@ namespace Services.Services
             return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
         }
 
+        public async Task<List<JobViewModel>> GetAllJobsAsync() =>
+            _mapper.Map <List<JobViewModel>>(await _repository.GetAllJobsAsync());
+
         public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
             string sortBy, string search, string filterByCompany,
             List<string> filterByEmploymentType, string filterByStatusType,
