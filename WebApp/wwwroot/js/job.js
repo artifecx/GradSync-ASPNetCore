@@ -1,4 +1,73 @@
-﻿document.addEventListener('click', function (e) {
+﻿$(document).ready(function () {
+    var url = new URL(window.location);
+    var showModal = url.searchParams.get('showModal');
+
+    if (showModal === 'editJob') {
+        $('#editJobModal').modal('show');
+        url.searchParams.delete('showModal');
+        window.history.replaceState(null, null, url);
+    }
+});
+
+function submitCreateJob() {
+    var form = $('#createJobForm');
+
+    form.validate();
+    if (!form.valid()) {
+        return;
+    }
+
+    var formData = form.serialize();
+
+    $.ajax({
+        url: '/jobs/create',
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (xhr, status, error) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+function submitEditJob() {
+    var form = $('#editJobForm');
+
+    form.validate();
+    if (!form.valid()) {
+        return;
+    }
+
+    var formData = form.serialize();
+
+    $.ajax({
+        url: '/jobs/update',
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (xhr, status, error) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+document.addEventListener('click', function (e) {
     const actionBtn = e.target.closest('.actionDropdownJobBtn');
     if (actionBtn) {
         const JobId = actionBtn.dataset.jobid;
@@ -17,17 +86,6 @@
         document.querySelectorAll('.actionDropdownJobMenu').forEach(menu => {
             menu.classList.add('hidden');
         });
-    }
-});
-
-$(document).ready(function () {
-    var url = new URL(window.location);
-    var showModal = url.searchParams.get('showModal');
-
-    if (showModal === 'editJob') {
-        $('#editJobModal').modal('show');
-        url.searchParams.delete('showModal');
-        window.history.replaceState(null, null, url);
     }
 });
 
