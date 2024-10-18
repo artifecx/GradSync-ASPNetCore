@@ -1,5 +1,6 @@
 ﻿using Data.Interfaces;
 using Data.Models;
+using static Services.Exceptions.JobExceptions;
 using Services.Interfaces;
 using Services.ServiceModels;
 using AutoMapper;
@@ -10,6 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
+using static Services.Exceptions.CompanyExceptions;
 
 namespace Services.Services
 {
@@ -40,7 +43,7 @@ namespace Services.Services
             job.CreatedDate = DateTime.Now;
             job.UpdatedDate = DateTime.Now;
             job.StatusTypeId = "Open";
-
+            job.PostedById = model.PostedById;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
             job.JobSkills = model.Skills.Select(skill => new JobSkill
@@ -94,12 +97,121 @@ namespace Services.Services
 
         public async Task UpdateJobAsync(JobViewModel model)
         {
-            throw new NotImplementedException();
+            var job = await _repository.GetJobByIdAsync(model.JobId, true);
+            if (job == null)
+                throw new JobException("Job not found.");
+
+            _mapper.Map(model, job);
+            bool jobSkillsChanged = SetJobSkills(job, model);
+            bool jobDepartmentChanged = SetJobDepartments(job, model);
+            job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
+            job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
+
+            if (!_repository.HasChanges(job) && !jobSkillsChanged && !jobDepartmentChanged)
+                throw new CompanyException("No changes detected.");
+
+            job.UpdatedDate = DateTime.Now;
+
+            await _repository.UpdateJobAsync(job);
         }
 
-        public async Task DeleteJobAsync(string id)
+        private bool SetJobSkills(Job job, JobViewModel model)
         {
-            throw new NotImplementedException();
+            var currentJobSkills = job.JobSkills.Select(js => js.SkillId).ToList();
+            var newSkills = model.Skills.Select(s => s.SkillId).ToList();
+
+            var skillsToRemove = currentJobSkills.Except(newSkills).ToList();
+            if (skillsToRemove.Any())
+            {
+                foreach (var skillId in skillsToRemove)
+                {
+                    var jobSkill = job.JobSkills.FirstOrDefault(js => js.SkillId == skillId);
+                    if (jobSkill != null)
+                    {
+                        job.JobSkills.Remove(jobSkill);
+                    }
+                }
+            }
+            var skillsToAdd = newSkills.Except(currentJobSkills).ToList();
+            if (skillsToAdd.Any())
+            {
+                foreach (var skillId in skillsToAdd)
+                {
+                    var jobSkill = new JobSkill
+                    {
+                        JobSkillId = Guid.NewGuid().ToString(),
+                        JobId = job.JobId,
+                        SkillId = skillId
+                    };
+                    job.JobSkills.Add(jobSkill);
+                }
+            }
+            return skillsToAdd.Any() || skillsToRemove.Any();
+        }
+
+        private bool SetJobDepartments(Job job, JobViewModel model)
+        {
+            var currentJobDepartments = job.JobDepartments.Select(js => js.DepartmentId).ToList();
+            var newDepartments = model.Departments.Select(s => s.DepartmentId).ToList();
+
+            var departmentsToRemove = currentJobDepartments.Except(newDepartments).ToList();
+            if (departmentsToRemove.Any())
+            {
+                foreach (var departmentId in departmentsToRemove)
+                {
+                    var jobDepartment = job.JobDepartments.FirstOrDefault(js => js.DepartmentId == departmentId);
+                    if (jobDepartment != null)
+                    {
+                        job.JobDepartments.Remove(jobDepartment);
+                    }
+                }
+            }
+            var departmentsToAdd = newDepartments.Except(currentJobDepartments).ToList();
+            if (departmentsToAdd.Any())
+            {
+                foreach (var departmentId in departmentsToAdd)
+                {
+                    var jobDepartment = new JobDepartment
+                    {
+                        JobDepartmentId = Guid.NewGuid().ToString(),
+                        JobId = job.JobId,
+                        DepartmentId = departmentId
+                    };
+                    job.JobDepartments.Add(jobDepartment);
+                }
+            }
+            return departmentsToAdd.Any() || departmentsToRemove.Any();
+        }
+
+        public async Task ArchiveJobAsync(string id)
+        {
+            var job = await _repository.GetJobByIdAsync(id, true);
+            job.IsArchived = true;
+            job.StatusTypeId = "Closed";
+            job.AvailableSlots = 0;
+            if(job.Applications.Any())
+            {
+                foreach (var application in job.Applications)
+                {
+                    application.ApplicationStatusTypeId = "Rejected";
+                    application.UpdatedDate = DateTime.Now;
+                }
+            }
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
+        }
+
+        public async Task UnarchiveJobAsync(JobServiceModel model)
+        {
+            var job = await _repository.GetJobByIdAsync(model.JobId, "true");
+
+            if (job == null) throw new JobException("Job not found!");
+
+            job.IsArchived = false;
+            job.StatusTypeId = "Open";
+            job.AvailableSlots = model.AvailableSlots.Value;
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
         }
 
         #region Get Methods        
@@ -107,12 +219,14 @@ namespace Services.Services
             string sortBy, string search, string filterByCompany,
             List<string> filterByEmploymentType, string filterByStatusType,
             List<string> filterByWorkSetup, int pageIndex, int pageSize, 
-            string filterByDatePosted = null, string filterBySalary = null)
+            string filterByDatePosted = null, string filterBySalary = null, string archived = null)
         {
-            var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
+            var jobs = string.Equals(archived, "archived") ?
+                _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync()) :
+                _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
             jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
                 filterByEmploymentType, filterByStatusType, filterByWorkSetup,
-                filterByDatePosted, filterBySalary);
+                filterByDatePosted, filterBySalary, archived);
 
             var count = jobs.Count;
             var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
@@ -126,12 +240,14 @@ namespace Services.Services
         public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
             string sortBy, string search, string filterByCompany,
             List<string> filterByEmploymentType, string filterByStatusType,
-            List<string> filterByWorkSetup, int pageIndex, int pageSize)
+            List<string> filterByWorkSetup, int pageIndex, int pageSize, string archived = null)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var jobs = _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
+            var jobs = string.Equals(archived, "archived") ? 
+                _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterArchivedJobsAsync(userId)) :
+                _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
             jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
-                filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+                filterByEmploymentType, filterByStatusType, filterByWorkSetup, archived);
 
             var count = jobs.Count;
             var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
@@ -143,19 +259,31 @@ namespace Services.Services
             List<JobViewModel> jobs, string sortBy, string search, 
             string filterByCompany, List<string> filterByEmploymentType, 
             string filterByStatusType, List<string> filterByWorkSetup, 
-            string filterByDatePosted = null, string filterBySalary = null)
+            string filterByDatePosted = null, string filterBySalary = null,
+            string archived = null)
         {
             if (!string.IsNullOrEmpty(search))
             {
-                jobs = jobs
-                    .Where(job => 
-                        job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        job.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        job.EmploymentTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        job.SetupTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                        job.StatusTypeId.Contains(search, StringComparison.OrdinalIgnoreCase))
-                    .ToList();
+                if (!string.IsNullOrEmpty(archived))
+                {
+                    jobs = jobs
+                        .Where(job =>
+                            job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.EmploymentTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.SetupTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.StatusTypeId.Contains(search, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
+                else
+                {
+                    jobs = jobs
+                        .Where(job =>
+                            job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                            job.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
+                        .ToList();
+                }
             }
 
             if (!string.IsNullOrEmpty(filterByDatePosted))
@@ -210,6 +338,8 @@ namespace Services.Services
                 "created_asc" => jobs.OrderBy(j => j.CreatedDate).ToList(),
                 "salary_desc" => jobs.OrderByDescending(j => GetUpperSalary(j.Salary)).ThenByDescending(j => GetLowerSalary(j.Salary)).ToList(),
                 "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
+                "updated_desc" => jobs.OrderByDescending(j => j.UpdatedDate).ToList(),
+                "updated_asc" => jobs.OrderBy(j => j.UpdatedDate).ToList(),
                 //"match" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
                 _ => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
             };
@@ -218,13 +348,14 @@ namespace Services.Services
         }
 
         /// <summary>
-        /// Retrieves a team by its identifier asynchronously.
+        /// Retrieves a job by its identifier asynchronously.
         /// </summary>
-        /// <param name="id">The team identifier.</param>
-        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. The task result contains the team view model.</returns>
+        /// <param name="id">The job identifier.</param>
+        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. 
+        /// The task result contains the team view model.</returns>
         public async Task<JobViewModel> GetJobByIdAsync(string id) 
         {
-            var job = await _repository.GetJobByIdAsync(id);
+            var job = await _repository.GetJobByIdAsync(id, false);
             var model = _mapper.Map<JobViewModel>(job);
 
             model.SalaryLower = GetLowerSalary(job.Salary);

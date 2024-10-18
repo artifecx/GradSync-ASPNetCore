@@ -32,7 +32,7 @@ else
 {
     @foreach (var item in Model)
     {
-        <tr class="hover:bg-gray-100 ">
+        <tr class="hover:bg-gray-100">
             <td class="px-6 py-3 text-sm text-gray-700">
                 <a href="@Url.Action("GetJob", "Job", 
                     new { 
@@ -107,9 +107,9 @@ else
                             </button>
 
                             <!-- Archive Job -->
-                            <button onclick=" displayDeleteModal('@item.JobId' , '@item.PostedBy)"
+                            <button onclick="displayDeleteModal('@item.JobId' , '@item.Title')"
                                     class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                <i class="fas fa-info-circle mr-2"></i> Archive Chat
+                                <i class="fas fa-archive mr-2"></i> Archive Job
                             </button>
                         </div>
                     </div>
@@ -117,15 +117,5 @@ else
             </td>
         </tr>
     }
-}
-
-<!-- Values passed to the js files -->
-<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Job")" />
-
- @section Scripts {
-    <script src="~/js/delete.js"></script>
-    <script src="~/js/toastrNotification.js"></script>
-    <script src="~/js/archive.js"></script>
-    <script src="~/js/job.js"></script>
 }
         

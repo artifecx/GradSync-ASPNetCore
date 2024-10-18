@@ -70,8 +70,8 @@
                       </span>
 
                        <!-- Date Created -->
-                      <div class="text-xs text-gray-500" title="@Model.CreatedDate"> Posted
-                            @(Model.CreatedDate == DateTime.MinValue ? "Date Not Available" : Model.CreatedDate.ToUniversalTime().Humanize())
+                        <div class="text-xs text-gray-500" title="@Model.UpdatedDate">Updated
+                            @(Model.UpdatedDate == DateTime.MinValue ? "Date Not Available" : Model.UpdatedDate.ToUniversalTime().Humanize())
                       </div>
                    </div>
                 </div>          

@@ -31,6 +31,18 @@ namespace WebApp
                 CreateMap<AccountServiceModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, UserViewModel>().ReverseMap();
                 CreateMap<JobViewModel, Job>()
+                    .ForMember(dest => dest.JobId, opt => opt.Ignore())
+                    .ForMember(dest => dest.PostedById, opt => opt.Ignore())
+                    .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                    .ForMember(dest => dest.UpdatedDate, opt => opt.Ignore())
+                    .ForMember(dest => dest.EmploymentType, opt => opt.Ignore())
+                    .ForMember(dest => dest.PostedBy, opt => opt.Ignore())
+                    .ForMember(dest => dest.Salary, opt => opt.Ignore())
+                    .ForMember(dest => dest.Schedule, opt => opt.Ignore())
+                    .ForMember(dest => dest.SetupType, opt => opt.Ignore())
+                    .ForMember(dest => dest.StatusTypeId, opt => opt.Ignore())
+                    .ForMember(dest => dest.StatusType, opt => opt.Ignore())
+                    .ForMember(dest => dest.YearLevel, opt => opt.Ignore())
                     .ReverseMap()
                     .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.PostedBy.Company))
                     .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.JobSkills.Select(s => s.Skill)))

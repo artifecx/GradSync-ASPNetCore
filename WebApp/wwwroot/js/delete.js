@@ -1,7 +1,7 @@
 ﻿var itemId;
 function displayDeleteModal(id, name) {
     itemId = id;
-    itemName = name;
+    var itemName = name;
     document.getElementById('deleteModalMessage').textContent = `Are you sure you want to delete ${itemName}? This action is permanent and cannot be undone.`;
     $('#deleteModal').modal('show');
 }

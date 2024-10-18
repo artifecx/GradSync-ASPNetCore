@@ -2,6 +2,7 @@
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -19,24 +20,17 @@ namespace Data.Repositories
                         .Where(j => !j.IsArchived)
                         .Include(j => j.JobSkills)
                             .ThenInclude(j => j.Skill)
-                            .AsNoTracking()
                         .Include(j => j.YearLevel)
-                            .AsNoTracking()
                         .Include(j => j.JobDepartments)
                             .ThenInclude(j => j.Department)
-                            .AsNoTracking()
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.Company)
-                            .AsNoTracking()
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.User)
-                            .AsNoTracking()
                         .Include(j => j.EmploymentType)
-                            .AsNoTracking()
                         .Include(j => j.SetupType)
-                            .AsNoTracking()
                         .Include(j => j.StatusType)
-                            .AsNoTracking();
+                        .Include(j => j.Applications);
         }
 
         public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
@@ -48,8 +42,14 @@ namespace Data.Repositories
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
 
+        public async Task<List<Job>> GetArchivedJobsAsync() =>
+            await this.GetDbSet<Job>().Where(j => j.IsArchived).ToListAsync();
+
         public async Task<List<Job>> GetRecruiterJobsAsync(string userId) =>
             await GetJobsWithIncludes().Where(j => string.Equals(j.PostedById, userId)).AsNoTracking().ToListAsync();
+
+        public async Task<List<Job>> GetRecruiterArchivedJobsAsync(string userId) =>
+            await this.GetDbSet<Job>().Where(j => j.IsArchived && string.Equals(j.PostedById, userId)).ToListAsync();
 
         public async Task AddJobAsync(Job job)
         {
@@ -63,15 +63,14 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task DeleteJobAsync(Job job)
+        public async Task<Job> GetJobByIdAsync(string id, bool? track)
         {
-            job.IsArchived = true;
-            this.GetDbSet<Job>().Update(job);
-            await UnitOfWork.SaveChangesAsync();
+            var query = track.GetValueOrDefault() ? GetJobsWithIncludes() : GetJobsWithIncludes().AsNoTracking();
+            return await query.FirstOrDefaultAsync(j => j.JobId == id);
         }
 
-        public async Task<Job> GetJobByIdAsync(string id) =>
-            await GetJobsWithIncludes().AsNoTracking().FirstOrDefaultAsync(j => j.JobId == id);
+        public async Task<Job> GetJobByIdAsync(string id, string isArchived) =>
+            await this.GetDbSet<Job>().FirstOrDefaultAsync(j => j.IsArchived == Convert.ToBoolean(isArchived) && j.JobId == id);
 
         public async Task<List<Company>> GetCompaniesWithListingsAsync()
         {
@@ -102,5 +101,11 @@ namespace Data.Repositories
 
         public async Task<List<Skill>> GetSkillsAsync() =>
             await this.GetDbSet<Skill>().AsNoTracking().ToListAsync();
+
+        public bool HasChanges(Job job)
+        {
+            var entry = this.GetDbSet<Job>().Entry(job);
+            return entry.Properties.Any(p => p.IsModified);
+        }
     }
 }
