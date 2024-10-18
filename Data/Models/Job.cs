@@ -29,7 +29,7 @@ public partial class Job
 
     public string Salary { get; set; }
 
-    public string ScheduleId { get; set; }
+    public string Schedule { get; set; }
 
     public string PostedById { get; set; }
 
@@ -43,19 +43,17 @@ public partial class Job
 
     public virtual ICollection<JobApplicantMatch> JobApplicantMatches { get; set; } = new List<JobApplicantMatch>();
 
+    public virtual ICollection<JobDepartment> JobDepartments { get; set; } = new List<JobDepartment>();
+
+    public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
+
     public virtual Recruiter PostedBy { get; set; }
 
     public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
-
-    public virtual Schedule Schedule { get; set; }
 
     public virtual SetupType SetupType { get; set; }
 
     public virtual StatusType StatusType { get; set; }
 
     public virtual YearLevel YearLevel { get; set; }
-
-    public virtual ICollection<Department> Departments { get; set; } = new List<Department>();
-
-    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 }
