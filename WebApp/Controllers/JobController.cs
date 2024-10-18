@@ -13,6 +13,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Resources.Messages;
 using System.Collections.Generic;
+using Microsoft.IdentityModel.Tokens;
 
 namespace WebApp.Controllers
 {
@@ -54,16 +55,25 @@ namespace WebApp.Controllers
             string sortBy, 
             string search, 
             string filterByCompany,
-            List<string> filterByEmploymentType, 
+            string filterByEmploymentType, 
             string filterByStatusType,
-            List<string> filterByWorkSetup, 
+            string filterByWorkSetup, 
             int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
+                var filterByEmploymentTypeList = new List<string>();
+                if (!string.IsNullOrEmpty(filterByEmploymentType))
+                    filterByEmploymentTypeList.Add(filterByEmploymentType);
+                var filterByWorkSetupList = new List<string>();
+                if (!string.IsNullOrEmpty(filterByWorkSetup))
+                    filterByWorkSetupList.Add(filterByWorkSetup);
 
-                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentTypeList, filterByStatusType, filterByWorkSetupList, pageIndex, 10);
+
+                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
+                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
+
                 ViewBag.Companies = await _jobService.GetCompaniesWithListingsAsync();
 
                 return View("Index", jobs);
@@ -77,16 +87,24 @@ namespace WebApp.Controllers
             string sortBy,
             string search,
             string filterByCompany,
-            List<string> filterByEmploymentType,
+            string filterByEmploymentType,
             string filterByStatusType,
-            List<string> filterByWorkSetup,
+            string filterByWorkSetup,
             int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup, pageIndex, 5);
+                var filterByEmploymentTypeList = new List<string>();
+                if(!string.IsNullOrEmpty(filterByEmploymentType))
+                    filterByEmploymentTypeList.Add(filterByEmploymentType);
+                var filterByWorkSetupList = new List<string>();
+                if (!string.IsNullOrEmpty(filterByWorkSetup))
+                    filterByWorkSetupList.Add(filterByWorkSetup);
 
-                await InitializeValues(sortBy, search, filterByCompany, filterByEmploymentType, filterByStatusType, filterByWorkSetup);
+                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, filterByCompany, filterByEmploymentTypeList, filterByStatusType, filterByWorkSetupList, pageIndex, 10);
+
+                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
+                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
 
                 return View("Index", jobs);
             }, "GetAllJobsRecruiter");
@@ -111,9 +129,8 @@ namespace WebApp.Controllers
                 var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, 
                     filterByStatusType, filterByWorkSetup, pageIndex, 3, filterByDatePosted, filterBySalary);
 
-                await InitializeValues(sortBy, search, filterByCompany, 
-                    filterByEmploymentType, filterByStatusType, 
-                    filterByWorkSetup, filterByDatePosted, filterBySalary);
+                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType, filterByDatePosted, filterBySalary);
+                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
 
                 return View("IndexApplicant", jobs);
             }, "GetAllJobsApplicant");
@@ -123,22 +140,30 @@ namespace WebApp.Controllers
             string sortBy,
             string search,
             string filterByCompany,
-            List<string> filterByEmploymentType,
             string filterByStatusType,
-            List<string> filterByWorkSetup,
             string filterByDatePosted = null,
             string filterBySalary = null)
         {
             ViewData["SortBy"] = sortBy;
             ViewData["Search"] = search;
             ViewData["FilterByCompany"] = filterByCompany;
-            ViewData["FilterByEmploymentType"] = filterByEmploymentType;
             ViewData["FilterByStatusType"] = filterByStatusType;
-            ViewData["FilterByWorkSetup"] = filterByWorkSetup;
             ViewData["FilterByDatePosted"] = filterByDatePosted;
             ViewData["FilterBySalary"] = filterBySalary;
 
             await PopulateViewBagsAsync();
+        }
+
+        private async Task InitializeValues(string filterByEmploymentType, string filterByWorkSetup)
+        {
+            ViewData["FilterByEmploymentType"] = filterByEmploymentType;
+            ViewData["FilterByWorkSetup"] = filterByWorkSetup;
+        }
+
+        private async Task InitializeValues(List<string> filterByEmploymentType, List<string> filterByWorkSetup)
+        {
+            ViewData["FilterByEmploymentType"] = filterByEmploymentType;
+            ViewData["FilterByWorkSetup"] = filterByWorkSetup;
         }
 
         private async Task PopulateViewBagsAsync()
@@ -146,7 +171,8 @@ namespace WebApp.Controllers
             ViewBag.EmploymentTypes = await _jobService.GetEmploymentTypesAsync();
             ViewBag.StatusTypes = await _jobService.GetStatusTypesAsync();
             ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
-            ViewBag.YearLevels = await _jobService.GetYearLevelsAsync();
+            ViewBag.YearLevels = (await _jobService.GetYearLevelsAsync())
+                .OrderByDescending(y => y.Year).ToList();
             ViewBag.Departments = await _jobService.GetDepartmentsAsync();
             ViewBag.Skills = await _jobService.GetSkillsAsync();
         }
@@ -210,13 +236,15 @@ namespace WebApp.Controllers
             {
                 if (ModelState.IsValid)
                 {
-                    // Implement
+                    model.PostedById = UserId;
+                    await _jobService.AddJobAsync(model);
+                    TempData["SuccessMessage"] = "Successfully created a new job!";
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "";
+                TempData["ErrorMessage"] = "An error has occurred while creating a new job.";
                 return Json(new { success = false });
             }, "Create");
-        }
+        } 
 
         /// <summary>
         /// Updates the selected job.
@@ -233,10 +261,11 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid)
                 {
                     // Implement
-                    TempData["SuccessMessage"] = "";
+                    var m = model;
+                    TempData["SuccessMessage"] = "Wowzers";
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "";
+                TempData["ErrorMessage"] = "Ernk";
                 return Json(new { success = false });
             }, "Update");
         }
