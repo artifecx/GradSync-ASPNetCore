@@ -1,4 +1,4 @@
-﻿using System.Threading.Tasks;
+﻿/*using System.Threading.Tasks;
 using System.Collections.Concurrent;
 using System.Threading;
 using System;
@@ -10,7 +10,7 @@ namespace Services.Services
 {
     public class MatchCalculationBackgroundService : BackgroundService
     {
-        private readonly MatchCalculationQueue _queue;
+       *//* private readonly MatchCalculationQueue _queue;*//*
         private readonly ILogger<MatchCalculationBackgroundService> _logger;
         private readonly IServiceProvider _serviceProvider;
 
@@ -43,3 +43,4 @@ namespace Services.Services
         }
     }
 }
+*/

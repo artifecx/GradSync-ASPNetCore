@@ -147,9 +147,17 @@
 
                                     <!-- Job Skills -->
                                     <div class="mb-1 flex flex-wrap space-x-2">
-                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 1</span>
-                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 2</span>
-                                        <span class="rounded-full border px-2 py-1 text-xs">Skill 3</span>
+                                        @if(job.Skills.Any())
+                                        {
+                                            foreach(var skill in job.Skills)
+                                            {
+                                               <span class="rounded-full border px-2 py-1 text-xs">@skill.Name.ToUpper()</span> 
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <text>No skills listed.</text>
+                                        }
                                     </div>
 
                                     <div class="mb-2 flex items-center justify-between">
