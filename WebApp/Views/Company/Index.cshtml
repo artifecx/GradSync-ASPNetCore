@@ -187,15 +187,7 @@
                             }
                         </td>
                         <td>
-                            @Html.ActionLink("", "GetCompany", new
-                                {
-                                    id = item.CompanyId,
-                                    sortBy = sortBy,
-                                    verified = verified,
-                                    hasValidMOA = hasValidMOA,
-                                    search = search,
-                                    pageIndex = Model.PageIndex
-                                }, new { @class = "fas fa-info-circle action-icon" }) |
+                            @Html.ActionLink("", "GetCompany", new { id = item.CompanyId }, new { @class = "fas fa-info-circle action-icon" }) |
                             @Html.ActionLink("", "GetCompany", new { id = item.CompanyId, showModal = "editCompany" }, new { @class = "fas fa-edit action-icon" }) |
                             <button type="button" onclick="displayDeleteModal('@item.CompanyId', '@item.Name')" class="action-icon mx-1">
                                 <i class="fa fa-archive" aria-hidden="true"></i>
