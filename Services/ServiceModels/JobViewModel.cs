@@ -7,45 +7,18 @@ namespace Services.ServiceModels
 {
     public class JobViewModel
     {
-        [Display(Name = "Job Title")]
-        public string Title { get; set; }
-
-        [Display(Name = "Description")]
-        public string Description { get; set; }
-
-        [Display(Name = "Location")]
-        public string Location { get; set; }
-
-        [Display(Name = "Skills Requirement")]
-        public List<Skill> Skills { get; set; }
-
-        
-
-        [Display(Name = "Recommended Departments")]
-        public List<Department> Departments { get; set; }
+        public string JobId { get; set; }
 
         [Display(Name = "Date Created")]
         public DateTime CreatedDate { get; set; }
 
         [Display(Name = "Date Updated")]
         public DateTime UpdatedDate { get; set; }
-
-        [Display(Name = "Available Slots")]
-        public string AvailableSlots { get; set; }
-
-        [Display(Name = "Salary")]
-        public string Salary { get; set; }
-
-        public string YearLevelId { get; set; }
         public string CompanyId { get; set; }
         public string RecruiterId { get; set; }
-        public string JobId { get; set; }
-        public string PostedById { get; set; }
-        public string EmploymentTypeId { get; set; }
-        public string SetupTypeId { get; set; }
-        public string StatusTypeId { get; set; }
-        public string ScheduleId { get; set; }
 
+        public string StatusTypeId { get; set; }
+        
         [Display(Name = "Year Level Requirement")]
         public YearLevel YearLevel { get; set; }
 
@@ -64,7 +37,67 @@ namespace Services.ServiceModels
         [Display(Name = "Work Setup")]
         public SetupType SetupType { get; set; }
 
-        [Display(Name = "Schedule")]
-        public Schedule Schedule { get; set; }
+
+
+        [Required]
+        [Display(Name = "Job Title")]
+        public string Title { get; set; }
+
+        [Required]
+        [Display(Name = "Description")]
+        public string Description { get; set; }
+
+        [Required]
+        [Display(Name = "Location")]
+        public string Location { get; set; }
+
+        [Required]
+        [Display(Name = "Year Level Requirement")]
+        public string YearLevelId { get; set; }
+
+        [Required]
+        [Display(Name = "Setup Type")]
+        public string SetupTypeId { get; set; }
+
+        [Required]
+        [Range(1, int.MaxValue, ErrorMessage = "Available slots must be greater than zero.")]
+        [Display(Name = "Available Slots")]
+        public int? AvailableSlots { get; set; }
+
+        [Display(Name = "Salary Range (Monthly)")]
+        public string Salary { get; set; }
+        [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Lower bound must be a non-negative number.")]
+        [Display(Name = "Lower")]
+        public double? SalaryLower { get; set; }
+        [Required]
+        [Range(0, double.MaxValue, ErrorMessage = "Upper bound must be a non-negative number.")]
+        [Display(Name = "Upper")]
+        public double? SalaryUpper { get; set; }
+
+        [Display(Name = "Schedule (Weekly)")]
+        public string Schedule { get; set; }
+        [Required]
+        [Range(0, 7, ErrorMessage = "Days must be between 0 (flexible) and 7.")]
+        [Display(Name = "Days")]
+        public int? ScheduleDays { get; set; }
+        [Required]
+        [Range(0, 60, ErrorMessage = "Hours must be between 0 (flexible) and 60.")]
+        [Display(Name = "Hours")]
+        public int? ScheduleHours { get; set; }
+
+        [Required]
+        [Display(Name = "Employment Type")]
+        public string EmploymentTypeId { get; set; }
+
+        [Required]
+        [Display(Name = "Skills Requirement")]
+        public List<Skill> Skills { get; set; }
+
+        [Required]
+        [Display(Name = "Recommended Departments")]
+        public List<Department> Departments { get; set; }
+
+        public string PostedById { get; set; }
     }
 }

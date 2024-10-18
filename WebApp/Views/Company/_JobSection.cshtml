@@ -1,0 +1,78 @@
+﻿@model Services.ServiceModels.CompanyViewModel
+
+<div class="max-h-80 overflow-y-auto rounded border bg-gray-50 p-4">
+    <!-- Header: Title and Add Job Button -->
+    <div class="flex items-center justify-between pb-2">
+        <h4 class="text-xl font-semibold">Jobs</h4>
+        <button class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                onclick="displayAddJobModal('@Model.CompanyId')">
+            <i class="fa fa-plus mr-2"></i>
+            Add Job
+        </button>
+    </div>
+
+    <!-- Search Input -->
+    <div class="mb-4">
+        <input type="text"
+               id="jobSearch"
+               class="w-full rounded border px-3 py-2 leading-tight text-gray-700 shadow focus:outline-none focus:shadow-outline"
+               placeholder="Search jobs by title or description..."
+               oninput="filterJobs()" />
+    </div>
+
+    <!-- Jobs Table -->
+    <table class="min-w-full bg-white">
+        <thead class="sticky top-0 bg-gray-100">
+            <tr>
+                <th class="border-b-2 border-gray-300 px-6 py-3 text-left uppercase tracking-wider text-gray-600">Title</th>
+                <th class="border-b-2 border-gray-300 px-6 py-3 text-left uppercase tracking-wider text-gray-600">Description</th>
+                <th class="border-b-2 border-gray-300 px-6 py-3 text-left uppercase tracking-wider text-gray-600">Open Slots</th>
+                <th class="border-b-2 border-gray-300 px-6 py-3 text-left uppercase tracking-wider text-gray-600">Status</th>
+                <th class="border-b-2 border-gray-300 px-6 py-3 text-left uppercase tracking-wider text-gray-600">Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            @if (!Model.Recruiters.Any())
+            {
+                <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-red-500">No Jobs Available</td>
+                </tr>
+            }
+            else
+            {
+                @foreach (var job in Model.Recruiters)
+                {
+                    <tr class="border-b bg-white hover:bg-gray-50">
+                        <td class="whitespace-nowrap px-6 py-4">
+                            <a href="#" class="hover:underline">
+                                @job.Title
+                            </a>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-gray-700">
+                            @job.Title
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-gray-700">
+                            <span class="text-green-600">Active</span>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-gray-700">
+                            <span class="text-green-600">Active</span>
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4">
+                            <a title="Edit"
+                               href="javascript:void(0);"
+                               onclick="">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                            <span class="px-2 text-gray-400">|</span>
+                            <a title="Delete"
+                               href="javascript:void(0);"
+                               onclick="">
+                                <i class="fas fa-trash"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+</div>

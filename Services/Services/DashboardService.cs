@@ -91,9 +91,9 @@ namespace Services.Services
                 .AsParallel()
                 .GroupBy(j => j.SetupTypeId)
                 .ToDictionary(g => g.Key, g => g.Count());
-            model.TotalJobsPerDepartment = jobs.SelectMany(j => j.Departments)
+            model.TotalJobsPerDepartment = jobs.SelectMany(j => j.JobDepartments)
                 .AsParallel()
-                .GroupBy(d => d.ShortName)
+                .GroupBy(d => d.Department.ShortName)
                 .ToDictionary(g => g.Key, g => g.Count());
             model.JobSalaryDistribution = jobs
                 .AsParallel()

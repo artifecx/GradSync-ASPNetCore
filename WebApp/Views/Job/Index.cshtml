@@ -1,9 +1,10 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
 @using Data.Models
 @using Humanizer
+@using System.Text.Json;
 
 @{
-    ViewData["Title"] = "Recruiter Job Management";
+    ViewData["Title"] = "Job Management";
     await Html.RenderPartialAsync("_CreateJobModal", new Services.ServiceModels.JobViewModel());
 
     string filterByCompany = ViewData["FilterByCompany"] as string;
@@ -15,19 +16,29 @@
     string search = ViewData["Search"] as string;
 
     int pageIndex = Model.PageIndex;
-    string aspAction = "GetAllJobsRecruiter";
+    string aspAction = string.Empty;
+
+    if (User.IsInRole("Admin") || User.IsInRole("NLO"))
+        aspAction = "GetAllJobsAdmin";
+    else if (User.IsInRole("Recruiter"))
+        aspAction = "GetAllJobsRecruiter";
+    else
+        aspAction = "GetAllJobsApplicant";
+
+    var Departments = ViewBag.Departments as List<Department>;
+    var Skills = ViewBag.Skills as List<Skill>;
 }
 
-<div class="bg-[#F5F7F8] flex min-h-screen">
+<div class="flex min-h-screen bg-[#F5F7F8]">
     <div class="flex-1 flex items-center justify-center p-3">
         <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
             <div class="flex items-center justify-between">
                 <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
-                    Recruiter Job Management
+                    Job Management
                 </h1>
 
                 <!-- Search and Add Job Button -->
-                <div class="flex items-center pb-8 space-x-2">
+                <div class="flex items-center space-x-2 pb-8">
                     <div class="flex items-center space-x-2">
                         <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
                             @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
@@ -46,12 +57,12 @@
             </div>
 
             <!-- Table -->
-            <div class="min-w-full bg-whit rounded-lg">
-                <table class="min-w-full table-auto border rounded-lg bg-white">
-                    <thead class="bg-gray-100 border rounded-lg">
+            <div class="bg-whit min-w-full rounded-lg">
+                <table class="min-w-full table-auto rounded-lg border bg-white">
+                    <thead class="rounded-lg border bg-gray-100">
                         @await Html.PartialAsync("_JobTableHeader", Model)
                     </thead>
-                    <tbody class="divide-y divide-gray-200 border rounded-lg bg-white">
+                    <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
                         @await Html.PartialAsync("_JobTableBody", Model)
                     </tbody>
                 </table>
@@ -102,15 +113,118 @@
     </div>
 </div>
 
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/job.js"></script>
     <script>
-        function debounceSearch(query) {
-            clearTimeout(window.searchTimeout);
-            window.searchTimeout = setTimeout(function () {
-                window.location.href = '@Url.Action("GetAllJobsRecruiter")?search=' + query;
-            }, 300);
-        }
+        document.addEventListener('DOMContentLoaded', function () {
+            var cancelClicked = false;
+            document.getElementById("closeCreateJobModal").addEventListener("click", function () {
+                cancelClicked = true;
+            });
+            document.getElementById("cancelCreateJob").addEventListener("click", function () {
+                cancelClicked = true;
+            });
+            $('#createJobModal').on('hidden.bs.modal', function () {
+                if(cancelClicked){
+                    createJobForm.reset();
+                    $(".text-red-500").text('');
+                    $("#remainingTitleChars").text('100 characters remaining');
+                    $("#remainingDescriptionChars").text('800 characters remaining');
+                }
+                cancelClicked = false;
+            });
+
+            var skillsInput = document.querySelector('#createJobSkillsInput');
+            var skillsHiddenInputs = document.getElementById('skillsHiddenInputs');
+
+            var skillsList = @Html.Raw(JsonSerializer.Serialize(Skills.Select(s => new { value = s.Name, id = s.SkillId })));
+
+            var tagifySkills = new Tagify(skillsInput, {
+                whitelist: skillsList,
+                enforceWhitelist: true,
+                searchKeys: ['value'],
+                pattern: null,
+                dropdown: {
+                    classname: "color-blue",
+                    enabled: 0,
+                    maxItems: 5,
+                    position: 'top'
+                },
+            });
+
+            tagifySkills.DOM.scope.classList.add(
+                'block',
+                'w-full',
+                'rounded-lg',
+                'border',
+                'border-gray-300',
+                'p-2',
+                'focus:ring-blue-500',
+                'focus:border-blue-500',
+                'overflow-y-auto',
+                'max-h-16'
+            );
+
+            tagifySkills.on('change', function () {
+                var selectedValues = tagifySkills.value;
+                skillsHiddenInputs.innerHTML = '';
+                selectedValues.forEach(function (item, index) {
+                    var hiddenInputId = document.createElement('input');
+                    hiddenInputId.type = 'hidden';
+                    hiddenInputId.name = 'Skills[' + index + '].SkillId';
+                    hiddenInputId.value = item.id;
+                    skillsHiddenInputs.appendChild(hiddenInputId);
+
+                    $("#skillsValidation").text('');
+                });
+            });
+
+            var departmentsInput = document.querySelector('#createJobDepartmentsInput');
+            var departmentsHiddenInputs = document.getElementById('departmentsHiddenInputs');
+            var departmentsList = @Html.Raw(JsonSerializer.Serialize(Departments.Select(d => new { value = d.Name, id = d.DepartmentId })));
+
+            var tagifyDepartments = new Tagify(departmentsInput, {
+                whitelist: departmentsList,
+                enforceWhitelist: true,
+                searchKeys: ['value'],
+                pattern: null,
+                dropdown: {
+                    classname: "color-blue",
+                    enabled: 0,
+                    maxItems: 5,
+                    position: 'top'
+                },
+            });
+
+            tagifyDepartments.DOM.scope.classList.add(
+                'block',
+                'w-full',
+                'rounded-lg',
+                'border',
+                'border-gray-300',
+                'p-2',
+                'focus:ring-blue-500',
+                'focus:border-blue-500',
+                'overflow-y-auto',
+                'max-h-16'
+            );
+
+            tagifyDepartments.on('change', function () {
+                var selectedValues = tagifyDepartments.value;
+                departmentsHiddenInputs.innerHTML = '';
+                selectedValues.forEach(function (item, index) {
+                    var hiddenInputId = document.createElement('input');
+                    hiddenInputId.type = 'hidden';
+                    hiddenInputId.name = 'Departments[' + index + '].DepartmentId';
+                    hiddenInputId.value = item.id;
+                    departmentsHiddenInputs.appendChild(hiddenInputId);
+
+                    $("#departmentsValidation").text('');
+                });
+            });
+        });
     </script>
 }
