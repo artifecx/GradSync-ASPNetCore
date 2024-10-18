@@ -34,7 +34,17 @@ else
     {
         <tr class="hover:bg-gray-100 ">
             <td class="px-6 py-3 text-sm text-gray-700">
-                <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
+                <a href="@Url.Action("GetJob", "Job", 
+                    new { 
+                        id = item.JobId,
+                        sortBy = sortBy,
+                        search = search,
+                        pageIndex = Model.PageIndex ,
+                        filterByStatusType = filterByStatusType,
+                        filterByWorkSetup = filterByWorkSetup,
+                        filterByEmploymentType = filterByEmploymentType,
+                        filterByCompany = filterByCompany,
+                    })"
                    class="hover:text-[#A53D3D] hover:underline">
                     @Html.DisplayFor(modelItem => item.Title)
                 </a>
