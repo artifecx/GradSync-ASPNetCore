@@ -1,0 +1,84 @@
+﻿@model List<Services.ServiceModels.JobViewModel>
+@using Humanizer;
+
+@{
+    string GetEmploymentTypeColor(string employmentType) =>
+        employmentType switch
+        {
+            "Part-time" => "#fdbf77",
+            "Full-time" => "#54eba2",
+            "Contract" => "#ee6d6b",
+            "Internship" => "#82b8f1",
+            _ => "#DCDDDF",
+        };
+}
+
+@if (Model == null || !Model.Any())
+{
+    <a href="@Url.Action("GetAllJobsApplicant", "Job")">
+        <p class="text-gray-500">No featured jobs available at the moment. Please check back later.</p>
+    </a>
+}
+else
+{
+    <div>
+        <!-- Container aligned to the parent content -->
+                <div class="flex space-x-4 min-w-max py-2">
+                    @foreach (var job in Model)
+                    {
+                        <div onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
+                             class="min-w-[300px] cursor-pointer rounded-xl bg-white shadow-md transition-shadow duration-300 hover:shadow-lg p-4">
+                            <!-- Company -->
+                            <div class="font-semibold text-xs text-gray-600">
+                                <span>@(job.Company?.Name)</span>
+                            </div>
+
+                            <!-- Location, Employment Type, and Work Setup -->
+                            <div class="font-normal text-xs text-gray-600 pt-2">
+                                <i class="fas fa-map-marker-alt pr-1 text-sm"></i>
+                                @job.Location
+                                <span class="ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900 border"
+                                      style="background-color:@GetEmploymentTypeColor(job.EmploymentType?.Name);">
+                                    @(job.EmploymentType?.Name)
+                                </span>
+                                <span class="ml-1 rounded-md border px-2 py-1 text-xs font-normal text-gray-900"
+                                      style="border: 2px solid;">
+                                    @(job.SetupType?.Name)
+                                </span>
+                            </div>
+
+                            <!-- Job Title -->
+                            <div class="mt-2 text-xl font-semibold text-[#7A1515]">
+                                @job.Title
+                            </div>
+
+                            <!-- Salary -->
+                            <div class="mt-2 text-sm font-bold text-gray-700">
+                                @job.Salary
+                            </div>
+
+                            <!-- Job Skills -->
+                            <div class="mt-2 flex flex-wrap gap-2">
+                                @if (job.Skills != null && job.Skills.Any())
+                                {
+                                    @foreach (var skill in job.Skills)
+                                    {
+                                        <span class="rounded-full border px-2 py-1 text-xs">@skill.Name</span>
+                                    }
+                                }
+                                else
+                                {
+                                    <span class="text-xs text-gray-500">No skills listed.</span>
+                                }
+                            </div>
+
+                            <!-- Job Match Percentage -->
+                            <div class="mt-2 flex items-center space-x-1 text-sm font-semibold text-gray-700">
+                                <span class="pr-1 text-xs font-bold">Job Match:</span>
+                                <span class="rounded-full border border-red-500 px-2 py-1 text-xs text-green-600">85%</span>
+                            </div>
+                        </div>
+                    }
+        </div>
+    </div>
+}

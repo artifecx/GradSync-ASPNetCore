@@ -32,8 +32,13 @@ else
 {
     @foreach (var item in Model)
     {
-        <tr class="hover:bg-gray-100">
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Title)</td>
+        <tr class="hover:bg-gray-100 ">
+            <td class="px-6 py-3 text-sm text-gray-700">
+                <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
+                   class="hover:text-[#A53D3D] hover:underline">
+                    @Html.DisplayFor(modelItem => item.Title)
+                </a>
+            </td>
             @if (!User.IsInRole("Recruiter"))
             {
                 <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>
@@ -68,13 +73,13 @@ else
                             <!-- Edit Job -->
                             <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = item.JobId })'"
                                     class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
-                                <i class="fas fa-edit -circle mr-2"></i> Edit Job Info
+                                <i class="fas fa-edit mr-2"></i> Edit Job Info
                             </button>
 
                             <!-- Archive Job -->
                             <button onclick=" displayDeleteModal('@item.JobId' , '@item.PostedBy)"
                                     class="w-full text-left px-4 py-2 text-sm cursor-pointer text-grey-700 hover:text-[#A53D3D] focus:outline-none">
-                                <i class="fas fa-info-circle mr-2"></i> Archive Chat
+                                <i class="fas fa-archive mr-2"></i> Archive Chat
                             </button>
                         </div>
                     </div>

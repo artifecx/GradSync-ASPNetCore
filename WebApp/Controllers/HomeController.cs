@@ -19,6 +19,7 @@ namespace WebApp.Controllers
     public class HomeController : ControllerBase<HomeController>
     {
         private readonly IDashboardService _dashboardService;
+        private readonly IJobService _jobService;
         /// <summary>
         /// Constructor
         /// </summary>
@@ -30,12 +31,14 @@ namespace WebApp.Controllers
 
         public HomeController(
             IDashboardService dashboardService,
+            IJobService jobService,
             IHttpContextAccessor httpContextAccessor,
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
             IMapper mapper = null) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _dashboardService = dashboardService;
+            _jobService = jobService;
         }
 
         /// <summary>
@@ -43,10 +46,12 @@ namespace WebApp.Controllers
         /// </summary>
         /// <returns> Home View </returns>
         [Route("/main")]
+        [HttpGet]
         [Authorize(Policy = "Applicant")]
         public IActionResult Index()
         {
-            return View();
+            var model = _jobService.GetAllJobsAsync().Result;
+            return View(model);
         }
 
         [Route("dashboard")]
