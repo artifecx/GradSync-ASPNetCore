@@ -65,7 +65,7 @@
         <div class="pb-3 pt-2 text-sm">
             <label for="filterBySalary" class="mb-2 block text-sm font-medium text-[#7A1515]">MONTHLY SALARY RANGE (₱)</label>
             <div class="relative">
-                <input type="range" id="filterBySalary_range" min="0" max="60000" step="100" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 10000)
+                <input type="range" id="filterBySalary_range" min="0" max="60000" step="100" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000)
                        class="h-2 w-full appearance-none rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7A1515]">
                 <div class="opacity-10 pointer-events-none absolute inset-0 rounded-lg"></div>
             </div>
@@ -74,7 +74,7 @@
                 <span>₱60,000+</span>
             </div>
             <div class="mt-2 flex justify-center text-sm text-gray-600">
-                <input type="number" id="filterBySalary" name="filterBySalary" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 10000) min="0" max="60000"
+                <input type="number" id="filterBySalary" name="filterBySalary" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000) min="0" max="60000"
                        class="w-full max-w-xs rounded-lg border border-red-500 px-3 py-2 text-sm focus:ring-[#7A1515] focus:border-[#7A1515]" placeholder="Enter salary ₱">
             </div>
         </div>
