@@ -1,7 +1,49 @@
-﻿
+﻿<!-- Applicant Homepage -->
+@model List<Services.ServiceModels.JobViewModel>
 @{
-    ViewData["Title"] = "Home";
+    ViewData["Title"] = "GradSync - Home";
 }
 
-<h1>GradSync</h1>
+<div class="min-h-screen bg-[#F1F2F4] mt-12">
+    <div class="mx-12 mt-6 flex">
+        <div class="flex justify-between mx-12 mt-12">
 
+            <!-- Left Content -->
+            <div class="w-3/4 mt-10">
+                <div class="text-5xl font-bold text-gray-900 mb-2 leading-tight">
+                    Discover jobs that suit your
+                    <span class="text-[#7A1515]">interest & skills</span> today!
+                </div>
+                <div class="mr-12 pr-12 text-justify text-gray-600 font-normal tracking-tight mb-2">
+                    <p class="text-gray-400">
+                        Unlock your potential with GradSync. We connect you with opportunities that align with your
+                        expertise and passions, making the job search process simple and efficient. Whether you're
+                        looking for a new career path or a step up in your current field, we are here to help you
+                        find the perfect match. Start your journey with us and find the job that fits you best.
+                    </p>
+                </div>
+                <a href="@Url.Action("GetAllJobsApplicant", "Job")">
+                    <button class="bg-[#7A1515] hover:bg-[#991b1b] font-semibold text-white px-3 py-2 rounded-lg">
+                        Job Search
+                    </button>
+                </a>
+            </div>
+
+            <!-- Right Image -->
+            <div class="w-1/2 flex justify-end mt-1">
+                <img src="/img/hero.png" alt="Illustration" class="full">
+            </div>
+        </div>
+    </div>
+
+    <!-- Featured Jobs Section -->
+    <div class="mx-12">
+        <div class="flex justify-between mx-12 mb-2">
+            <div class="text-xl font-semibold text-gray-700 leading-tight">Featured Jobs</div>
+        </div>
+
+        <div class="text-left mx-12 mb-4 max-w-[calc(100vw-200px)] flex-grow overflow-x-auto">
+            <div>@await Html.PartialAsync("FeaturedJobs", Model)</div>
+        </div>
+    </div>
+</div>
