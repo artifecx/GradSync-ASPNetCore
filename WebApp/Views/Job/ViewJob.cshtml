@@ -138,8 +138,8 @@
         sessionStorage.setItem('filterByWorkSetup', JSON.stringify(urlParams.getAll('filterByWorkSetup')) || '[]');
         sessionStorage.setItem('search', urlParams.get('search') || '');
         sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
-        sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '1');
-        sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '1');
+        sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '');
+        sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '');
 
         document.querySelector('#back-button').addEventListener('click', function (event) {
             event.preventDefault();
@@ -157,8 +157,8 @@
             params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
             params.set('search', sessionStorage.getItem('search') || '');
             params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '1');
-            params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '1');
+            params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '');
+            params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '');
             window.location.href = `${baseUrl}?${params.toString()}`;
         });
     </script>
