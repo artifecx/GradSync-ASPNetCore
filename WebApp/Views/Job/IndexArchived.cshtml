@@ -1,0 +1,236 @@
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
+@using Data.Models
+@using Humanizer
+@using System.Text.Json;
+
+@{
+    ViewData["Title"] = "Archived Jobs";
+    await Html.RenderPartialAsync("_UnarchiveJobModal", new Services.ServiceModels.JobServiceModel());
+
+    string sortBy = ViewData["SortBy"] as string;
+    string search = ViewData["Search"] as string;
+
+    int pageIndex = Model.PageIndex;
+    string aspAction = string.Empty;
+    string aspActionReturn = string.Empty;
+
+    if (User.IsInRole("Admin") || User.IsInRole("NLO"))
+    {
+        aspAction = "GetArchivedJobs";
+        aspActionReturn = "GetAllJobsAdmin";
+    }
+    
+    else if (User.IsInRole("Recruiter"))
+    {
+        aspAction = "GetArchivedJobsRecruiter";
+        aspActionReturn = "GetAllJobsRecruiter";
+    }
+
+    string sortByUpdated = string.Equals(sortBy, "updated_asc") ? "updated_desc" : "updated_asc";
+}
+
+<div class="flex min-h-screen bg-[#F5F7F8]">
+    <div class="flex-1 flex items-center justify-center p-3">
+        <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
+            <div class="mb-2 flex">
+                <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </a>
+            </div>
+            <div class="flex items-center justify-between">
+                
+                <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
+                    Archived Jobs
+                </h1>
+                
+                <!-- Search and Add Job Button -->
+                <div class="flex items-center space-x-2 pb-8">
+                    <div class="flex items-center space-x-2">
+                        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Title, description" })
+                            <input type="hidden" name="sortBy" value="@sortBy" />
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Table -->
+            <div class="min-w-full rounded-lg bg-white">
+                <table class="min-w-full table-auto rounded-lg border bg-white">
+                    <thead class="rounded-lg border bg-gray-100">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                @Html.DisplayNameFor(model => model.First().Title)
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                @Html.DisplayNameFor(model => model.First().Description)
+                            </th>
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                                <a asp-action="@aspAction"
+                                   asp-route-search="@search"
+                                   asp-route-sortBy="@sortByUpdated"
+                                   class="text-black">
+                                        Date Archived
+                                    @(sortBy == "updated_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "updated_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                                </a>
+                            </th>
+                            <!-- Action-->
+                            <th class="px-6 py-3 text-left text-xs font-medium uppercase">Action</th>
+                        <tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
+                        @if (!Model.Any())
+                        {
+                            <tr>
+                                <td colspan="4" class="px-6 py-4 text-center text-[#7A1515]">No Archived Jobs</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            @foreach (var item in Model)
+                            {
+                                <tr>
+                                    <td class="px-6 py-3 text-sm text-gray-700">
+                                        @item.Title
+                                    </td>
+                                    <td class="cursor-pointer px-6 py-3 text-sm text-gray-700">
+                                        @{
+                                            var originalDetails = item.Description;
+                                            var details = originalDetails?.Length > 80 ? originalDetails?.Substring(0, 80) + "..." : originalDetails;
+                                        }
+                                        <text title="@originalDetails">@details</text>
+                                    </td>
+                                    <td class="px-6 py-3 text-sm text-gray-700">
+                                        @item.UpdatedDate
+                                    </td>
+                                    <td>
+
+                                        <button data-toggle="modal" data-target="#unarchiveJobModal" data-job-id="@item.JobId" data-postedby-id="@item.PostedById"
+                                                class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                            <i class="fa-solid fa-box-open mr-2"></i> Unarchive Job
+                                        </button>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+
+                <!-- Pagination -->
+                <nav class="flex justify-center pt-3">
+                    <ul class="pagination flex items-center">
+                        @if (Model.HasPreviousPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@(Model.PageIndex - 1)"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            </li>
+                        }
+                        @for (int i = 1; i <= Model.TotalPages; i++)
+                        {
+                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@i"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    @i
+                                </a>
+                            </li>
+                        }
+                        @if (Model.HasNextPage)
+                        {
+                            <li class="page-item">
+                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                   asp-action="@aspAction"
+                                   asp-route-pageIndex="@(Model.PageIndex + 1)"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+        sessionStorage.setItem('filterByEmploymentType', JSON.stringify(urlParams.getAll('filterByEmploymentType')) || '[]');
+        sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
+        sessionStorage.setItem('filterByWorkSetup', JSON.stringify(urlParams.getAll('filterByWorkSetup')) || '[]');
+        sessionStorage.setItem('search', urlParams.get('search') || '');
+        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+        sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '');
+        sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '');
+
+        document.querySelector('#back-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            const baseUrl = '@Url.Action($"{aspActionReturn}", "Job")';
+            const params = new URLSearchParams();
+            const filterByEmploymentType = JSON.parse(sessionStorage.getItem('filterByEmploymentType') || '[]');
+            const filterByWorkSetup = JSON.parse(sessionStorage.getItem('filterByWorkSetup') || '[]');
+            filterByEmploymentType.forEach(employmentType => {
+                params.append('filterByEmploymentType', employmentType);
+            });
+            filterByWorkSetup.forEach(workSetup => {
+                params.append('filterByWorkSetup', workSetup);
+            });
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
+            params.set('search', sessionStorage.getItem('search') || '');
+            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+            params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '');
+            params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        });
+    </script>
+    <script>
+        $('[data-toggle="modal"]').on('click', function () {
+            var jobId = $(this).data('job-id');
+            var postedById = $(this).data('postedby-id');
+            $('#unarchiveJobForm input[name="JobId"]').val(jobId);
+            $('#unarchiveJobForm input[name="PostedById"]').val(postedById);
+        });
+
+        function submitUnarchiveJob() {
+            var form = $('#unarchiveJobForm');
+
+            form.validate();
+            if (!form.valid()) {
+                return;
+            }
+
+            var formData = form.serialize();
+
+            var baseUrl = '@Url.Action(aspAction, "Job")';
+            var actionUrl = '@Url.Action("Unarchive", "Job")';
+            $.ajax({
+                url: actionUrl,
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.success) {
+                        window.location.href = baseUrl;
+                    } else {
+                        var errorMessage = response.error || "An error occurred.";
+                        toastr.error(errorMessage);
+                    }
+                }
+            });
+        }
+    </script>
+}

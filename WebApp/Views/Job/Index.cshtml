@@ -6,6 +6,7 @@
 @{
     ViewData["Title"] = "Job Management";
     await Html.RenderPartialAsync("_CreateJobModal", new Services.ServiceModels.JobViewModel());
+    await Html.RenderPartialAsync("_DeleteModal");
 
     string filterByCompany = ViewData["FilterByCompany"] as string;
     string filterByEmploymentType = ViewData["FilterByEmploymentType"] as string;
@@ -17,13 +18,18 @@
 
     int pageIndex = Model.PageIndex;
     string aspAction = string.Empty;
+    string aspActionArchived = string.Empty;
 
     if (User.IsInRole("Admin") || User.IsInRole("NLO"))
+    {
         aspAction = "GetAllJobsAdmin";
+        aspActionArchived = "GetArchivedJobs";
+    }
     else if (User.IsInRole("Recruiter"))
+    {
         aspAction = "GetAllJobsRecruiter";
-    else
-        aspAction = "GetAllJobsApplicant";
+        aspActionArchived = "GetArchivedJobsRecruiter";
+    }
 
     var Departments = ViewBag.Departments as List<Department>;
     var Skills = ViewBag.Skills as List<Skill>;
@@ -36,7 +42,7 @@
                 <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
                     Job Management
                 </h1>
-
+                
                 <!-- Search and Add Job Button -->
                 <div class="flex items-center space-x-2 pb-8">
                     <div class="flex items-center space-x-2">
@@ -58,6 +64,21 @@
 
             <!-- Table -->
             <div class="bg-whit min-w-full rounded-lg">
+                <div class="float-right py-2">
+                    <button onclick="location.href='@Url.Action(aspActionArchived, "Job", 
+                            new { 
+                                sortBy = sortBy, 
+                                search = search, 
+                                pageIndex = Model.PageIndex,
+                                filterByStatusType = filterByStatusType,
+                                filterByWorkSetup = filterByWorkSetup,
+                                filterByEmploymentType = filterByEmploymentType,
+                                filterByCompany = filterByCompany
+                            })'"
+                            class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
+                        <i class="fa fa-archive"></i> Archived Jobs
+                    </button>
+                </div>
                 <table class="min-w-full table-auto rounded-lg border bg-white">
                     <thead class="rounded-lg border bg-gray-100">
                         @await Html.PartialAsync("_JobTableHeader", Model)
@@ -114,9 +135,13 @@
 </div>
 
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="baseUrl" value="@Url.Action(aspAction, "Job")" />
+<input type="hidden" id="deleteUrl" value="@Url.Action("Archive", "Job")" />
 
 @section Scripts {
+    <script src="~/js/delete.js"></script>
     <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/archive.js"></script>
     <script src="~/js/job.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {

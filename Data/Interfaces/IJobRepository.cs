@@ -11,11 +11,13 @@ namespace Data.Interfaces
         Task<List<Application>> GetAllApplicationsNoIncludesAsync();
         Task<List<Job>> GetAllJobsDepartmentsIncludeAsync();
         Task<List<Job>> GetAllJobsAsync();
+        Task<List<Job>> GetArchivedJobsAsync();
         Task<List<Job>> GetRecruiterJobsAsync(string userId);
+        Task<List<Job>> GetRecruiterArchivedJobsAsync(string userId);
         Task AddJobAsync(Job job);
         Task UpdateJobAsync(Job job);
-        Task DeleteJobAsync(Job job);
-        Task<Job> GetJobByIdAsync(string id);
+        Task<Job> GetJobByIdAsync(string id, bool? track);
+        Task<Job> GetJobByIdAsync(string id, string isArchived);
         Task<List<Company>> GetCompaniesWithListingsAsync();
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();
@@ -23,5 +25,6 @@ namespace Data.Interfaces
         Task<List<Department>> GetDepartmentsAsync();
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
+        bool HasChanges(Job job);
     }
 }

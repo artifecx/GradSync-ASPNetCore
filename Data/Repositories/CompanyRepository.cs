@@ -20,15 +20,11 @@ namespace Data.Repositories
             return this.GetDbSet<Company>()
                         .Where(c => !c.IsArchived)
                         .Include(c => c.MemorandumOfAgreement)
-                            .AsNoTracking()
                         .Include(c => c.CompanyLogo)
-                            .AsNoTracking()
                         .Include(c => c.Recruiters)
                             .ThenInclude(r => r.Jobs)
-                            .AsNoTracking()
                         .Include(c => c.Recruiters)
-                            .ThenInclude(r => r.User)
-                            .AsNoTracking();
+                            .ThenInclude(r => r.User);
         }
 
         public async Task<List<Company>> GetAllCompaniesNoFilesAsync()
@@ -36,13 +32,10 @@ namespace Data.Repositories
             return await this.GetDbSet<Company>()
                 .Where(c => !c.IsArchived)
                 .Include(c => c.MemorandumOfAgreement)
-                    .AsNoTracking()
                 .Include(c => c.Recruiters)
                     .ThenInclude(r => r.Jobs)
-                    .AsNoTracking()
                 .Include(c => c.Recruiters)
                     .ThenInclude(r => r.User)
-                    .AsNoTracking()
                 .Select(c => new Company
                 {
                     CompanyId = c.CompanyId,
@@ -131,7 +124,6 @@ namespace Data.Repositories
             string prefix = company.Name.Substring(0, Math.Min(3, company.Name.Length)).ToLowerInvariant();
             var companies = dbSet
                 .Where(c => !c.IsArchived && c.CompanyId != excludeCompanyId && c.Name.ToLower().StartsWith(prefix))
-                .AsNoTracking()
                 .Select(c => new { c.CompanyId, c.Name })
                 .AsNoTracking()
                 .ToList();

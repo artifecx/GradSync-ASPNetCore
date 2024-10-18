@@ -111,6 +111,70 @@ namespace WebApp.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "Recruiter")]
+        [Route("recruiter/archived")]
+        public async Task<IActionResult> GetArchivedJobsRecruiter(
+            string sortBy,
+            string search,
+            string filterByCompany,
+            string filterByEmploymentType,
+            string filterByStatusType,
+            string filterByWorkSetup,
+            int pageIndex = 1)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (sortBy.IsNullOrEmpty()) sortBy = "updated_desc";
+                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, null, new List<string>(), null, new List<string>(), pageIndex, 10, "archived");
+
+                await InitializeValues(sortBy, search, null, null);
+
+                return View("IndexArchived", jobs);
+            }, "GetAllJobsRecruiter");
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "Admin")]
+        [Route("/archived")]
+        public async Task<IActionResult> GetArchivedJobs(
+            string sortBy,
+            string search,
+            string filterByCompany,
+            string filterByEmploymentType,
+            string filterByStatusType,
+            string filterByWorkSetup,
+            int pageIndex = 1)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (sortBy.IsNullOrEmpty()) sortBy = "updated_desc";
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, null, new List<string>(), null, new List<string>(), pageIndex, 10, null, null, "archived");
+
+                await InitializeValues(sortBy, search, null, null);
+
+                return View("IndexArchived", jobs);
+            }, "GetAllJobsRecruiter");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "AdminOrRecruiter")]
+        [Route("unarchive")]
+        public async Task<IActionResult> Unarchive(JobServiceModel model)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    await _jobService.UnarchiveJobAsync(model);
+                    TempData["SuccessMessage"] = "Successfully unarchived job!";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occurred while removing the job from the archive.";
+                return Json(new { success = false });
+            }, "GetAllJobsRecruiter");
+        }
+
+        [HttpGet]
         [Authorize(Policy = "Applicant")]
         [Route("all")]
         public async Task<IActionResult> GetAllJobsApplicant(
@@ -258,30 +322,37 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (ModelState.IsValid)
+                if (ModelState.IsValid && string.Equals(model.PostedById, UserId))
                 {
-                    // Implement
-                    var m = model;
-                    TempData["SuccessMessage"] = "Wowzers";
+                    await _jobService.UpdateJobAsync(model);
+                    TempData["SuccessMessage"] = "Successfully updated the job.";
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = "Ernk";
+                TempData["ErrorMessage"] = "An error has occurred while updating the job.";
                 return Json(new { success = false });
             }, "Update");
         }
 
         /// <summary>
-        /// Deletes the selected job.
+        /// Archives the selected job.
         /// </summary>
         /// <param name="id">The job identifier.</param>
-        /// <returns>A task that represents the asynchronous operation. The task result contains an <see cref="IActionResult"/>.</returns>
+        /// <returns>A task that represents the asynchronous operation. 
+        /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
         [Authorize(Policy = "AdminOrRecruiter")]
-        [Route("delete")]
-        public async Task<IActionResult> Delete(string id)
+        [Route("archive")]
+        public async Task<IActionResult> Archive(string id)
         {
             return await HandleExceptionAsync(async () =>
             {
+                if (ModelState.IsValid)
+                {
+                    await _jobService.ArchiveJobAsync(id);
+                    TempData["SuccessMessage"] = "Successfully archived the job.";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occurred while archiving the job.";
                 return Json(new { success = false });
             }, "Delete");
         }
