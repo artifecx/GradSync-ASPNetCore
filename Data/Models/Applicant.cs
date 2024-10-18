@@ -19,6 +19,8 @@ public partial class Applicant
 
     public string EmbeddingJson { get; set; }
 
+    public virtual ICollection<ApplicantSkill> ApplicantSkills { get; set; } = new List<ApplicantSkill>();
+
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
     public virtual EducationalDetail EducationalDetail { get; set; }
@@ -30,6 +32,4 @@ public partial class Applicant
     public virtual ICollection<SavedJob> SavedJobs { get; set; } = new List<SavedJob>();
 
     public virtual User User { get; set; }
-
-    public virtual ICollection<Skill> Skills { get; set; } = new List<Skill>();
 }
