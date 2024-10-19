@@ -22,16 +22,19 @@ namespace Services.Services
     public class JobService : IJobService
     {
         private readonly IJobRepository _repository;
+        private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public JobService(
             IJobRepository repository,
+            ICompanyRepository companyRepository,
             IMapper mapper,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
+            _companyRepository = companyRepository;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -39,11 +42,17 @@ namespace Services.Services
         public async Task AddJobAsync(JobViewModel model)
         {
             var job = _mapper.Map<Job>(model);
+            var recruiter = await _companyRepository.GetRecruiterByIdAsync(model.PostedById, false);
+
+            if (recruiter == null)
+                throw new CompanyException("Recruiter not found.");
+
             job.JobId = Guid.NewGuid().ToString();
             job.CreatedDate = DateTime.Now;
             job.UpdatedDate = DateTime.Now;
             job.StatusTypeId = "Open";
-            job.PostedById = model.PostedById;
+            job.PostedById = recruiter.UserId;
+            job.CompanyId = recruiter.CompanyId;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
             job.JobSkills = model.Skills.Select(skill => new JobSkill
@@ -52,12 +61,11 @@ namespace Services.Services
                 JobId = job.JobId,
                 SkillId = skill.SkillId
             }).ToList();
-
-            job.JobDepartments = model.Departments.Select(department => new JobDepartment
+            job.JobPrograms = model.Programs.Select(program => new JobProgram
             {
-                JobDepartmentId = Guid.NewGuid().ToString(),
+                JobProgramId = Guid.NewGuid().ToString(),
                 JobId = job.JobId,
-                DepartmentId = department.DepartmentId
+                ProgramId = program.ProgramId
             }).ToList();
 
             await _repository.AddJobAsync(job);
@@ -103,11 +111,11 @@ namespace Services.Services
 
             _mapper.Map(model, job);
             bool jobSkillsChanged = SetJobSkills(job, model);
-            bool jobDepartmentChanged = SetJobDepartments(job, model);
+            bool jobProgramChanged = SetJobPrograms(job, model);
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
 
-            if (!_repository.HasChanges(job) && !jobSkillsChanged && !jobDepartmentChanged)
+            if (!_repository.HasChanges(job) && !jobSkillsChanged && !jobProgramChanged)
                 throw new CompanyException("No changes detected.");
 
             job.UpdatedDate = DateTime.Now;
@@ -149,38 +157,38 @@ namespace Services.Services
             return skillsToAdd.Any() || skillsToRemove.Any();
         }
 
-        private bool SetJobDepartments(Job job, JobViewModel model)
+        private bool SetJobPrograms(Job job, JobViewModel model)
         {
-            var currentJobDepartments = job.JobDepartments.Select(js => js.DepartmentId).ToList();
-            var newDepartments = model.Departments.Select(s => s.DepartmentId).ToList();
+            var currentJobPrograms = job.JobPrograms.Select(js => js.ProgramId).ToList();
+            var newPrograms = model.Programs.Select(s => s.ProgramId).ToList();
 
-            var departmentsToRemove = currentJobDepartments.Except(newDepartments).ToList();
-            if (departmentsToRemove.Any())
+            var programsToRemove = currentJobPrograms.Except(newPrograms).ToList();
+            if (programsToRemove.Any())
             {
-                foreach (var departmentId in departmentsToRemove)
+                foreach (var programId in programsToRemove)
                 {
-                    var jobDepartment = job.JobDepartments.FirstOrDefault(js => js.DepartmentId == departmentId);
-                    if (jobDepartment != null)
+                    var jobProgram = job.JobPrograms.FirstOrDefault(js => js.ProgramId == programId);
+                    if (jobProgram != null)
                     {
-                        job.JobDepartments.Remove(jobDepartment);
+                        job.JobPrograms.Remove(jobProgram);
                     }
                 }
             }
-            var departmentsToAdd = newDepartments.Except(currentJobDepartments).ToList();
-            if (departmentsToAdd.Any())
+            var programsToAdd = newPrograms.Except(currentJobPrograms).ToList();
+            if (programsToAdd.Any())
             {
-                foreach (var departmentId in departmentsToAdd)
+                foreach (var programId in programsToAdd)
                 {
-                    var jobDepartment = new JobDepartment
+                    var jobProgram = new JobProgram
                     {
-                        JobDepartmentId = Guid.NewGuid().ToString(),
+                        JobProgramId = Guid.NewGuid().ToString(),
                         JobId = job.JobId,
-                        DepartmentId = departmentId
+                        ProgramId = programId
                     };
-                    job.JobDepartments.Add(jobDepartment);
+                    job.JobPrograms.Add(jobProgram);
                 }
             }
-            return departmentsToAdd.Any() || departmentsToRemove.Any();
+            return programsToAdd.Any() || programsToRemove.Any();
         }
 
         public async Task ArchiveJobAsync(string id)
@@ -356,6 +364,9 @@ namespace Services.Services
         public async Task<JobViewModel> GetJobByIdAsync(string id) 
         {
             var job = await _repository.GetJobByIdAsync(id, false);
+            if (job == null)
+                throw new JobException("Job not found.");
+
             var model = _mapper.Map<JobViewModel>(job);
 
             model.SalaryLower = GetLowerSalary(job.Salary);
@@ -379,8 +390,8 @@ namespace Services.Services
         public async Task<List<SetupType>> GetWorkSetupsAsync() =>
             await _repository.GetWorkSetupsAsync();
 
-        public async Task<List<Department>> GetDepartmentsAsync() =>
-            await _repository.GetDepartmentsAsync();
+        public async Task<List<Program>> GetProgramsAsync() =>
+            await _repository.GetProgramsAsync();
 
         public async Task<List<Skill>> GetSkillsAsync() =>
             await _repository.GetSkillsAsync();

@@ -7,8 +7,6 @@ public partial class Applicant
 {
     public string UserId { get; set; }
 
-    public string IdNumber { get; set; }
-
     public string ResumeId { get; set; }
 
     public string EducationalDetailId { get; set; }

@@ -21,8 +21,8 @@ namespace Data.Repositories
                         .Include(j => j.JobSkills)
                             .ThenInclude(j => j.Skill)
                         .Include(j => j.YearLevel)
-                        .Include(j => j.JobDepartments)
-                            .ThenInclude(j => j.Department)
+                        .Include(j => j.JobPrograms)
+                            .ThenInclude(j => j.Program)
                         .Include(j => j.PostedBy)
                             .ThenInclude(r => r.Company)
                         .Include(j => j.PostedBy)
@@ -36,8 +36,8 @@ namespace Data.Repositories
         public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
             await this.GetDbSet<Application>().AsNoTracking().ToListAsync();
 
-        public async Task<List<Job>> GetAllJobsDepartmentsIncludeAsync() =>
-            await this.GetDbSet<Job>().Include(j => j.JobDepartments).ThenInclude(j => j.Department).AsNoTracking().ToListAsync();
+        public async Task<List<Job>> GetAllJobsProgramsIncludeAsync() =>
+            await this.GetDbSet<Job>().Include(j => j.JobPrograms).ThenInclude(j => j.Program).AsNoTracking().ToListAsync();
 
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
@@ -96,8 +96,8 @@ namespace Data.Repositories
         public async Task<List<YearLevel>> GetYearLevelsAsync() =>
             await this.GetDbSet<YearLevel>().AsNoTracking().ToListAsync();
 
-        public async Task<List<Department>> GetDepartmentsAsync() =>
-            await this.GetDbSet<Department>().AsNoTracking().Include(d => d.College).ToListAsync();
+        public async Task<List<Program>> GetProgramsAsync() =>
+            await this.GetDbSet<Program>().AsNoTracking().Include(p => p.Department).ThenInclude(d => d.College).ToListAsync();
 
         public async Task<List<Skill>> GetSkillsAsync() =>
             await this.GetDbSet<Skill>().AsNoTracking().ToListAsync();

@@ -95,8 +95,8 @@ namespace Services.ServiceModels
         public List<Skill> Skills { get; set; }
 
         [Required]
-        [Display(Name = "Recommended Departments")]
-        public List<Department> Departments { get; set; }
+        [Display(Name = "Recommended Programs")]
+        public List<Program> Programs { get; set; }
 
         public string PostedById { get; set; }
     }
