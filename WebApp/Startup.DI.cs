@@ -43,12 +43,14 @@ namespace WebApp
             this._services.AddSingleton<IEmailService, EmailService>();
             this._services.AddHostedService<EmailBackgroundService>();
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+            this._services.AddScoped<IApplicationService, ApplicationService>();
 
             // Repositories
             this._services.AddScoped<IUserRepository, UserRepository>();
             this._services.AddScoped<IJobRepository, JobRepository>();
             this._services.AddScoped<ICompanyRepository, CompanyRepository>();
             this._services.AddScoped<IUserPreferencesRepository, UserPreferencesRepository>();
+            this._services.AddScoped<IApplicationRepository, ApplicationRepository>();
 
             // Manager Class
             this._services.AddScoped<SignInManager>();
