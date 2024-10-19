@@ -32,7 +32,7 @@
         <div class="pb-3 pt-2 text-sm">
             <label for="filterByDatePosted" class="mb-2 block text-sm font-medium text-[#7A1515]">DATE POSTED</label>
             <select name="filterByDatePosted" id="filterByDatePosted"
-                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-2 transition-all duration-200 focus:ring-[#991b1b] focus:border-[#991b1b]">
+                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2 py-2 transition-all duration-200 focus:ring-[#991b1b] focus:border-[#991b1b]">
                 <option value="" selected=@(string.IsNullOrEmpty(filterByDatePosted) || string.Equals(filterByDatePosted, "match"))>Anytime</option>
                 <option value="today" selected=@(string.Equals(filterByDatePosted, "today"))>Today</option>
                 <option value="week" selected=@(string.Equals(filterByDatePosted, "week"))>This Week</option>
