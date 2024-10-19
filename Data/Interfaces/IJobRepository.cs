@@ -9,7 +9,7 @@ namespace Data.Interfaces
     public interface IJobRepository
     {
         Task<List<Application>> GetAllApplicationsNoIncludesAsync();
-        Task<List<Job>> GetAllJobsDepartmentsIncludeAsync();
+        Task<List<Job>> GetAllJobsProgramsIncludeAsync();
         Task<List<Job>> GetAllJobsAsync();
         Task<List<Job>> GetArchivedJobsAsync();
         Task<List<Job>> GetRecruiterJobsAsync(string userId);
@@ -22,7 +22,7 @@ namespace Data.Interfaces
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();
         Task<List<SetupType>> GetWorkSetupsAsync();
-        Task<List<Department>> GetDepartmentsAsync();
+        Task<List<Program>> GetProgramsAsync();
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
         bool HasChanges(Job job);

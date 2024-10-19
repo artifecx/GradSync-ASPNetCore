@@ -14,7 +14,6 @@
             _ => "#DCDDDF",
         };
     }
-    var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
 }
 
 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
@@ -54,8 +53,8 @@
             </li>
             <li class="gap-2">
                 <i class="fas fa-university text-lg"></i>
-                <span class="pl-2 font-semibold">Departments:</span>
-                <div class="pl-8">@string.Join(", ", (Model.Departments as List<Department>).Select(department => department.Name))</div>
+            <span class="pl-2 font-semibold">Programs:</span>
+                <div class="pl-8">@string.Join(", ", (Model.Programs as List<Program>).Select(program => program.Name))</div>
             </li>
         </ul>
 

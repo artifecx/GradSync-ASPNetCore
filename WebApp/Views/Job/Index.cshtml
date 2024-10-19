@@ -31,7 +31,7 @@
         aspActionArchived = "GetArchivedJobsRecruiter";
     }
 
-    var Departments = ViewBag.Departments as List<Department>;
+    var Programs = ViewBag.Programs as List<Program>;
     var Skills = ViewBag.Skills as List<Skill>;
 
     bool verified = ViewBag.Verified as bool? ?? false;
@@ -235,12 +235,12 @@ else
                 });
             });
 
-            var departmentsInput = document.querySelector('#createJobDepartmentsInput');
-            var departmentsHiddenInputs = document.getElementById('departmentsHiddenInputs');
-            var departmentsList = @Html.Raw(JsonSerializer.Serialize(Departments.Select(d => new { value = d.Name, id = d.DepartmentId })));
+            var programsInput = document.querySelector('#createJobProgramsInput');
+            var programsHiddenInputs = document.getElementById('programsHiddenInputs');
+            var programsList = @Html.Raw(JsonSerializer.Serialize(Programs.Select(d => new { value = d.Name, id = d.ProgramId })));
 
-            var tagifyDepartments = new Tagify(departmentsInput, {
-                whitelist: departmentsList,
+            var tagifyPrograms = new Tagify(programsInput, {
+                whitelist: programsList,
                 enforceWhitelist: true,
                 searchKeys: ['value'],
                 pattern: null,
@@ -252,7 +252,7 @@ else
                 },
             });
 
-            tagifyDepartments.DOM.scope.classList.add(
+            tagifyPrograms.DOM.scope.classList.add(
                 'block',
                 'w-full',
                 'rounded-lg',
@@ -265,17 +265,17 @@ else
                 'max-h-16'
             );
 
-            tagifyDepartments.on('change', function () {
-                var selectedValues = tagifyDepartments.value;
-                departmentsHiddenInputs.innerHTML = '';
+            tagifyPrograms.on('change', function () {
+                var selectedValues = tagifyPrograms.value;
+                programsHiddenInputs.innerHTML = '';
                 selectedValues.forEach(function (item, index) {
                     var hiddenInputId = document.createElement('input');
                     hiddenInputId.type = 'hidden';
-                    hiddenInputId.name = 'Departments[' + index + '].DepartmentId';
+                    hiddenInputId.name = 'Programs[' + index + '].ProgramId';
                     hiddenInputId.value = item.id;
-                    departmentsHiddenInputs.appendChild(hiddenInputId);
+                    programsHiddenInputs.appendChild(hiddenInputId);
 
-                    $("#departmentsValidation").text('');
+                    $("#programsValidation").text('');
                 });
             });
         });

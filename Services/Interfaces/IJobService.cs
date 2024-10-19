@@ -28,7 +28,7 @@ namespace Services.Interfaces
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();
         Task<List<SetupType>> GetWorkSetupsAsync();
-        Task<List<Department>> GetDepartmentsAsync();
+        Task<List<Program>> GetProgramsAsync();
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
     }

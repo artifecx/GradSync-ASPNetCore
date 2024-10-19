@@ -27,6 +27,8 @@ public partial class Company
 
     public virtual CompanyLogo CompanyLogo { get; set; }
 
+    public virtual ICollection<Job> Jobs { get; set; } = new List<Job>();
+
     public virtual MemorandumOfAgreement MemorandumOfAgreement { get; set; }
 
     public virtual ICollection<Recruiter> Recruiters { get; set; } = new List<Recruiter>();

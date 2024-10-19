@@ -40,7 +40,7 @@ namespace Services.Services
         {
             var users = await _userRepository.GetAllUsersNoIncludesAsync();
             var applications = await _jobRepository.GetAllApplicationsNoIncludesAsync();
-            var jobs = await _jobRepository.GetAllJobsDepartmentsIncludeAsync();
+            var jobs = await _jobRepository.GetAllJobsProgramsIncludeAsync();
 
             var dashboardViewModel = new DashboardViewModel();
 
@@ -91,9 +91,9 @@ namespace Services.Services
                 .AsParallel()
                 .GroupBy(j => j.SetupTypeId)
                 .ToDictionary(g => g.Key, g => g.Count());
-            model.TotalJobsPerDepartment = jobs.SelectMany(j => j.JobDepartments)
+            model.TotalJobsPerProgram = jobs.SelectMany(j => j.JobPrograms)
                 .AsParallel()
-                .GroupBy(d => d.Department.ShortName)
+                .GroupBy(d => d.Program.ShortName)
                 .ToDictionary(g => g.Key, g => g.Count());
             model.JobSalaryDistribution = jobs
                 .AsParallel()

@@ -245,7 +245,7 @@ namespace WebApp.Controllers
             ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
             ViewBag.YearLevels = (await _jobService.GetYearLevelsAsync())
                 .OrderByDescending(y => y.Year).ToList();
-            ViewBag.Departments = await _jobService.GetDepartmentsAsync();
+            ViewBag.Programs = await _jobService.GetProgramsAsync();
             ViewBag.Skills = await _jobService.GetSkillsAsync();
         }
 
