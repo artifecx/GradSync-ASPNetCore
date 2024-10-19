@@ -33,106 +33,134 @@
 
     var Departments = ViewBag.Departments as List<Department>;
     var Skills = ViewBag.Skills as List<Skill>;
+
+    bool verified = ViewBag.Verified as bool? ?? false;
 }
 
-<div class="flex min-h-screen bg-[#F5F7F8]">
-    <div class="flex-1 flex items-center justify-center p-3">
-        <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
-            <div class="flex items-center justify-between">
-                <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
-                    Job Management
-                </h1>
-                
-                <!-- Search and Add Job Button -->
-                <div class="flex items-center space-x-2 pb-8">
-                    <div class="flex items-center space-x-2">
-                        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
-                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
-                            <input type="hidden" name="sortBy" value="@sortBy" />
-                        </form>
+@if (!verified && User.IsInRole("Recruiter"))
+{
+    <div class="mx-auto mt-10 max-w-2xl rounded-lg border border-gray-200 bg-gray-100 p-6 shadow-md">
+        <div class="mb-4 text-center text-sm font-semibold text-gray-700">
+            <i>---- Someone from the NLO will need to manually approve your company before being allowed to post new jobs. ----</i>
+        </div>
+
+        <ul class="space-y-2 text-base font-medium text-gray-700">
+            <li class="flex justify-between">
+                <span>1. Company verification status:</span>
+                <span class="font-semibold italic text-[#7A1515]">@(verified ? "Verified" : "Pending")</span>
+            </li>
+            <li class="flex justify-between">
+                <span>2. Memorandum of Agreement status:</span>
+                <span class="font-semibold italic text-[#7A1515]">@(verified ? "Verified" : "Pending")</span>
+            </li>
+        </ul>
+    </div>
+}
+else
+{
+    <div class="min-h-[calc(96vh-60px)] flex bg-[#F5F7F8]">
+        <div class="flex-1 flex items-center justify-center p-3">
+            <div class="h-full w-full max-w-7xl overflow-auto rounded-lg bg-white p-6 shadow-md">
+
+                <div class="flex items-center justify-between">
+                    <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
+                        Job Management
+                    </h1>
+
+                    <!-- Search and Add Job Button -->
+                    <div class="flex items-center space-x-2 pb-8">
+                        <div class="flex items-center space-x-2">
+                            <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+                                @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
+                                <input type="hidden" name="sortBy" value="@sortBy" />
+                            </form>
+                        </div>
+                        @if (User.IsInRole("Recruiter"))
+                        {
+                            <div class="flex items-center space-x-2">
+                                <button type="button"
+                                        class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                                        data-toggle="modal"
+                                        data-target="#createJobModal">
+                                    <i class="fas fa-plus pr-1"></i> Add Job
+                                </button>
+                            </div>
+                        }
                     </div>
-                    <div class="flex items-center space-x-2">
-                        <button type="button"
-                                class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
-                                data-toggle="modal"
-                                data-target="#createJobModal">
-                            <i class="fas fa-plus pr-1"></i> Add Job
+                </div>
+
+                <!-- Table -->
+                <div class="bg-whit min-w-full rounded-lg">
+                    <div class="float-right py-2">
+                        <button onclick="location.href='@Url.Action(aspActionArchived, "Job",
+                        new {
+                            sortBy = sortBy,
+                            search = search,
+                            pageIndex = Model.PageIndex,
+                            filterByStatusType = filterByStatusType,
+                            filterByWorkSetup = filterByWorkSetup,
+                            filterByEmploymentType = filterByEmploymentType,
+                            filterByCompany = filterByCompany
+                        })'"
+                                class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
+                            <i class="fa fa-archive"></i> Archived Jobs
                         </button>
                     </div>
-                </div>
-            </div>
+                    <table class="min-w-full table-auto rounded-lg border bg-white">
+                        <thead class="rounded-lg border bg-gray-100">
+                            @await Html.PartialAsync("_JobTableHeader", Model)
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
+                            @await Html.PartialAsync("_JobTableBody", Model)
+                        </tbody>
+                    </table>
 
-            <!-- Table -->
-            <div class="bg-whit min-w-full rounded-lg">
-                <div class="float-right py-2">
-                    <button onclick="location.href='@Url.Action(aspActionArchived, "Job", 
-                            new { 
-                                sortBy = sortBy, 
-                                search = search, 
-                                pageIndex = Model.PageIndex,
-                                filterByStatusType = filterByStatusType,
-                                filterByWorkSetup = filterByWorkSetup,
-                                filterByEmploymentType = filterByEmploymentType,
-                                filterByCompany = filterByCompany
-                            })'"
-                            class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
-                        <i class="fa fa-archive"></i> Archived Jobs
-                    </button>
+                    <!-- Pagination -->
+                    <nav class="flex justify-center pt-3">
+                        <ul class="pagination flex items-center">
+                            @if (Model.HasPreviousPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                        asp-action="@aspAction"
+                                        asp-route-pageIndex="@(Model.PageIndex - 1)"
+                                        asp-route-sortBy="@sortBy"
+                                        asp-route-search="@search">
+                                        <i class="fas fa-chevron-left"></i>
+                                    </a>
+                                </li>
+                            }
+                            @for (int i = 1; i <= Model.TotalPages; i++)
+                            {
+                                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                                        asp-action="@aspAction"
+                                        asp-route-pageIndex="@i"
+                                        asp-route-sortBy="@sortBy"
+                                        asp-route-search="@search">
+                                        @i
+                                    </a>
+                                </li>
+                            }
+                            @if (Model.HasNextPage)
+                            {
+                                <li class="page-item">
+                                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                                        asp-action="@aspAction"
+                                        asp-route-pageIndex="@(Model.PageIndex + 1)"
+                                        asp-route-sortBy="@sortBy"
+                                        asp-route-search="@search">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </nav>
                 </div>
-                <table class="min-w-full table-auto rounded-lg border bg-white">
-                    <thead class="rounded-lg border bg-gray-100">
-                        @await Html.PartialAsync("_JobTableHeader", Model)
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
-                        @await Html.PartialAsync("_JobTableBody", Model)
-                    </tbody>
-                </table>
-
-                <!-- Pagination -->
-                <nav class="flex justify-center pt-3">
-                    <ul class="pagination flex items-center">
-                        @if (Model.HasPreviousPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@(Model.PageIndex - 1)"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        }
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@i"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                        @if (Model.HasNextPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@(Model.PageIndex + 1)"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
             </div>
         </div>
     </div>
-</div>
+}
 
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 <input type="hidden" id="baseUrl" value="@Url.Action(aspAction, "Job")" />

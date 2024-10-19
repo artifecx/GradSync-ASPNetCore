@@ -8,6 +8,7 @@ using System.Net.Sockets;
 using System.Threading.Tasks;
 using FuzzySharp;
 using System;
+using System.ComponentModel.Design;
 
 namespace Data.Repositories
 {
@@ -92,6 +93,9 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
+        public async Task SetRecruiterCompany(Recruiter recruiter) =>
+            this.GetDbSet<Recruiter>().Update(recruiter);
+
         public async Task ArchiveCompanyAsync(string companyId)
         {
             var recruiterIds = await GetDbSet<Recruiter>()
@@ -139,9 +143,11 @@ namespace Data.Repositories
             return false;
         }
 
-        public async Task<Recruiter> GetRecruiterByIdAsync(string userId) =>
-            await this.GetDbSet<Recruiter>().AsNoTracking()
-                .FirstOrDefaultAsync(c => c.UserId == userId);
+        public async Task<Recruiter> GetRecruiterByIdAsync(string userId, bool track) 
+        {
+            var query = track ? this.GetDbSet<Recruiter>() : this.GetDbSet<Recruiter>().AsNoTracking();
+            return await query.FirstOrDefaultAsync(c => c.UserId == userId);
+        }
 
         private static string NormalizeCompanyName(string name)
         {

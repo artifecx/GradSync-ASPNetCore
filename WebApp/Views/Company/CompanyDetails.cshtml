@@ -11,13 +11,6 @@
                 <!-- Company Details Section -->
                 <div>
                     <div class="mb-4 flex items-center">
-                        <!-- Back Button -->
-                        <a href="#" class="back-button mr-4 text-black">
-                            <h2 class="font-bold">
-                                <i class="fa-solid fa-arrow-left mx-2"></i>
-                            </h2>
-                        </a>
-
                         <!-- Title and Edit Icon Container -->
                         <div class="flex items-center">
                             <h4 class="text-xl font-semibold">
@@ -78,6 +71,9 @@
                                 <li>
                                     <strong>Recruiter Email:</strong> @recruiter.User.Email
                                 </li>
+                                <li>
+                                    <strong>Name:</strong> @($"{recruiter.User.FirstName} {recruiter.User.MiddleName} {recruiter.User.LastName} {recruiter.User.Suffix}")
+                                </li>
                             }
                         </ul>
                     }
@@ -95,6 +91,7 @@
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 
 @section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/company.js"></script>
     <script>
         document.querySelector('.back-button').addEventListener('click', function (event) {

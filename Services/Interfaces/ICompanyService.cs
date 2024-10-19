@@ -23,6 +23,6 @@ namespace Services.Interfaces
         Task UpdateCompanyLogoAsync(IFormFile file, string type);
         Task ReassignRecruiterAsync(string companyId, string recruiterId);
         Task AssignRecruiterAsync(string companyId, string recruiterId);
-        Task<CompanyViewModel> GetRecruiterCompanyAsync(string userId);
+        Task<CompanyViewModel> GetCompanyByRecruiterId(string userId);
     }
 }

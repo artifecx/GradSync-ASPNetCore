@@ -109,18 +109,53 @@ namespace WebApp.Controllers
 
         [HttpGet]
         [Authorize(Policy = "Recruiter")]
-        [Route("details")]
-        public async Task<IActionResult> GetRecruiterCompany()
+        [Route("/company/view")]
+        public async Task<IActionResult> GetCompanyRecruiter()
         {
-            var company = await _companyService.GetRecruiterCompanyAsync(UserId);
-
-            if (company == null)
+            return await HandleExceptionAsync(async () =>
             {
-                TempData["ErrorMessage"] = "Company not found!";
-                return RedirectToAction("GetAllCompanies");
-            }
+                var company = await _companyService.GetCompanyByRecruiterId(UserId);
+                if (company == null)
+                {
+                    TempData["ErrorMessage"] = "Company not found!";
+                    return RedirectToAction("RegisterCompany");
+                }
 
-            return View("CompanyDetails", company);
+                return View("CompanyDetails", company);
+            }, "GetCompanyRecruiter");
+        }
+
+        [HttpGet]
+        [Authorize(Policy = "Recruiter")]
+        [Route("/company/register")]
+        public async Task<IActionResult> RegisterCompany()
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                var company = await _companyService.GetCompanyByRecruiterId(UserId);
+                if(company != null) return RedirectToAction("GetCompanyRecruiter");
+
+                return View(new CompanyViewModel());
+            }, "RegisterCompany");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "Recruiter")]
+        [Route("/company/register")]
+        public async Task<IActionResult> RegisterCompany(CompanyViewModel model)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    model.RecruiterId = UserId;
+                    await _companyService.AddCompanyAsync(model);
+                    TempData["SuccessMessage"] = "Company registered successfully!";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occured while registering company.";
+                return Json(new { success = false });
+            }, "RegisterCompany");
         }
 
         [HttpPost]
