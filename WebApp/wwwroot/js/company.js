@@ -1,4 +1,35 @@
-﻿$(document).ready(function () {
+﻿function submitRegisterCompany() {
+    var form = $('#registerCompanyForm');
+    var redirectUrl = $('#redirectUrl').val();
+    var actionUrl = $('#actionUrl').val();
+
+    form.validate();
+    if (!form.valid()) {
+        return;
+    }
+
+    var formData = form.serialize();
+
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        data: formData,
+        success: function (response) {
+            if (response.success) {
+                window.location.href = redirectUrl;
+            } else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (xhr, status, error) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+$(document).ready(function () {
     var url = new URL(window.location);
     var showModal = url.searchParams.get('showModal');
 

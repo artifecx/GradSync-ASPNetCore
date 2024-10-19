@@ -24,6 +24,7 @@ namespace WebApp.Controllers
     public class JobController : ControllerBase<JobController>
     {
         private readonly IJobService _jobService;
+        private readonly ICompanyService _companyService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JobController"/> class.
@@ -41,10 +42,12 @@ namespace WebApp.Controllers
             IConfiguration configuration,
             IMapper mapper,
             IJobService jobService,
+            ICompanyService companyService,
             TokenValidationParametersFactory tokenValidationParametersFactory,
             TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _jobService = jobService;
+            _companyService = companyService;
         }
 
         #region GET Methods 
@@ -94,6 +97,11 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
+                var company = await _companyService.GetCompanyByRecruiterId(UserId);
+                if (company == null) return RedirectToAction("RegisterCompany", "Company");
+
+                ViewBag.Verified = company.IsVerified;
+
                 var filterByEmploymentTypeList = new List<string>();
                 if(!string.IsNullOrEmpty(filterByEmploymentType))
                     filterByEmploymentTypeList.Add(filterByEmploymentType);

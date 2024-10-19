@@ -48,5 +48,7 @@ namespace Services.ServiceModels
 
         [Display(Name = "Active Listings")]
         public int ActiveJobListings { get; set; }
+
+        public string RecruiterId { get; set; }
     }
 }
