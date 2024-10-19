@@ -1,4 +1,22 @@
-﻿function togglePasswordVisibility() {
+﻿document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('registerUserForm');
+    const registerButton = document.getElementById('registerButton');
+
+    form.addEventListener('submit', function (event) {
+        registerButton.disabled = true;
+    });
+});
+
+document.addEventListener("DOMContentLoaded", function () {
+    const form = document.getElementById('loginForm');
+    const loginButton = document.getElementById('loginButton');
+
+    form.addEventListener('submit', function (event) {
+        loginButton.disabled = true;
+    });
+});
+
+function togglePasswordVisibility() {
     var passwordInput = document.getElementById("passwordInput");
     var eyeOpenIcon = document.getElementById("eyeOpenIcon");
     var eyeClosedIcon = document.getElementById("eyeClosedIcon");
@@ -83,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             success: function (response) {
                 if (response.success) {
                     $('#registerUserModal').modal('hide');
-                    toastr.success('User Registered Successfully!');
+                    toastr.success('User registered successfully!');
                 } else {
                     toastr.error(response.error || "An error occurred.");
                 }
