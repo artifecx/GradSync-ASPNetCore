@@ -18,7 +18,6 @@ namespace Data.Interfaces
         Task UpdateJobAsync(Job job);
         Task<Job> GetJobByIdAsync(string id, bool? track);
         Task<Job> GetJobByIdAsync(string id, string isArchived);
-        Task<List<Company>> GetCompaniesWithListingsAsync();
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();
         Task<List<SetupType>> GetWorkSetupsAsync();

@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using static Services.Exceptions.CompanyExceptions;
+using Data.Repositories;
 
 namespace Services.Services
 {
@@ -192,5 +193,8 @@ namespace Services.Services
 
         public async Task AssignRecruiterAsync(string companyId, string recruiterId) =>
             throw new NotImplementedException();
+
+        public async Task<List<Company>> GetCompaniesWithListingsAsync() =>
+            await _repository.GetCompaniesWithListingsAsync();
     }
 }

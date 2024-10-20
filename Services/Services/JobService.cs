@@ -375,11 +375,7 @@ namespace Services.Services
             model.ScheduleHours = GetHoursSchedule(job.Schedule);
 
             return model;
-        }
-                       
-
-        public async Task<List<Company>> GetCompaniesWithListingsAsync() =>
-            await _repository.GetCompaniesWithListingsAsync();
+        }  
 
         public async Task<List<EmploymentType>> GetEmploymentTypesAsync() =>
             await _repository.GetEmploymentTypesAsync();
