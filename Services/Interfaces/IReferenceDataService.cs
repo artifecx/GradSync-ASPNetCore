@@ -1,4 +1,6 @@
 ﻿using Data.Models;
+using Microsoft.Extensions.DependencyInjection;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -13,5 +15,8 @@ namespace Services.Interfaces
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
         Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
+        Task<List<Role>> GetUserRolesAsync();
+        void InvalidateCache(string cacheKey);
+        Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc);
     }
 }

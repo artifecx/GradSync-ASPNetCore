@@ -120,14 +120,6 @@ namespace Services.Services
         /// The task result contains the <see cref="UserViewModel"/>.</returns>
         public async Task<UserViewModel> GetUserAsync(string userId) =>
             _mapper.Map<UserViewModel>(await _repository.GetUserByIdAsync(userId));
-
-        /// <summary>
-        /// Retrieves all <see cref="Role"/> asynchronously.
-        /// </summary>
-        /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
-        /// The task result contains the <see cref="List{T}"/> of <see cref="Role"/>.</returns>
-        public async Task<List<Role>> GetRolesAsync() =>
-            await _repository.GetAllRolesAsync();
         #endregion
 
         #region CRUD Methods

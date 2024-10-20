@@ -26,6 +26,9 @@ namespace Data.Repositories
         public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
             await this.GetDbSet<ApplicationStatusType>().AsNoTracking().ToListAsync();
 
+        public async Task<List<Role>> GetUserRolesAsync() =>
+            await this.GetDbSet<Role>().AsNoTracking().ToListAsync();
+
         public async Task<List<Program>> GetProgramsAsync() =>
             await this.GetDbSet<Program>()
                 .Where(p => !p.IsDeleted)
