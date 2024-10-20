@@ -22,6 +22,7 @@ namespace WebApp.Controllers
     public class UserController : ControllerBase<UserController>
     {
         private readonly IUserService _userService;
+        private readonly IReferenceDataService _referenceDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
@@ -40,11 +41,13 @@ namespace WebApp.Controllers
                 IConfiguration configuration,
                 IMapper mapper,
                 IUserService userService,
+                IReferenceDataService referenceDataService,
                 TokenValidationParametersFactory tokenValidationParametersFactory,
                 TokenProviderOptionsFactory tokenProviderOptionsFactory
             ) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _userService = userService;
+            _referenceDataService = referenceDataService;
         }
 
         #region GET Methods 
@@ -70,7 +73,7 @@ namespace WebApp.Controllers
                 ViewData["SortBy"] = sortBy;
                 ViewData["Role"] = role;
                 ViewData["Verified"] = verified;
-                ViewBag.Roles = (await _userService.GetRolesAsync());
+                ViewBag.Roles = await _referenceDataService.GetUserRolesAsync();
 
                 return View("Index", users);
             }, "GetAllUsers");

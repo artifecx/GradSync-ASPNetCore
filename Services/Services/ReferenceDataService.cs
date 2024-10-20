@@ -73,6 +73,14 @@ namespace Services.Services
                 var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                 return await repository.GetApplicationStatusTypesAsync();
             });
+
+        public async Task<List<Role>> GetUserRolesAsync() =>
+            await GetOrSetCacheAsync("UserRoles", async (scope) =>
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                return await repository.GetUserRolesAsync();
+            });
+
         #endregion Get Methods
 
         private async Task<List<T>> GetOrSetCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
@@ -86,6 +94,25 @@ namespace Services.Services
                 }
             }
             return cachedData;
+        }
+
+        public void InvalidateCache(string cacheKey)
+        {
+            if (string.IsNullOrEmpty(cacheKey))
+            {
+                throw new ArgumentException("Cache key cannot be null or empty", nameof(cacheKey));
+            }
+
+            _memoryCache.Remove(cacheKey);
+        }
+
+        public async Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var freshData = await getDataFunc(scope);
+                _memoryCache.Set(cacheKey, freshData);
+            }
         }
     }
 }

@@ -13,5 +13,6 @@ namespace Data.Interfaces
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
         Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
+        Task<List<Role>> GetUserRolesAsync();
     }
 }

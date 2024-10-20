@@ -15,7 +15,6 @@ namespace Data.Interfaces
         Task<User> GetUserByEmailAsync(string email);
         Task<User> GetUserByEmailAndPasswordAsync(string email, string passwordKey);
         Task<User> GetUserByTokenAsync(string token);
-        Task<List<Role>> GetAllRolesAsync();
         void AddUser(User user);
         Task UpdateUserAsync(User user);
         Task DeleteUserAsync(string userId);

@@ -60,13 +60,6 @@ namespace Data.Repositories
         /// <returns>A <see cref="User"/> with no related data.</returns>
         public async Task<User> GetUserByTokenAsync(string token) =>
             await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.Token == token);
-
-        /// <summary>
-        /// Retrieves all roles.
-        /// </summary>
-        /// <returns>A <see cref="List{T}"/> of <see cref="Role"/></returns>
-        public async Task<List<Role>> GetAllRolesAsync() =>
-            await this.GetDbSet<Role>().ToListAsync();
         #endregion
 
         #region User CRUD Methods

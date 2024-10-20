@@ -16,6 +16,5 @@ namespace Services.Interfaces
         Task UpdateUserAsync(UserViewModel model);
         Task ResetUserPasswordAsync(string id);
         Task DeleteUserAsync(string userId);
-        Task<List<Role>> GetRolesAsync();
     }
 }
