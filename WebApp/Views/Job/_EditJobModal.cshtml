@@ -139,7 +139,7 @@
                             </div>
                         </div>
 
-                        <!-- Sixth Row: Skills | Departments -->
+                        <!-- Sixth Row: Skills | Programs -->
                         <div class="flex space-x-6">
                             <!-- Skills -->
                             <div class="flex-1">
@@ -149,17 +149,18 @@
                                 <span asp-validation-for="Skills" class="text-sm text-red-500" id="skillsValidation"></span>
                             </div>
 
-                            <!-- Departments -->
+                            <!-- Programs -->
                             <div class="flex-1">
-                                <label asp-for="Departments" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="Computer Science, Information Technology" type="text" id="editJobDepartmentsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
-                                <div type="hidden" id="departmentsHiddenInputs" name="Departments"></div>
-                                <span asp-validation-for="Departments" class="text-sm text-red-500" id="departmentsValidation"></span>
+                                <label asp-for="Programs" class="block text-sm font-medium text-gray-700"></label>
+                                <input placeholder="Computer Science, Information Technology" type="text" id="editJobProgramsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <div type="hidden" id="programsHiddenInputs" name="Programs"></div>
+                                <span asp-validation-for="Programs" class="text-sm text-red-500" id="programsValidation"></span>
                             </div>
                         </div>
                     </div>
                     <input asp-for="JobId" type="hidden" value="@Model.JobId" />
                     <input asp-for="PostedById" type="hidden" value="@Model.PostedById" />
+                    <input asp-for="CompanyId" type="hidden" value="@Model.CompanyId   " />
                 </form>
             </div>
 

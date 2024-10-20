@@ -18,14 +18,13 @@
              alt="logo"
              onclick="window.location.href = '@(isRecruiter ? Url.Action("GetAllJobsRecruiter", "Job") : Url.Action("Dashboard", "Home"))';">
     </div>
-    <div class="bg-[#F5F7F8] mb-2 mt-5 font-semibold text-gray-700">Navigation</div>
+    <div class="mb-2 mt-5 bg-[#F5F7F8] font-semibold text-gray-700">Navigation</div>
     <ul class="flex-grow list-none text-[#7A1515]">
         @if (isAdmin || isSuper)
         {
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="Dashboard" asp-controller="Home"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                    hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-area-chart mr-2"></i>
                     Dashboard
                 </a>
@@ -36,8 +35,7 @@
         {
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllUsers" asp-controller="User"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-users mr-2"></i>
                     Users
                 </a>
@@ -47,24 +45,21 @@
         {
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllCompanies" asp-controller="Company"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-building mr-2"></i>
                     Companies
                 </a>
             </li>
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllJobsAdmin" asp-controller="Job"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-suitcase mr-2"></i>
                     Jobs
                 </a>
             </li>
             <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="" asp-controller=""
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                <a asp-action="GetAllApplicationsAdmin" asp-controller="Application"
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
                 </a>
@@ -73,25 +68,22 @@
         @if (isRecruiter)
         {
                 <li class="bg-[#F5F7F8] py-2">
-        <a asp-action="GetRecruiterCompany" asp-controller="Company"
-           class="flex items-center rounded px-2 py-1 text-[#7A1515]
-       hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
-            <i class="fa fa-building mr-2"></i>
-            Company
-        </a>
-    </li>
+                <a asp-action="GetCompanyRecruiter" asp-controller="Company"
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
+                    <i class="fa fa-building mr-2"></i>
+                    Company
+                </a>
+            </li>
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="GetAllJobsRecruiter" asp-controller="Job"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-suitcase mr-2"></i>
                     Jobs
                 </a>
             </li>
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
                 </a>
@@ -104,16 +96,14 @@
         {
             <li class="bg-[#F5F7F8] py-2">
                 <a asp-action="" asp-controller=""
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515]
-                   hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-cog mr-2"></i> Settings
                 </a>
             </li>
         }
         <li class="bg-[#F5F7F8] py-2">
             <a href="#" data-toggle="modal" data-target="#logoutModal"
-               class="flex items-center rounded px-2 py-1 text-[#7A1515]
-               hover:text-[#991b1b] hover:bg-gray-200 transition duration-200">
+               class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                 <i class="fa fa-sign-out mr-2"></i>
                 Log out
             </a>

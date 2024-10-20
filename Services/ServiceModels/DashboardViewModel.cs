@@ -26,7 +26,7 @@ namespace Services.ServiceModels
         public Dictionary<string, int> TotalJobsPerEmploymentType { get; set; }
         public Dictionary<string, int> TotalJobsPerStatusType { get; set; }
         public Dictionary<string, int> TotalJobsPerSetupType { get; set; }
-        public Dictionary<string, int> TotalJobsPerDepartment { get; set; }
+        public Dictionary<string, int> TotalJobsPerProgram { get; set; }
         public Dictionary<string, int> JobSalaryDistribution { get; set; }
         #endregion
     }

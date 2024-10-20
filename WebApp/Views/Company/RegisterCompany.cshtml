@@ -1,0 +1,82 @@
+﻿@model Services.ServiceModels.CompanyViewModel
+
+@{
+    ViewData["Title"] = "Register Company";
+}
+
+<div class="min-h-screen bg-[#F5F7F8]">
+    <div class="flex items-center justify-center p-4">
+        <div class="w-full max-w-7xl space-y-4 rounded-lg bg-white p-6 shadow-md">
+            <!-- Header Section -->
+            <div class="flex items-center justify-between">
+                <h1 class="mr-2 text-3xl font-bold text-[#7A1515]">Register Company</h1>
+                <div>
+                    <button onclick="location.href='@Url.Action("RequestJoinCompany", "Company")'"
+                            class="text-grey-700 w-full cursor-pointer hover:text-[#A53D3D] focus:outline-none">
+                        <i class="fa-solid fa-arrow-right-to-bracket"></i> Join Existing Company
+                    </button>
+                </div>
+            </div>
+
+            <!-- Registration Form -->
+            <form id="registerCompanyForm" class="space-y-4">
+                @Html.AntiForgeryToken()
+                <!-- Validation Summary -->
+                <div class="mb-4 text-red-500">
+                    <div asp-validation-summary="ModelOnly"></div>
+                </div>
+
+                <!-- Company Name -->
+                <div>
+                    <label asp-for="Name" class="block text-sm font-bold text-gray-700">Company Name</label>
+                    <input asp-for="Name" class="w-full rounded border px-3 py-2 text-gray-700" />
+                    <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                </div>
+
+                <!-- Contact Information -->
+                <div class="flex flex-col space-x-4 md:flex-row md:space-x-4">
+                    <!-- Contact Email -->
+                    <div class="flex-1">
+                        <label asp-for="ContactEmail" class="block text-sm font-bold text-gray-700">Contact Email</label>
+                        <input asp-for="ContactEmail" class="w-full rounded border px-3 py-2 text-gray-700" />
+                        <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                    <!-- Contact Number -->
+                    <div class="flex-1">
+                        <label asp-for="ContactNumber" class="block text-sm font-bold text-gray-700">Contact Number</label>
+                        <input asp-for="ContactNumber" class="w-full rounded border px-3 py-2 text-gray-700" />
+                        <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                </div>
+
+                <!-- Address -->
+                <div>
+                    <label asp-for="Address" class="block text-sm font-bold text-gray-700">Address</label>
+                    <input asp-for="Address" class="w-full rounded border px-3 py-2 text-gray-700" />
+                    <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
+                </div>
+
+                <!-- Description -->
+                <div>
+                    <label asp-for="Description" class="block text-sm font-bold text-gray-700">Description</label>
+                    <textarea asp-for="Description" class="w-full rounded border px-3 py-2 text-gray-700"></textarea>
+                    <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
+                </div>
+            </form>
+            <!-- Action Buttons -->
+            <div class="flex space-x-2">
+                <button type="reset" class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600">Reset</button>
+                <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" onclick="submitRegisterCompany()">Register</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="redirectUrl" value="@Url.Action("GetCompanyRecruiter", "Company")" />
+<input type="hidden" id="actionUrl" value="@Url.Action("RegisterCompany", "Company")" />
+
+@section Scripts{
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/company.js"></script>
+}

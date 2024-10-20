@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using static Services.Exceptions.CompanyExceptions;
+using Data.Repositories;
 
 namespace Services.Services
 {
@@ -43,6 +44,17 @@ namespace Services.Services
 
             if (string.Equals(_accountService.GetCurrentUserRole(), "NLO"))
                 company.IsVerified = true;
+            else if (string.Equals(_accountService.GetCurrentUserRole(), "Recruiter"))
+            {
+                var recruiterId = model.RecruiterId;
+                var recruiter = await _repository.GetRecruiterByIdAsync(recruiterId, true);
+                if(recruiter == null) throw new CompanyException("Recruiter not found!");
+
+                recruiter.CompanyId = company.CompanyId;
+                recruiter.Title = "Head";
+
+                await _repository.SetRecruiterCompany(recruiter);
+            }
             else
                 throw new CompanyException("Could not verify user to enable adding companies.");
 
@@ -65,9 +77,9 @@ namespace Services.Services
 
             await _repository.UpdateCompanyAsync(company);
         }
-        public async Task<CompanyViewModel> GetRecruiterCompanyAsync(string userId)
+        public async Task<CompanyViewModel> GetCompanyByRecruiterId(string userId)
         {
-            var recruiter = await _repository.GetRecruiterByIdAsync(userId);
+            var recruiter = await _repository.GetRecruiterByIdAsync(userId, false);
             var company = await _repository.GetCompanyByIdAsync(recruiter.CompanyId);
             return _mapper.Map<CompanyViewModel>(company);
         }
@@ -181,5 +193,8 @@ namespace Services.Services
 
         public async Task AssignRecruiterAsync(string companyId, string recruiterId) =>
             throw new NotImplementedException();
+
+        public async Task<List<Company>> GetCompaniesWithListingsAsync() =>
+            await _repository.GetCompaniesWithListingsAsync();
     }
 }

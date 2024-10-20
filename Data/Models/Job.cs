@@ -23,7 +23,7 @@ public partial class Job
 
     public DateTime CreatedDate { get; set; }
 
-    public DateTime? UpdatedDate { get; set; }
+    public DateTime UpdatedDate { get; set; }
 
     public int AvailableSlots { get; set; }
 
@@ -33,17 +33,21 @@ public partial class Job
 
     public string PostedById { get; set; }
 
+    public string CompanyId { get; set; }
+
     public bool IsArchived { get; set; }
 
     public string EmbeddingJson { get; set; }
 
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
+    public virtual Company Company { get; set; }
+
     public virtual EmploymentType EmploymentType { get; set; }
 
     public virtual ICollection<JobApplicantMatch> JobApplicantMatches { get; set; } = new List<JobApplicantMatch>();
 
-    public virtual ICollection<JobDepartment> JobDepartments { get; set; } = new List<JobDepartment>();
+    public virtual ICollection<JobProgram> JobPrograms { get; set; } = new List<JobProgram>();
 
     public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();
 

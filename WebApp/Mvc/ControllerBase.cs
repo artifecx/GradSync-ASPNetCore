@@ -70,6 +70,14 @@ namespace WebApp.Mvc
         }
 
         /// <summary>
+        /// Get Role.
+        /// </summary>
+        public string UserRole
+        {
+            get { return User.FindFirst(ClaimTypes.Role)?.Value; }
+        }
+
+        /// <summary>
         /// Get UserName.
         /// </summary>
         public string UserName

@@ -24,6 +24,8 @@ namespace WebApp.Controllers
     public class JobController : ControllerBase<JobController>
     {
         private readonly IJobService _jobService;
+        private readonly ICompanyService _companyService;
+        private readonly IReferenceDataService _referenceDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JobController"/> class.
@@ -41,10 +43,14 @@ namespace WebApp.Controllers
             IConfiguration configuration,
             IMapper mapper,
             IJobService jobService,
+            ICompanyService companyService,
+            IReferenceDataService referenceDataService,
             TokenValidationParametersFactory tokenValidationParametersFactory,
             TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _jobService = jobService;
+            _companyService = companyService;
+            _referenceDataService = referenceDataService;
         }
 
         #region GET Methods 
@@ -74,7 +80,7 @@ namespace WebApp.Controllers
                 await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
                 await InitializeValues(filterByEmploymentType, filterByWorkSetup);
 
-                ViewBag.Companies = await _jobService.GetCompaniesWithListingsAsync();
+                ViewBag.Companies = await _companyService.GetCompaniesWithListingsAsync();
 
                 return View("Index", jobs);
             }, "GetAllJobsAdmin");
@@ -94,6 +100,11 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
+                var company = await _companyService.GetCompanyByRecruiterId(UserId);
+                if (company == null) return RedirectToAction("RegisterCompany", "Company");
+
+                ViewBag.Verified = company.IsVerified;
+
                 var filterByEmploymentTypeList = new List<string>();
                 if(!string.IsNullOrEmpty(filterByEmploymentType))
                     filterByEmploymentTypeList.Add(filterByEmploymentType);
@@ -232,13 +243,13 @@ namespace WebApp.Controllers
 
         private async Task PopulateViewBagsAsync()
         {
-            ViewBag.EmploymentTypes = await _jobService.GetEmploymentTypesAsync();
-            ViewBag.StatusTypes = await _jobService.GetStatusTypesAsync();
-            ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
-            ViewBag.YearLevels = (await _jobService.GetYearLevelsAsync())
+            ViewBag.EmploymentTypes = await _referenceDataService.GetEmploymentTypesAsync();
+            ViewBag.StatusTypes = await _referenceDataService.GetStatusTypesAsync();
+            ViewBag.WorkSetups = await _referenceDataService.GetWorkSetupsAsync();
+            ViewBag.YearLevels = (await _referenceDataService.GetYearLevelsAsync())
                 .OrderByDescending(y => y.Year).ToList();
-            ViewBag.Departments = await _jobService.GetDepartmentsAsync();
-            ViewBag.Skills = await _jobService.GetSkillsAsync();
+            ViewBag.Programs = await _referenceDataService.GetProgramsAsync();
+            ViewBag.Skills = await _referenceDataService.GetSkillsAsync();
         }
 
         /// <summary>
