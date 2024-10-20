@@ -13,6 +13,8 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static Services.Exceptions.CompanyExceptions;
+using Microsoft.Extensions.Caching.Memory;
+using System.Xml;
 
 namespace Services.Services
 {
@@ -25,17 +27,20 @@ namespace Services.Services
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly IMemoryCache _memoryCache;
 
         public JobService(
             IJobRepository repository,
             ICompanyRepository companyRepository,
             IMapper mapper,
+            IMemoryCache memoryCache,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _companyRepository = companyRepository;
             _mapper = mapper;
+            _memoryCache = memoryCache;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -375,26 +380,7 @@ namespace Services.Services
             model.ScheduleHours = GetHoursSchedule(job.Schedule);
 
             return model;
-        }  
-
-        public async Task<List<EmploymentType>> GetEmploymentTypesAsync() =>
-            await _repository.GetEmploymentTypesAsync();
-
-        public async Task<List<StatusType>> GetStatusTypesAsync() =>
-            await _repository.GetStatusTypesAsync();
-
-        public async Task<List<SetupType>> GetWorkSetupsAsync() =>
-            await _repository.GetWorkSetupsAsync();
-
-        public async Task<List<Program>> GetProgramsAsync() =>
-            await _repository.GetProgramsAsync();
-
-        public async Task<List<Skill>> GetSkillsAsync() =>
-            await _repository.GetSkillsAsync();
-
-        public async Task<List<YearLevel>> GetYearLevelsAsync() =>
-            await _repository.GetYearLevelsAsync();
-
+        }
         #endregion Get Methods
 
         /// <summary>

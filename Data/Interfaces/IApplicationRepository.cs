@@ -10,6 +10,5 @@ namespace Data.Interfaces
         Task UpdateApplicationAsync(Application application);
         Task DeleteApplicationAsync(Application application);
         Task<List<Application>> GetAllApplications(bool includes);
-        Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
     }
 }

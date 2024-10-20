@@ -34,6 +34,7 @@ namespace WebApp
 
             // Services
             this._services.TryAddSingleton<TokenValidationParametersFactory>();
+            this._services.TryAddSingleton<IReferenceDataService, ReferenceDataService>();
             this._services.AddScoped<IAccountService, AccountService>();
             this._services.AddScoped<IUserService, UserService>();
             this._services.AddScoped<IJobService, JobService>();
@@ -46,6 +47,7 @@ namespace WebApp
             this._services.AddScoped<IApplicationService, ApplicationService>();
 
             // Repositories
+            this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();
             this._services.AddScoped<IUserRepository, UserRepository>();
             this._services.AddScoped<IJobRepository, JobRepository>();
             this._services.AddScoped<ICompanyRepository, CompanyRepository>();

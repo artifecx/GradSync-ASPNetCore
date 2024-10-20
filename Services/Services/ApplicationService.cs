@@ -126,8 +126,5 @@ namespace Services.Services
 
             return new PaginatedList<ApplicationViewModel>(items, totalCount, pageIndex, pageSize);
         }
-
-        public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
-            await _repository.GetApplicationStatusTypesAsync();
     }
 }
