@@ -30,7 +30,14 @@ namespace WebApp
                 CreateMap<UserViewModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, User>().ReverseMap();
                 CreateMap<AccountServiceModel, UserViewModel>().ReverseMap();
-                CreateMap<ApplicationViewModel, Application>().ReverseMap();
+                CreateMap<ApplicationViewModel, Application>()
+                    .ReverseMap()
+                    .ForMember(dest => dest.ApplicantId, opt => opt.MapFrom(src => src.UserId))
+                    .ForMember(dest => dest.Applicant, opt => opt.MapFrom(src => src.User))
+                    .ForMember(dest => dest.ApplicantName, opt => opt.MapFrom(src => src.User.User.FirstName +
+                                    src.User.User.MiddleName + src.User.User.LastName + src.User.User.Suffix))
+                    .ForMember(dest => dest.RecruiterName, opt => opt.MapFrom(src => src.Job.PostedBy.User.FirstName +
+                                    src.Job.PostedBy.User.MiddleName + src.Job.PostedBy.User.LastName + src.Job.PostedBy.User.Suffix));
                 CreateMap<JobViewModel, Job>()
                     .ForMember(dest => dest.JobId, opt => opt.Ignore())
                     .ForMember(dest => dest.PostedById, opt => opt.Ignore())
@@ -58,7 +65,7 @@ namespace WebApp
                     .ForMember(dest => dest.IsVerified, opt => opt.Ignore())
                     .ForMember(dest => dest.IsArchived, opt => opt.Ignore())
                     .ReverseMap()
-                    .ForMember(dest => dest.ActiveJobListings, opt => opt.MapFrom(src => src.Recruiters.SelectMany(r => r.Jobs).Count(j => !j.IsArchived)));
+                    .ForMember(dest => dest.ActiveJobListings, opt => opt.MapFrom(src => src.Jobs.Count(j => !j.IsArchived)));
             }
         }
     }

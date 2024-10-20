@@ -1,4 +1,6 @@
-﻿using Services.ServiceModels;
+﻿using Data.Models;
+using Services.ServiceModels;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 
 namespace Services.Interfaces
@@ -8,7 +10,7 @@ namespace Services.Interfaces
         Task AddApplicationAsync(ApplicationViewModel model);
         Task UpdateApplicationAsync(ApplicationViewModel model);
         Task DeleteApplicationAsync(string id);
-        Task<PaginatedList<ApplicationViewModel>> GetApplicationsAsync(
-            int pageIndex, int pageSize, string search, string statusFilter);
+        Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters);
+        Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
     }
 }
