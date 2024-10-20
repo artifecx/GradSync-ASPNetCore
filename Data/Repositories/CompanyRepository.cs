@@ -164,5 +164,15 @@ namespace Data.Repositories
             int similarityRatio = Fuzz.TokenSetRatio(name1, name2);
             return similarityRatio >= 80;
         }
+
+        public async Task<List<Company>> GetCompaniesWithListingsAsync()
+        {
+            var companies = await this.GetDbSet<Company>()
+                .Where(c => !c.IsArchived && c.Jobs.Any())
+                .AsNoTracking()
+                .ToListAsync();
+
+            return companies;
+        }
     }
 }

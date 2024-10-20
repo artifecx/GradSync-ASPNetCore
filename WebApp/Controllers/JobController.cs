@@ -77,7 +77,7 @@ namespace WebApp.Controllers
                 await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
                 await InitializeValues(filterByEmploymentType, filterByWorkSetup);
 
-                ViewBag.Companies = await _jobService.GetCompaniesWithListingsAsync();
+                ViewBag.Companies = await _companyService.GetCompaniesWithListingsAsync();
 
                 return View("Index", jobs);
             }, "GetAllJobsAdmin");

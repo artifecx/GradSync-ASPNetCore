@@ -24,5 +24,6 @@ namespace Services.Interfaces
         Task ReassignRecruiterAsync(string companyId, string recruiterId);
         Task AssignRecruiterAsync(string companyId, string recruiterId);
         Task<CompanyViewModel> GetCompanyByRecruiterId(string userId);
+        Task<List<Company>> GetCompaniesWithListingsAsync();
     }
 }

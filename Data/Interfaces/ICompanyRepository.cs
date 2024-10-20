@@ -18,5 +18,6 @@ namespace Data.Interfaces
         bool CompanyExists(Company company, string excludeCompanyId = null);
         Task<Recruiter> GetRecruiterByIdAsync(string userId, bool track);
         Task SetRecruiterCompany(Recruiter recruiter);
+        Task<List<Company>> GetCompaniesWithListingsAsync();
     }
 }
