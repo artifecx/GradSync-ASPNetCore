@@ -11,6 +11,5 @@ namespace Services.Interfaces
         Task UpdateApplicationAsync(ApplicationViewModel model);
         Task DeleteApplicationAsync(string id);
         Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters);
-        Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
     }
 }

@@ -25,6 +25,7 @@ namespace WebApp.Controllers
     {
         private readonly IJobService _jobService;
         private readonly ICompanyService _companyService;
+        private readonly IReferenceDataService _referenceDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="JobController"/> class.
@@ -43,11 +44,13 @@ namespace WebApp.Controllers
             IMapper mapper,
             IJobService jobService,
             ICompanyService companyService,
+            IReferenceDataService referenceDataService,
             TokenValidationParametersFactory tokenValidationParametersFactory,
             TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _jobService = jobService;
             _companyService = companyService;
+            _referenceDataService = referenceDataService;
         }
 
         #region GET Methods 
@@ -240,13 +243,13 @@ namespace WebApp.Controllers
 
         private async Task PopulateViewBagsAsync()
         {
-            ViewBag.EmploymentTypes = await _jobService.GetEmploymentTypesAsync();
-            ViewBag.StatusTypes = await _jobService.GetStatusTypesAsync();
-            ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
-            ViewBag.YearLevels = (await _jobService.GetYearLevelsAsync())
+            ViewBag.EmploymentTypes = await _referenceDataService.GetEmploymentTypesAsync();
+            ViewBag.StatusTypes = await _referenceDataService.GetStatusTypesAsync();
+            ViewBag.WorkSetups = await _referenceDataService.GetWorkSetupsAsync();
+            ViewBag.YearLevels = (await _referenceDataService.GetYearLevelsAsync())
                 .OrderByDescending(y => y.Year).ToList();
-            ViewBag.Programs = await _jobService.GetProgramsAsync();
-            ViewBag.Skills = await _jobService.GetSkillsAsync();
+            ViewBag.Programs = await _referenceDataService.GetProgramsAsync();
+            ViewBag.Skills = await _referenceDataService.GetSkillsAsync();
         }
 
         /// <summary>

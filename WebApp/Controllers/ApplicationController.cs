@@ -25,7 +25,7 @@ namespace WebApp.Controllers
     public partial class ApplicationController : ControllerBase<ApplicationController>
     {
         private readonly IApplicationService _applicationService;
-        private readonly IJobService _jobService;
+        private readonly IReferenceDataService _referenceDataService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ApplicationController"/> class.
@@ -39,7 +39,7 @@ namespace WebApp.Controllers
         /// <param name="tokenProviderOptionsFactory">The token provider options factory.</param>
         public ApplicationController(
             IApplicationService applicationService,
-            IJobService jobService,
+            IReferenceDataService referenceDataService,
             IHttpContextAccessor httpContextAccessor,
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
@@ -48,14 +48,14 @@ namespace WebApp.Controllers
             TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             this._applicationService = applicationService;
-            this._jobService = jobService;
+            this._referenceDataService = referenceDataService;
         }
 
         private async Task PopulateViewBagsAsync()
         {
-            ViewBag.Programs = await _jobService.GetProgramsAsync();
-            ViewBag.WorkSetups = await _jobService.GetWorkSetupsAsync();
-            ViewBag.AppStatusTypes = await _applicationService.GetApplicationStatusTypesAsync();
+            ViewBag.Programs = await _referenceDataService.GetProgramsAsync();
+            ViewBag.WorkSetups = await _referenceDataService.GetWorkSetupsAsync();
+            ViewBag.AppStatusTypes = await _referenceDataService.GetApplicationStatusTypesAsync();
         }
     }
 }

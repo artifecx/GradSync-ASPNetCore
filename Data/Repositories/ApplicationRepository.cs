@@ -186,8 +186,5 @@ namespace Data.Repositories
                     .AsNoTracking();
             return await query.ToListAsync();
         }
-
-        public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
-            await this.GetDbSet<ApplicationStatusType>().AsNoTracking().ToListAsync();
     }
 }

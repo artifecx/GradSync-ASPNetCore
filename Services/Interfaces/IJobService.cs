@@ -24,11 +24,5 @@ namespace Services.Interfaces
             List<string> filterByEmploymentType, string filterByStatusType,
             List<string> filterByWorkSetup, int pageIndex, int pageSize, string archived = null);
         Task<JobViewModel> GetJobByIdAsync(string id);
-        Task<List<EmploymentType>> GetEmploymentTypesAsync();
-        Task<List<StatusType>> GetStatusTypesAsync();
-        Task<List<SetupType>> GetWorkSetupsAsync();
-        Task<List<Program>> GetProgramsAsync();
-        Task<List<YearLevel>> GetYearLevelsAsync();
-        Task<List<Skill>> GetSkillsAsync();
     }
 }
