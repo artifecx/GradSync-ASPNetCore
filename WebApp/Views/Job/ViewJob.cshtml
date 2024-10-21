@@ -141,6 +141,10 @@
         sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '');
         sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '');
 
+        const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
+        const newUrl = window.location.origin + window.location.pathname + idParam;
+        window.history.replaceState({}, document.title, newUrl);
+
         document.querySelector('#back-button').addEventListener('click', function (event) {
             event.preventDefault();
             const baseUrl = '@Url.Action($"{aspAction}", "Job")';

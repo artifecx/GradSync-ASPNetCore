@@ -1,0 +1,101 @@
+﻿@model Services.ServiceModels.ApplicationViewModel
+@using Data.Models 
+@using Humanizer
+
+@{
+    string GetStatusColor(string applicationStatus)
+    {
+        return applicationStatus switch
+        {
+            "Viewed" => "#fdbf77",
+            "Accepted" => "#54eba2",
+            "Rejected" => "#ee6d6b",
+            "Shortlisted" => "#82b8f1",
+            _ => "#DCDDDF",
+        };
+    }
+}
+
+<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+    <div class="flex items-center justify-between pb-2 text-sm font-normal">
+        <div>
+            <i class="fa-solid fa-percent pr-1 text-sm"></i>
+            Match Percent
+        </div>
+        <div class="ml-2">
+            <a href="@Url.Action("GetJob", "Job", new { id = Model.JobId })"
+               class="font-semibold hover:text-[#A53D3D] hover:underline">
+                View Job
+            </a>
+        </div>
+    </div>
+
+    <div class="mt-2 flex"> 
+        <div class="text-lg font-bold">Status:</div>
+        <div class="border-2 ml-1 rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider text-gray-900" 
+                style="background-color:@GetStatusColor(Model.ApplicationStatusType.Name);">
+            @Model.ApplicationStatusType.Name
+        </div>
+    </div>
+    <span class="text-sm font-semibold text-gray-700">
+        Last Update: @(Model.UpdatedDate == Model.CreatedDate || Model.UpdatedDate == DateTime.MinValue ? "Unavailable" : Model.UpdatedDate.ToUniversalTime().Humanize())
+    </span>
+
+    <hr class="border-gray-300" />
+    <h3 class="mb-3 text-sm font-semibold text-gray-500">Applicant Information</h3>
+
+    <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Name: </span>
+            <span>@Model.ApplicantName</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Id Number: </span>
+            <span>@Model.Applicant.EducationalDetail.IdNumber</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Email: </span>
+            <span>@Model.Applicant.User.Email</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Resume: </span>
+            <a href="" class="font-semibold">View</a>
+        </li>
+    </ul>
+
+    <hr class="border-gray-300" />
+    <h3 class="mb-3 text-sm font-semibold text-gray-500">Recruiter Information</h3>
+
+    <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Name: </span>
+            <span>@Model.RecruiterName</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Email: </span>
+            <span>@Model.Job.PostedBy.User.Email</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Title: </span>
+            <span>@Model.Job.PostedBy.Title</span>
+        </li>
+    </ul>
+
+    <hr class="border-gray-300" />
+    <h3 class="mb-3 text-sm font-semibold text-gray-500">Company Information</h3>
+
+    <ul class="space-y-2 text-sm text-gray-700">
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Name: </span>
+            <span>@Model.Job.Company.Name</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Email: </span>
+            <span>@Model.Job.Company.ContactEmail</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Phone: </span>
+            <span>@Model.Job.Company.ContactNumber</span>
+        </li>
+    </ul>
+</div>

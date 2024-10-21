@@ -45,6 +45,7 @@ namespace WebApp
             this._services.AddHostedService<EmailBackgroundService>();
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             this._services.AddScoped<IApplicationService, ApplicationService>();
+            this._services.TryAddSingleton<IMessageService, MessageService>();
 
             // Repositories
             this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();
@@ -53,6 +54,7 @@ namespace WebApp
             this._services.AddScoped<ICompanyRepository, CompanyRepository>();
             this._services.AddScoped<IUserPreferencesRepository, UserPreferencesRepository>();
             this._services.AddScoped<IApplicationRepository, ApplicationRepository>();
+            this._services.AddScoped<IMessageRepository, MessageRepository>();
 
             // Manager Class
             this._services.AddScoped<SignInManager>();
