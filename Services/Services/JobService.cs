@@ -53,8 +53,7 @@ namespace Services.Services
                 throw new CompanyException("Recruiter not found.");
 
             job.JobId = Guid.NewGuid().ToString();
-            job.CreatedDate = DateTime.Now;
-            job.UpdatedDate = DateTime.Now;
+            job.CreatedDate = job.UpdatedDate = DateTime.Now;
             job.StatusTypeId = "Open";
             job.PostedById = recruiter.UserId;
             job.CompanyId = recruiter.CompanyId;

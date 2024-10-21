@@ -20,20 +20,20 @@
                     </a>
                 </div>
                 <div class="hidden md:ml-6 md:flex md:space-x-8">
-                    <a href="@Url.Action("Index", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("Index", "Home")" class="inline-flex items-center px-1 pt-1 font-semibold text-[#7A1515] hover:text-[#A53D3D] hover:underline">
                         Home
                     </a>
                     @* Conditionally render 'Jobs' link based on user role *@
                     @if (!isAdmin)
                     {
-                        <a href="@Url.Action("GetAllJobsApplicant", "Job")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
+                        <a href="@Url.Action("GetAllJobsApplicant", "Job")" class="inline-flex items-center px-1 pt-1 font-semibold text-[#7A1515] hover:text-[#A53D3D] hover:underline">
                             Find Job
                         </a>
                     }
-                    <a href="@Url.Action("Contact", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("Contact", "Home")" class="inline-flex items-center px-1 pt-1 font-semibold text-[#7A1515] hover:text-[#A53D3D] hover:underline">
                         Contact
                     </a>
-                    <a href="@Url.Action("About", "Home")" class="inline-flex items-center px-1 pt-1 text-[#7A1515] font-semibold hover:text-[#A53D3D] hover:underline">
+                    <a href="@Url.Action("About", "Home")" class="inline-flex items-center px-1 pt-1 font-semibold text-[#7A1515] hover:text-[#A53D3D] hover:underline">
                         About
                     </a>
                 </div>
@@ -49,11 +49,14 @@
                         </button>
                         <!-- Dropdown menu -->
                         <div id="dropdown-menu" class="absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white py-1 shadow-lg" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                            <a href="@Url.Action("GetAllApplications", "Application")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
+                                <i class="fa-solid fa-briefcase mr-2"></i>Applications
+                            </a>
                             <a href="@Url.Action("GetUserPreferences", "UserPreferences")" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                <i class="fa fa-cog mr-2"></i> Settings
+                                <i class="fa fa-cog mr-2"></i>Settings
                             </a>
                             <a href="#" data-toggle="modal" data-target="#logoutModal" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">
-                                <i class="fa fa-sign-out mr-2"></i> Log out
+                                <i class="fa fa-sign-out mr-2"></i>Log out
                             </a>
                         </div>
                     </div>
@@ -82,60 +85,6 @@
             </div>
         </div>
     </div>
-
-    <!-- Mobile menu -->
-    @*<div class="hidden md:hidden" id="mobile-menu">
-        <div class="space-y-1 pb-3 pt-2">
-            <a href="@Url.Action("Index", "Home")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                Home
-            </a>
-            @if (!isAdmin)
-            {
-                <a href="@Url.Action("Index", "Job")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                    Find Job
-                </a>
-            }
-            <a href="@Url.Action("Index", "Contact")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                Contact
-            </a>
-            <a href="@Url.Action("Index", "About")" class="block px-3 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                About
-            </a>
-        </div>
-        <div class="border-t border-gray-200 pb-3 pt-4">
-            @if (isLoggedIn)
-            {
-                <div class="flex items-center px-5">
-                    <div class="flex-shrink-0">
-                        <i class="fa fa-user-circle fa-2x"></i>
-                    </div>
-                    <div class="ml-3">
-                        <div class="text-base font-medium text-[#743030]">@userName</div>
-                        <div class="text-sm font-medium text-gray-500">@role</div>
-                    </div>
-                </div>
-                <div class="mt-3 space-y-1">
-                    <a href="@Url.Action("GetUserPreferences", "UserPreferences")" class="block px-5 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                        <i class="fa fa-cog mr-2"></i> Settings
-                    </a>
-                    <a href="#" data-toggle="modal" data-target="#logoutModal" class="block px-5 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                        <i class="fa fa-sign-out mr-2"></i> Log out
-                    </a>
-                </div>
-            }
-            else
-            {
-                <div class="mt-3 space-y-1 px-5">
-                    <a href="/Account/Login" class="block px-4 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                        Sign In
-                    </a>
-                    <a href="/Account/Register" class="block px-4 py-2 text-base font-medium text-[#743030] hover:bg-gray-50">
-                        Register
-                    </a>
-                </div>
-            }
-        </div>
-    </div>*@
 </nav>
 
 <script>
