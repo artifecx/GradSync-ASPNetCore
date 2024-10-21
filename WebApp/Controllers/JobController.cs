@@ -202,7 +202,7 @@ namespace WebApp.Controllers
             return await HandleExceptionAsync(async () =>
             {
                 var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, 
-                    filterByStatusType, filterByWorkSetup, pageIndex, 3, filterByDatePosted, filterBySalary);
+                    filterByStatusType, filterByWorkSetup, pageIndex, 10, filterByDatePosted, filterBySalary);
 
                 await InitializeValues(sortBy, search, filterByCompany, filterByStatusType, filterByDatePosted, filterBySalary);
                 await InitializeValues(filterByEmploymentType, filterByWorkSetup);
