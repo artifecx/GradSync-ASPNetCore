@@ -17,8 +17,6 @@ public partial class Application
 
     public DateTime? UpdatedDate { get; set; }
 
-    public string AdditionalInformationId { get; set; }
-
     public bool IsArchived { get; set; }
 
     public virtual ApplicationStatusType ApplicationStatusType { get; set; }
