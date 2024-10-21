@@ -43,6 +43,10 @@ public partial class User
 
     public virtual Avatar Avatar { get; set; }
 
+    public virtual ICollection<MessageParticipant> MessageParticipants { get; set; } = new List<MessageParticipant>();
+
+    public virtual ICollection<Message> Messages { get; set; } = new List<Message>();
+
     public virtual Recruiter Recruiter { get; set; }
 
     public virtual Role Role { get; set; }

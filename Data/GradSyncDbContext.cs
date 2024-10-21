@@ -16,8 +16,6 @@ public partial class GradSyncDbContext : DbContext
     {
     }
 
-    public virtual DbSet<AdditionalInformation> AdditionalInformations { get; set; }
-
     public virtual DbSet<Admin> Admins { get; set; }
 
     public virtual DbSet<Applicant> Applicants { get; set; }
@@ -52,6 +50,12 @@ public partial class GradSyncDbContext : DbContext
 
     public virtual DbSet<MemorandumOfAgreement> MemorandumOfAgreements { get; set; }
 
+    public virtual DbSet<Message> Messages { get; set; }
+
+    public virtual DbSet<MessageParticipant> MessageParticipants { get; set; }
+
+    public virtual DbSet<MessageThread> MessageThreads { get; set; }
+
     public virtual DbSet<Program> Programs { get; set; }
 
     public virtual DbSet<Recruiter> Recruiters { get; set; }
@@ -74,30 +78,6 @@ public partial class GradSyncDbContext : DbContext
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<AdditionalInformation>(entity =>
-        {
-            entity.ToTable("AdditionalInformation");
-
-            entity.HasIndex(e => e.Type, "IX_AdditionalInformation_Type");
-
-            entity.HasIndex(e => e.UploadedDate, "IX_AdditionalInformation_UploadedDate");
-
-            entity.Property(e => e.AdditionalInformationId).HasMaxLength(255);
-            entity.Property(e => e.FileContent).IsRequired();
-            entity.Property(e => e.FileName)
-                .IsRequired()
-                .HasMaxLength(255);
-            entity.Property(e => e.FileType)
-                .IsRequired()
-                .HasMaxLength(255);
-            entity.Property(e => e.Type)
-                .IsRequired()
-                .HasMaxLength(255);
-            entity.Property(e => e.UploadedDate)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-        });
-
         modelBuilder.Entity<Admin>(entity =>
         {
             entity.HasKey(e => e.UserId);
@@ -169,7 +149,6 @@ public partial class GradSyncDbContext : DbContext
             entity.HasIndex(e => e.UserId, "IX_Application_UserId");
 
             entity.Property(e => e.ApplicationId).HasMaxLength(255);
-            entity.Property(e => e.AdditionalInformationId).HasMaxLength(255);
             entity.Property(e => e.ApplicationStatusTypeId)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -573,6 +552,72 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.ValidityStart)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.ToTable("Message");
+
+            entity.HasIndex(e => e.MessageThreadId, "IX_Message_MessageThreadId");
+
+            entity.HasIndex(e => e.UserId, "IX_Message_SenderId");
+
+            entity.Property(e => e.MessageId).HasMaxLength(255);
+            entity.Property(e => e.Content)
+                .IsRequired()
+                .HasMaxLength(500);
+            entity.Property(e => e.MessageThreadId)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.Timestamp)
+                .HasDefaultValueSql("(getdate())")
+                .HasColumnType("datetime");
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.HasOne(d => d.MessageThread).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.MessageThreadId)
+                .HasConstraintName("FK_Message_MessageThread");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Messages)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_Message_User");
+        });
+
+        modelBuilder.Entity<MessageParticipant>(entity =>
+        {
+            entity.ToTable("MessageParticipant");
+
+            entity.HasIndex(e => e.MessageThreadId, "IX_MessageParticipant_MessageThreadId");
+
+            entity.HasIndex(e => e.UserId, "IX_MessageParticipant_UserId");
+
+            entity.Property(e => e.MessageParticipantId).HasMaxLength(255);
+            entity.Property(e => e.MessageThreadId)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.UserId)
+                .IsRequired()
+                .HasMaxLength(255);
+
+            entity.HasOne(d => d.MessageThread).WithMany(p => p.MessageParticipants)
+                .HasForeignKey(d => d.MessageThreadId)
+                .HasConstraintName("FK_MessageParticipant_MessageThread");
+
+            entity.HasOne(d => d.User).WithMany(p => p.MessageParticipants)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("FK_MessageParticipant_User");
+        });
+
+        modelBuilder.Entity<MessageThread>(entity =>
+        {
+            entity.ToTable("MessageThread");
+
+            entity.Property(e => e.MessageThreadId).HasMaxLength(255);
+            entity.Property(e => e.Title)
+                .IsRequired()
+                .HasMaxLength(255);
         });
 
         modelBuilder.Entity<Program>(entity =>
