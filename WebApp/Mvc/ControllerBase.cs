@@ -335,7 +335,7 @@ namespace WebApp.Mvc
             if (long.TryParse(FormLoadTime, out ticks))
             {
                 var loadTime = new DateTime(ticks);
-                var timeTaken = DateTime.UtcNow - loadTime;
+                var timeTaken = DateTime.Now - loadTime;
                 if (timeTaken.TotalSeconds < 8)
                 {
                     throw new UserException(Error_UserRegistrationDefault);

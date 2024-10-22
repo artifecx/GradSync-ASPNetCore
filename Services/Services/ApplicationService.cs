@@ -37,7 +37,6 @@ namespace Services.Services
             application.JobId = Guid.NewGuid().ToString();
             application.CreatedDate = DateTime.Now;
             application.UpdatedDate = DateTime.Now;
-            application.AdditionalInformationId = Guid.NewGuid().ToString();
 
             await _repository.AddApplicationAsync(application);
         }
@@ -126,5 +125,8 @@ namespace Services.Services
 
             return new PaginatedList<ApplicationViewModel>(items, totalCount, pageIndex, pageSize);
         }
+
+        public async Task<ApplicationViewModel> GetApplicationByIdAsync(string id) =>
+            _mapper.Map<ApplicationViewModel>(await _repository.GetApplicationByIdAsync(id));
     }
 }

@@ -98,6 +98,19 @@ namespace WebApp
 
             services.AddControllersWithViews();
             services.AddRazorPages().AddRazorRuntimeCompilation();
+            services.AddSignalR();
+
+            services.AddCors(options =>
+            {
+                options.AddDefaultPolicy(
+                    builder =>
+                    {
+                        builder.WithOrigins("https://gradsync.org")
+                            .AllowAnyHeader()
+                            .WithMethods("GET", "POST")
+                            .AllowCredentials();
+                    });
+            });
 
             //Configuration
             services.Configure<TokenAuthentication>(Configuration.GetSection("TokenAuthentication"));
@@ -216,6 +229,8 @@ namespace WebApp
 
             this._app.UseAuthentication();
             this._app.UseAuthorization();
+
+            this._app.UseCors();
         }
     }
 }

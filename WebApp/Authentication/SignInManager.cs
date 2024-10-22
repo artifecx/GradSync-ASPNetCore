@@ -143,7 +143,7 @@ namespace WebApp.Authentication
                             (ClaimsPrincipal)principal,
                             new AuthenticationProperties
                             {
-                                ExpiresUtc = DateTime.UtcNow.AddMinutes(token.ExpirationMinutes),
+                                ExpiresUtc = DateTime.Now.AddMinutes(token.ExpirationMinutes),
                                 IsPersistent = isPersistent,
                                 AllowRefresh = false
                             });

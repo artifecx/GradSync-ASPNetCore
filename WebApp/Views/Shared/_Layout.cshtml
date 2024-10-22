@@ -19,16 +19,19 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    @if (User.IsInRole("Applicant"))
-    {
-        @Html.Partial("_Header")
-    }
     <div class="layout bg-[#F5F7F8]">
-        @if (!User.IsInRole("Applicant"))
+        @if (User.IsInRole("Applicant"))
         {
-            @Html.Partial("_Sidebar")
+            @await Html.PartialAsync("_Header")
+        }
+        else
+        {
+            @await Html.PartialAsync("_Sidebar")
         }
         <main role="main" class="content">
+            @{
+                await Html.RenderPartialAsync("_LogoutModal");
+            }
             @RenderBody()
             @if(ViewBag.loginView == true)
 			{
@@ -51,34 +54,6 @@
         </main>
     </div>
 
-    <!-- Logout Modal -->
-    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="logoutModalLabel" aria-hidden="true">
-        <div class="modal-dialog modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-header border-0">
-                    <h5 class="modal-title flex items-center" id="logoutModalLabel">
-                        <i class="fa fa-hourglass-half mr-2"></i>
-                        Log out
-                    </h5>
-                    <button type="button" class="close text-gray-500 hover:text-gray-700" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">&times;</span>
-                    </button>
-                </div>
-                <div class="modal-body py-1 pl-4">
-                    <p>Are you sure you want to log out?</p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="rounded bg-gray-500 px-4 py-2 font-semibold text-white hover:bg-gray-600" data-dismiss="modal">Cancel</button>
-                    <form asp-action="SignOutUser" asp-controller="Account" method="post">
-                        <button type="submit" class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                            Confirm
-                        </button>
-                    </form>
-                </div>
-            </div>
-        </div>
-    </div>
-
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.3/jquery.validate.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.js"></script>
@@ -86,6 +61,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/tagify/dist/tagify.js"></script>
+    <script src="~/lib/signalr/signalr.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
     <script>
         toastr.options = {
@@ -94,6 +70,14 @@
             closeButton: true,
             progressBar: true
         };
+        document.addEventListener("DOMContentLoaded", function () {
+            const form = document.getElementById('signOutForm');
+            const button = document.getElementById('signOutButton');
+
+            form.addEventListener('submit', function (event) {
+                button.disabled = true;
+            });
+        });
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

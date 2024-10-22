@@ -1,0 +1,245 @@
+﻿@model Services.ServiceModels.ApplicationViewModel
+@using Data.Models;
+@using Humanizer;
+@using System.Text.Json;
+
+@{
+    ViewData["Title"] = $"Application | {Model.Job.Title}";
+    var userId = ViewBag.UserId;
+    string aspAction = "GetAllApplications";
+}
+
+<div class="mt-8 min-h-screen bg-gray-100 text-black">
+    <div class="mx-auto mt-10 flex max-w-7xl gap-6 rounded-lg bg-gray-100 px-6">
+        <div class="w-full justify-between">
+            <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+                <div class="flex justify-between">         
+                    <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </a>
+                </div>
+
+                <div class="flex justify-between">
+                    <div class="font-bold text-[40px]">@Model.Job.Title</div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex justify-between space-x-4 p-2">
+                        @if (User.IsInRole("Applicant"))
+                        {
+                            <!-- Withdraw -->
+                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
+                                <i class="fa-solid fa-door-open pr-1"></i> Withdraw Application
+                            </button>
+                        }
+                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
+                        {
+                            <!-- Update Status -->
+                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white"
+                                    data-toggle="modal"
+                                    data-target="#">
+                                <i class="fa-solid fa-arrows-rotate pr-2"></i> Update Status
+                            </button>
+                        }
+                    </div>
+                </div>
+
+                <!-- Applicant Name and Date Updated -->
+                <div class="w-full text-sm text-gray-700">
+                   <div class="">
+                       <!-- Date Applied -->
+                        <div class="text-xs text-gray-500" title="@Model.CreatedDate">
+                            Applied
+                            @(Model.CreatedDate == DateTime.MinValue ? "Date Not Available" : Model.CreatedDate.ToUniversalTime().Humanize())
+                      </div>
+                   </div>
+                </div>          
+            </div>
+        </div>
+    </div>     
+
+    <!-- Main Content with Sidebar -->
+    <div class="max-h-[calc(96vh-250px)] mx-auto mt-6 flex max-w-7xl gap-6 px-6">
+        <!-- Messages Section -->
+        <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="mb-4 pl-4 text-2xl font-bold text-gray-500">Chat History</h2>
+
+            <!-- Chat Box Container -->
+            <div class="max-h-[calc(100%-100px)] min-h-[calc(100%-100px)] mx-4 flex flex-col rounded-lg border border-gray-200 bg-gray-50">
+                <!-- Scrollable Chat Messages -->
+                <div class="flex flex-grow flex-col overflow-y-auto p-4" id="messageList">
+                    <div id="loadingIndicator" class="hidden text-center">
+                        <div class="loader"></div>
+                        <p>Loading messages...</p>
+                    </div>
+                    <!-- Message Div -->
+                </div>
+                <form id="sendForm">
+                    <div class="flex items-center border-t border-gray-200 p-4">
+                        <input id="messageInput" type="text" class="flex-grow rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2" placeholder="Type your message..." @(User.IsInRole("NLO") ? "hidden" : "")>
+                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed " @(User.IsInRole("NLO") ? "hidden" : "")>
+                            Send
+                        </button>
+                        <input type="hidden" id="threadId" value="@Model.ApplicationId" />
+                        <input type="hidden" id="userId1" value="@Model.ApplicantId" />
+                        <input type="hidden" id="userId2" value="@Model.Job.PostedById" />
+                        <input type="hidden" id="title" value="Application" />
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        @await Html.PartialAsync("InfoTab", Model)
+    </div>
+</div>
+
+<!-- TempData for Notifications -->
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/job.js"></script>
+
+    <script type="text/javascript">
+        const threadId = '@Model.ApplicationId';
+        const currentUserId = '@ViewBag.UserId';
+        const messageList = document.getElementById("messageList");
+        const connection = new signalR.HubConnectionBuilder()
+            .withUrl(`/chathub?threadId=${threadId}`)
+            .withAutomaticReconnect()
+            .build();
+
+        connection.onreconnecting(error => {
+            document.getElementById("messageInput").disabled = true;
+            const li = document.createElement("div");
+            li.textContent = `Connection lost due to error "${error}". Reconnecting.`;
+            messageList.appendChild(li);
+        });
+
+        connection.onreconnected(connectionId => {
+            document.getElementById("messageInput").disabled = false;
+            const li = document.createElement("div");
+            li.textContent = `Connection reestablished. Connected with connectionId "${connectionId}".`;
+            messageList.appendChild(li);
+        });
+
+        connection.on("ReceiveMessage", function (userName, messageContent, timestamp, userId) {
+            const timeFormatted = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const messageDiv = document.createElement("div");
+
+            if (userId !== currentUserId) {
+                messageDiv.innerHTML = `
+                    <div class="flex justify-start">
+                        <div class="mb-2">
+                            <span class="mb-1 block text-xs text-gray-600">${userName}</span>
+                            <div class="max-w-xs rounded-lg bg-gray-200 p-2">
+                                <p class="text-sm text-gray-800">${messageContent}</p>
+                                <span class="block text-xs text-gray-500">${timeFormatted}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            } else {
+                messageDiv.innerHTML = `
+                    <div class="flex justify-end">
+                        <div class="mb-2">
+                            <span class="mb-1 block text-right text-xs text-gray-600">You</span>
+                            <div class="max-w-xs rounded-lg bg-blue-500 p-2 text-white">
+                                <p class="text-sm">${messageContent}</p>
+                                <span class="block text-xs text-gray-200">${timeFormatted}</span>
+                            </div>
+                        </div>
+                    </div>`;
+            }
+
+            document.getElementById("messageList").appendChild(messageDiv);
+            messageList.scrollTop = messageList.scrollHeight;
+        });
+        document.getElementById("loadingIndicator").classList.remove("hidden");
+        connection.start().then(function () {
+            connection.invoke("GetThreadMessages", threadId).then(function (messages) {
+                document.getElementById("loadingIndicator").classList.add("hidden");
+                messages.forEach(function (message) {
+                    const { content, timestamp, userId } = message;
+                    const timeFormatted = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    const messageDiv = document.createElement("div");
+
+                    if (userId !== currentUserId) {
+                        messageDiv.innerHTML = `
+                            <div class="flex justify-start">
+                                <div class="mb-2">
+                                    <span class="mb-1 block text-xs text-gray-600">${message.user.firstName}</span>
+                                    <div class="max-w-xs rounded-lg bg-gray-200 p-2">
+                                        <p class="text-sm text-gray-800">${content}</p>
+                                        <span class="block text-xs text-gray-500">${timeFormatted}</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                    } else {
+                        messageDiv.innerHTML = `
+                            <div class="flex justify-end">
+                                <div class="mb-2">
+                                    <span class="mb-1 block text-right text-xs text-gray-600">You</span>
+                                    <div class="max-w-xs rounded-lg bg-blue-500 p-2 text-white">
+                                        <p class="text-sm">${content}</p>
+                                        <span class="block text-xs text-gray-200">${timeFormatted}</span>
+                                    </div>
+                                </div>
+                            </div>`;
+                    }
+
+                    document.getElementById("messageList").appendChild(messageDiv);
+                    messageList.scrollTop = messageList.scrollHeight;
+                });
+            }).catch(function (err) {
+                document.getElementById("loadingIndicator").classList.add("hidden");
+                console.error("Failed to load messages: ", err);
+            });
+        }).catch(function (err) {
+            document.getElementById("loadingIndicator").classList.add("hidden");
+            return console.error(err.toString());
+        });
+
+        document.getElementById("sendButton").addEventListener("click", function (event) {
+            const message = document.getElementById("messageInput").value;
+            const user1 = document.getElementById("userId1").value;
+            const user2 = document.getElementById("userId2").value;
+            const title = document.getElementById("title").value;
+
+            connection.invoke("SendMessageToThread", threadId, user1, user2, message, title)
+            .then(() => {
+                messageInput.value = "";
+            })
+            .catch(function (err) {
+                console.error(err.toString());
+            });
+            event.preventDefault();
+        });
+    </script>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
+        sessionStorage.setItem('search', urlParams.get('search') || '');
+        sessionStorage.setItem('filterByWorkSetup', urlParams.get('filterByWorkSetup') || '');
+        sessionStorage.setItem('filterByProgram', urlParams.get('filterByProgram') || '');
+        sessionStorage.setItem('filterByStatus', urlParams.get('filterByStatus') || '');
+        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
+
+        const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
+        const newUrl = window.location.origin + window.location.pathname + idParam;
+        window.history.replaceState({}, document.title, newUrl);
+
+        document.querySelector('#back-button').addEventListener('click', function (event) {
+            event.preventDefault();
+            const baseUrl = '@Url.Action($"{aspAction}", "Application")';
+            const params = new URLSearchParams();
+            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
+            params.set('search', sessionStorage.getItem('search') || '');
+            params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
+            params.set('filterByProgram', sessionStorage.getItem('filterByProgram') || '');
+            params.set('filterByStatus', sessionStorage.getItem('filterByStatus') || '');
+            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
+            window.location.href = `${baseUrl}?${params.toString()}`;
+        });
+    </script>
+}

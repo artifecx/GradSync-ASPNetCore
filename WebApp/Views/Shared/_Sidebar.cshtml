@@ -58,7 +58,7 @@
                 </a>
             </li>
             <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllApplicationsAdmin" asp-controller="Application"
+                <a asp-action="GetAllApplications" asp-controller="Application"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
@@ -82,7 +82,7 @@
                 </a>
             </li>
             <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="" asp-controller=""
+                <a asp-action="GetAllApplications" asp-controller="Application"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-check-circle-o mr-2"></i>
                     Applications
@@ -95,7 +95,7 @@
         @if (!isAdmin)
         {
             <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="" asp-controller=""
+                <a asp-action="GetUserPreferences" asp-controller="UserPreferences"
                    class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
                     <i class="fa fa-cog mr-2"></i> Settings
                 </a>

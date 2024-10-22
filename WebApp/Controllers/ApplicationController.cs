@@ -51,6 +51,64 @@ namespace WebApp.Controllers
             this._referenceDataService = referenceDataService;
         }
 
+        [HttpGet]
+        [Route("all")]
+        [Authorize]
+        public async Task<IActionResult> GetAllApplications(ApplicationFilter filters)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid)
+                {
+                    filters.UserId = UserId;
+                    filters.UserRole = UserRole;
+
+                    var model = await _applicationService.GetAllApplicationsAsync(filters);
+
+                    ViewData["Search"] = filters.Search;
+                    ViewData["SortBy"] = filters.SortBy;
+                    ViewData["ProgramFilter"] = filters.ProgramFilter;
+                    ViewData["WorkSetupFilter"] = filters.WorkSetupFilter;
+                    ViewData["StatusFilter"] = filters.StatusFilter;
+
+                    await PopulateViewBagsAsync();
+
+                    return View("Index", model);
+                }
+                return RedirectToAction("InvalidAccess", "Home");
+            }, "GetAllApplications");
+        }
+
+        [HttpGet]
+        [Route("view")]
+        [Authorize]
+        public async Task<IActionResult> GetApplication(string id)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (string.IsNullOrEmpty(id))
+                {
+                    TempData["ErrorMessage"] = "Invalid application id!";
+                    return RedirectToAction("GetAllApplications");
+                }
+
+                if (ModelState.IsValid)
+                {
+                    var model = await _applicationService.GetApplicationByIdAsync(id);
+                    if(model == null)
+                    {
+                        TempData["ErrorMessage"] = "Application not found!";
+                        return RedirectToAction("GetAllApplications");
+                    }
+                    
+                    ViewBag.UserId = UserId;
+
+                    return View("ViewApplication", model);
+                }
+                return RedirectToAction("InvalidAccess", "Home");
+            }, "GetAllApplicationsAdmin");
+        }
+
         private async Task PopulateViewBagsAsync()
         {
             ViewBag.Programs = await _referenceDataService.GetProgramsAsync();

@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using WebApp.Hubs;
 
 var appBuilder = WebApplication.CreateBuilder(new WebApplicationOptions
 {
@@ -35,6 +36,7 @@ app.MapControllerRoute(
     pattern: "{controller=Account}/{action=Login}");
 app.MapControllers();
 app.MapRazorPages();
+app.MapHub<ChatHub>("/chatHub");
 app.UseRateLimiter();
 
 // Run application

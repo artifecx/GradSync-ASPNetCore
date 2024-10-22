@@ -94,6 +94,7 @@ namespace Data.Repositories
                          PostedBy = new Recruiter
                          {
                              UserId = a.Job.PostedBy.UserId,  
+                             Title = a.Job.PostedBy.Title,
                              User = new User
                              {
                                  UserId = a.Job.PostedBy.User.UserId,
@@ -186,5 +187,8 @@ namespace Data.Repositories
                     .AsNoTracking();
             return await query.ToListAsync();
         }
+
+        public async Task<Application> GetApplicationByIdAsync(string id) =>
+            await GetApplicationsWithIncludes().AsNoTracking().FirstOrDefaultAsync(a => a.ApplicationId == id);
     }
 }

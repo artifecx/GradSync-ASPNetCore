@@ -12,10 +12,12 @@
     string filterByProgram = ViewData["ProgramFilter"] as string;
     string filterByWorkSetup = ViewData["WorkSetupFilter"] as string;
     string filterByStatus = ViewData["StatusFilter"] as string;
-    string aspAction = "GetAllApplicationsAdmin";
 
-    bool administrative = User.IsInRole("Admin") || User.IsInRole("NLO");
-    bool recruiter = User.IsInRole("Recruiter");
+
+    bool isAdministrative = User.IsInRole("Admin") || User.IsInRole("NLO");
+    bool isRecruiter = User.IsInRole("Recruiter");
+
+    string aspAction = "GetAllApplications";
 
     var programs = ViewBag.Programs as List<Program>;
     var workSetups = ViewBag.WorkSetups as List<SetupType>;
@@ -67,7 +69,7 @@
                 <table class="min-w-full table-auto rounded-lg border bg-white">
                     <thead class="rounded-lg border bg-gray-100">
                         <tr>
-                            @if (administrative || recruiter)
+                            @if (isAdministrative || isRecruiter)
                             {
                                 <!-- Applicant details -->
                                 <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Applicant)</th>
@@ -135,7 +137,7 @@
                                         @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                                     </a>
                                 </th>
-                                if (administrative){
+                                if (isAdministrative){
                                     <!-- Company details -->
                                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
                                 }
@@ -192,7 +194,7 @@
                                         @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                                     </a>
                                 </th>
-                                if (recruiter)
+                                if (isRecruiter)
                                 {
                                     <!-- Applicant Resume -->
                                     <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">@Html.DisplayNameFor(model => model.First().Applicant.Resume)</th>
@@ -369,8 +371,7 @@
                                 var applicantUser = applicant.User;
                                 var applicantResume = applicant.Resume;
                                 var applicantEducation = applicant.EducationalDetail;
-                                var applicantName = $"{applicantUser.FirstName} {applicantUser.MiddleName} {applicantUser.LastName} {applicantUser.Suffix}";
-                                var applicantDetails = $"{applicantName}\n{applicantEducation.IdNumber}\n{applicantUser.Email}";
+                                var applicantDetails = $"{item.ApplicantName}\n{applicantEducation.IdNumber}\n{applicantUser.Email}";
                                 var applicantProgram = applicantEducation.Program;
                                 var company = item.Job.Company;
                                 var companyDetails = $"{company.Name}\n{company.ContactEmail}\n{company.ContactNumber}";
@@ -380,7 +381,7 @@
                                 var applicationDate = $"{item.CreatedDate.ToString("MM/dd/yyyy")}\n{item.CreatedDate.ToString("hh:mm tt")}";
 
                                 <tr class="hover:bg-gray-100">
-                                    @if (administrative || recruiter)
+                                    @if (isAdministrative || isRecruiter)
                                     {
                                         <!-- Applicant details | FILTER -->
                                         <td class="px-6 py-3 text-sm text-gray-700">
@@ -391,18 +392,8 @@
                                         <!-- Applicant's program | FILTER -->
                                         <td class="cursor-pointer px-6 py-3 text-sm text-gray-700" title="@applicantProgram.Name">@applicantProgram.ShortName</td>
                                         <!-- Job title | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">
-                                            <a href="@Url.Action("GetJob", "Job",
-                                            new {
-                                                id = item.JobId,
-                                                search = search,
-                                                pageIndex = Model.PageIndex,
-                                            })"
-                                               class="hover:text-[#A53D3D] hover:underline">
-                                                @item.Job.Title
-                                            </a>
-                                        </td>
-                                        if (administrative)
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.Job.Title</td>
+                                        if (isAdministrative)
                                         {
                                             <!-- Company details | FILTER -->
                                             <td class="px-6 py-3 text-sm text-gray-700">@Html.Raw(companyDetails.Replace("\n", "<br>"))</td>
@@ -413,35 +404,33 @@
                                         <td class="px-6 py-3 text-sm text-gray-700">@jobSetup.Name</td>
                                         <!-- Application date | SORT -->
                                         <td class="px-6 py-3 text-sm text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
-                                        if (recruiter)
+                                        if (isRecruiter)
                                         {
                                             <!-- Applicant Resume | SORT -->
-                                            <td class="px-6 py-3 text-sm text-gray-700">@applicantResume.FileName</td>
+                                            <td class="px-6 py-3 text-sm font-semibold text-gray-700"><a href="#">View Resume</a></td>
                                         }
                                         <!-- Application Status | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">@applicationStatus.Name</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.ApplicationStatusType.Name</td>
                                     }
                                     else
                                     {
+                                        var recruiter = item.Job.PostedBy;
+                                        var recruiterDetails = $"{item.RecruiterName}\n{recruiter.User.Email}\n{recruiter.Title}";
+
                                         <!-- Job title | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">
-                                            <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
-                                               class="hover:text-[#A53D3D] hover:underline">
-                                                @item.Job.Title
-                                            </a>
-                                        </td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.Job.Title</td>
                                         <!-- Company details | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Company details here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@Html.Raw(companyDetails.Replace("\n", "<br>"))</td>
                                         <!-- Job location | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Job location here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@job.Location</td>
                                         <!-- Setup type | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Job setup here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@jobSetup.Name</td>
                                         <!-- Application date | SORT -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Application date here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
                                         <!-- Application Status | FILTER -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Application status here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@item.ApplicationStatusType.Name</td>
                                         <!-- Recruiter details -->
-                                        <td class="px-6 py-3 text-sm text-gray-700">Recruiter details here</td>
+                                        <td class="px-6 py-3 text-sm text-gray-700">@Html.Raw(recruiterDetails.Replace("\n", "<br>"))</td>
                                     }
 
                                     <td class="py-3 pl-6 text-left">
@@ -457,7 +446,7 @@
                                                  <div class="space-y-1 py-1">
 
                                                      <!-- Application Details -->
-                                                     <button onclick="location.href='@Url.Action("", "",
+                                                     <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                                                 new {
                                                                     id = item.ApplicationId,
                                                                     sortBy = sortBy,
