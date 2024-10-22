@@ -1,18 +1,15 @@
 ﻿using Data.Interfaces;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
-using NetTopologySuite.Geometries;
 using System.Collections.Generic;
-using System.ComponentModel.Design;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 
 namespace Data.Repositories
 {
+    /// <summary>
+    /// Repository for handling job application data
+    /// </summary>
     public class ApplicationRepository : BaseRepository, IApplicationRepository
     {
         public ApplicationRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
@@ -165,20 +162,34 @@ namespace Data.Repositories
                  }).AsNoTracking();
         }
 
+        /// <summary>
+        /// Asynchronously adds a new application to the database.
+        /// </summary>
+        /// <param name="application">The application to add.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task AddApplicationAsync(Application application)
         {
-
+            this.GetDbSet<Application>().Add(application);
+            await this.UnitOfWork.SaveChangesAsync();
         }
+
+        /// <summary>
+        /// Asynchronously updates an existing application in the database.
+        /// </summary>
+        /// <param name="application">The application to update.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateApplicationAsync(Application application)
         {
-
-        }
-        public async Task DeleteApplicationAsync(Application application)
-        {
-
+            this.GetDbSet<Application>().Update(application);
+            await this.UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<List<Application>> GetAllApplications(bool includes)
+        /// <summary>
+        /// Retrieves all applications from the database, optionally including related entities.
+        /// </summary>
+        /// <param name="includes">Indicates whether to include related entities in the result.</param>
+        /// <returns>A task representing the asynchronous operation, containing a list of applications.</returns>
+        public async Task<List<Application>> GetAllApplicationsAsync(bool includes)
         {
             var query = includes ? 
                 GetApplicationsWithIncludes() : 
@@ -188,7 +199,20 @@ namespace Data.Repositories
             return await query.ToListAsync();
         }
 
+        /// <summary>
+        /// Retrieves a specific application by its ID from the database.
+        /// </summary>
+        /// <param name="id">The ID of the application to retrieve.</param>
+        /// <returns>A task representing the asynchronous operation, containing the application if found; otherwise, null.</returns>
         public async Task<Application> GetApplicationByIdAsync(string id) =>
             await GetApplicationsWithIncludes().AsNoTracking().FirstOrDefaultAsync(a => a.ApplicationId == id);
+
+        /// <summary>
+        /// Retrieves all applications associated with a specific user from the database.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose applications to retrieve.</param>
+        /// <returns>A task representing the asynchronous operation, containing a list of applications.</returns>
+        public async Task<List<Application>> GetAllApplicationsByUserAsync(string userId) =>
+            await this.GetDbSet<Application>().Where(a => a.UserId == userId).AsNoTracking().ToListAsync();
     }
 }

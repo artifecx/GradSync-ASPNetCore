@@ -45,11 +45,8 @@ namespace WebApp
             this._services.AddScoped<IJobService, JobService>();
             this._services.AddScoped<ICompanyService, CompanyService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
-            this._services.AddSingleton<IEmailQueue, EmailQueue>();
-            this._services.AddSingleton<IEmailService, EmailService>();
-            this._services.AddHostedService<EmailBackgroundService>();
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
-            this._services.AddScoped<IApplicationService, ApplicationService>();
+            this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
             this._services.TryAddSingleton<IEventBus, EventBus>();
             this._services.AddScoped<ICachingService, CachingService>();

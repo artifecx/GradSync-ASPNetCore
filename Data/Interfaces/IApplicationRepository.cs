@@ -8,8 +8,8 @@ namespace Data.Interfaces
     {
         Task AddApplicationAsync(Application application);
         Task UpdateApplicationAsync(Application application);
-        Task DeleteApplicationAsync(Application application);
-        Task<List<Application>> GetAllApplications(bool includes);
+        Task<List<Application>> GetAllApplicationsAsync(bool includes);
         Task<Application> GetApplicationByIdAsync(string id);
+        Task<List<Application>> GetAllApplicationsByUserAsync(string userId);
     }
 }
