@@ -14,6 +14,7 @@ namespace Services.ServiceModels
         public IMemoryCache Cache { get; set; }
         public IServiceProvider ServiceProvider { get; set; }
         public Func<IServiceScope, Task<T>> FetchUpdatedData { get; set; }
+        public TimeSpan? ExpirationMinutes { get; set; }
     }
 
     public class DataCreatedEvent<T> : CacheEvent<T> { }

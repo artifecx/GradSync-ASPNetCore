@@ -18,17 +18,19 @@ namespace Services.Services
         public CachingService(IEventBus eventBus)
         {
             eventBus.Subscribe<DataUpdatedEvent<MessageThread>>(OnDataUpdated);
+            eventBus.Subscribe<DataUpdatedEvent<Application>>(OnDataUpdated);
             eventBus.Subscribe<DataListUpdatedEvent<Message>>(OnDataListUpdated);
+            eventBus.Subscribe<DataListUpdatedEvent<Application>>(OnDataListUpdated);
         }
 
         private static async void OnDataUpdated<T>(DataUpdatedEvent<T> @event)
         {
-            await RefreshCacheAsync(@event.Key, @event.Cache, @event.ServiceProvider, @event.FetchUpdatedData);
+            await RefreshCacheAsync(@event.Key, @event.Cache, @event.ServiceProvider, @event.FetchUpdatedData, @event.ExpirationMinutes);
         }
 
         private static async void OnDataListUpdated<T>(DataListUpdatedEvent<T> @event)
         {
-            await RefreshCacheAsync(@event.Key, @event.Cache, @event.ServiceProvider, @event.FetchUpdatedData);
+            await RefreshCacheAsync(@event.Key, @event.Cache, @event.ServiceProvider, @event.FetchUpdatedData, @event.ExpirationMinutes);
         }
 
         private static async void OnDataDeleted(DataDeletedEvent @event)
@@ -40,7 +42,8 @@ namespace Services.Services
             string cacheKey,
             IMemoryCache cache,
             IServiceProvider serviceProvider,
-            Func<IServiceScope, Task<List<T>>> getDataFunc)
+            Func<IServiceScope, Task<List<T>>> getDataFunc,
+            TimeSpan? cacheExpiration = null)
         {
             if (!cache.TryGetValue(cacheKey, out List<T> cachedData))
             {
@@ -55,7 +58,11 @@ namespace Services.Services
                             if (EqualityComparer<List<T>>.Default.Equals(cachedData, default) || cachedData.Count == 0)
                                 return default;
 
-                            cache.Set(cacheKey, cachedData);
+                            var cacheEntryOptions = new MemoryCacheEntryOptions();
+                            if (cacheExpiration.HasValue)
+                                cacheEntryOptions.SetAbsoluteExpiration(cacheExpiration.Value);
+
+                            cache.Set(cacheKey, cachedData, cacheEntryOptions);
                         }
                     }
                 }
@@ -71,7 +78,8 @@ namespace Services.Services
             string cacheKey,
             IMemoryCache cache,
             IServiceProvider serviceProvider,
-            Func<IServiceScope, Task<T>> getDataFunc)
+            Func<IServiceScope, Task<T>> getDataFunc,
+            TimeSpan? cacheExpiration = null)
         {
             if (!cache.TryGetValue(cacheKey, out T cachedData))
             {
@@ -85,7 +93,12 @@ namespace Services.Services
                             cachedData = await getDataFunc(scope);
                             if (EqualityComparer<T>.Default.Equals(cachedData, default))
                                 return default;
-                            cache.Set(cacheKey, cachedData);
+
+                            var cacheEntryOptions = new MemoryCacheEntryOptions();
+                            if (cacheExpiration.HasValue)
+                                cacheEntryOptions.SetAbsoluteExpiration(cacheExpiration.Value);
+
+                            cache.Set(cacheKey, cachedData, cacheEntryOptions);
                         }
                     }
                 }
@@ -101,12 +114,18 @@ namespace Services.Services
             string cacheKey,
             IMemoryCache cache, 
             IServiceProvider serviceProvider, 
-            Func<IServiceScope, Task<List<T>>> getDataFunc)
+            Func<IServiceScope, Task<List<T>>> getDataFunc,
+            TimeSpan? cacheExpiration = null)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var freshData = await getDataFunc(scope);
-                cache.Set(cacheKey, freshData);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions();
+                if (cacheExpiration.HasValue)
+                    cacheEntryOptions.SetAbsoluteExpiration(cacheExpiration.Value);
+
+                cache.Set(cacheKey, freshData, cacheEntryOptions);
             }
         }
 
@@ -114,12 +133,18 @@ namespace Services.Services
             string cacheKey,
             IMemoryCache cache,
             IServiceProvider serviceProvider, 
-            Func<IServiceScope, Task<T>> getDataFunc)
+            Func<IServiceScope, Task<T>> getDataFunc,
+            TimeSpan? cacheExpiration = null)
         {
             using (var scope = serviceProvider.CreateScope())
             {
                 var freshData = await getDataFunc(scope);
-                cache.Set(cacheKey, freshData);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions();
+                if (cacheExpiration.HasValue)
+                    cacheEntryOptions.SetAbsoluteExpiration(cacheExpiration.Value);
+
+                cache.Set(cacheKey, freshData, cacheEntryOptions);
             }
         }
 

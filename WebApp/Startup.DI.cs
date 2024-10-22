@@ -37,6 +37,9 @@ namespace WebApp
             // Services
             this._services.TryAddSingleton<TokenValidationParametersFactory>();
             this._services.TryAddSingleton<IReferenceDataService, ReferenceDataService>();
+            this._services.TryAddSingleton<IEmailQueue, EmailQueue>();
+            this._services.TryAddSingleton<IEmailService, EmailService>();
+            this._services.AddHostedService<EmailBackgroundService>();
             this._services.AddScoped<IAccountService, AccountService>();
             this._services.AddScoped<IUserService, UserService>();
             this._services.AddScoped<IJobService, JobService>();
@@ -48,7 +51,7 @@ namespace WebApp
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             this._services.AddScoped<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
-            this._services.AddSingleton<IEventBus, EventBus>();
+            this._services.TryAddSingleton<IEventBus, EventBus>();
             this._services.AddScoped<ICachingService, CachingService>();
 
             // Repositories
