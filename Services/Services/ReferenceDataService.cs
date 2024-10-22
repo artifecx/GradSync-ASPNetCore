@@ -7,6 +7,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Services.Interfaces;
 using Data.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
+using System.Threading;
 
 namespace Services.Services
 {
@@ -25,94 +26,109 @@ namespace Services.Services
         }
 
         #region Get Methods        
-        public async Task<List<EmploymentType>> GetEmploymentTypesAsync() =>
-            await GetOrSetCacheAsync("EmploymentTypes", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetEmploymentTypesAsync();
-            });
-
-        public async Task<List<StatusType>> GetStatusTypesAsync() =>
-            await GetOrSetCacheAsync("StatusTypes", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetStatusTypesAsync();
-            });
-
-        public async Task<List<SetupType>> GetWorkSetupsAsync() =>
-            await GetOrSetCacheAsync("WorkSetups", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetWorkSetupsAsync();
-            });
-
-        public async Task<List<Program>> GetProgramsAsync() =>
-            await GetOrSetCacheAsync("Programs", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetProgramsAsync();
-            });
-
-        public async Task<List<Skill>> GetSkillsAsync() =>
-            await GetOrSetCacheAsync("Skills", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetSkillsAsync();
-            });
-
-        public async Task<List<YearLevel>> GetYearLevelsAsync() =>
-            await GetOrSetCacheAsync("YearLevels", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetYearLevelsAsync();
-            });
-
-        public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
-            await GetOrSetCacheAsync("AppStatusTypes", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetApplicationStatusTypesAsync();
-            });
-
-        public async Task<List<Role>> GetUserRolesAsync() =>
-            await GetOrSetCacheAsync("UserRoles", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
-                return await repository.GetUserRolesAsync();
-            });
-
-        #endregion Get Methods
-
-        private async Task<List<T>> GetOrSetCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
-        {
-            if (!_memoryCache.TryGetValue(cacheKey, out List<T> cachedData))
-            {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    cachedData = await getDataFunc(scope);
-                    _memoryCache.Set(cacheKey, cachedData);
-                }
-            }
-            return cachedData;
-        }
-
-        public void InvalidateCache(string cacheKey)
-        {
-            if (string.IsNullOrEmpty(cacheKey))
-            {
-                throw new ArgumentException("Cache key cannot be null or empty", nameof(cacheKey));
-            }
-
-            _memoryCache.Remove(cacheKey);
-        }
-
-        public async Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
+        public async Task<List<EmploymentType>> GetEmploymentTypesAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var freshData = await getDataFunc(scope);
-                _memoryCache.Set(cacheKey, freshData);
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("EmploymentTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetEmploymentTypesAsync();
+                });
             }
         }
+
+        public async Task<List<StatusType>> GetStatusTypesAsync() 
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("StatusTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetStatusTypesAsync();
+                });
+            }
+        }
+
+        public async Task<List<SetupType>> GetWorkSetupsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("WorkSetups", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetWorkSetupsAsync();
+                });
+            }
+        }
+
+        public async Task<List<Program>> GetProgramsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("Programs", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetProgramsAsync();
+                });
+            }
+        }
+
+        public async Task<List<Skill>> GetSkillsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("Skills", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetSkillsAsync();
+                });
+            }
+        }
+
+        public async Task<List<YearLevel>> GetYearLevelsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("YearLevels", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetYearLevelsAsync();
+                });
+            }
+        }
+
+        public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("AppStatusTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetApplicationStatusTypesAsync();
+                });
+            }
+        }
+
+        public async Task<List<Role>> GetUserRolesAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("UserRoles", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetUserRolesAsync();
+                });
+            }
+        }
+        #endregion
     }
 }

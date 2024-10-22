@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MathNet.Numerics;
+using Services.EventBus;
 
 namespace WebApp
 {
@@ -46,6 +48,8 @@ namespace WebApp
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
             this._services.AddScoped<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
+            this._services.AddSingleton<IEventBus, EventBus>();
+            this._services.AddScoped<ICachingService, CachingService>();
 
             // Repositories
             this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();

@@ -6,7 +6,8 @@ using System.Collections.Generic;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using Microsoft.Extensions.Caching.Memory;
-using System.Threading;
+using Services.ServiceModels;
+using Services.EventBus;
 
 namespace Services.Services 
 {
@@ -14,17 +15,19 @@ namespace Services.Services
     {
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _memoryCache;
+        private readonly IEventBus _eventBus;
 
-        public MessageService(IServiceProvider serviceProvider, IMemoryCache memoryCache)
+        public MessageService(IServiceProvider serviceProvider, IMemoryCache memoryCache, IEventBus eventBus)
         {
             _serviceProvider = serviceProvider;
             _memoryCache = memoryCache;
+            _eventBus = eventBus;
         }
 
-        public async Task AddMessageAsync(Message message) 
+        public async Task AddMessageAsync(Message message)
         {
             var messageKey = $"RecentMessages-{message.MessageThreadId}";
-            var threadKey = $"Threads-{message.MessageThreadId}";
+            var threadKey = $"Thread-{message.MessageThreadId}";
 
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -32,103 +35,80 @@ namespace Services.Services
                 await repository.AddMessageAsync(message);
             }
 
-            InvalidateCache(messageKey);
-            InvalidateCache(threadKey);
-
-            await UpdateCacheAsync(messageKey, async (scope) =>
+            var recentMessagesEvent = new DataListUpdatedEvent<Message>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                return await repository.GetRecentMessagesAsync(message.MessageThreadId);
-            });
+                Key = messageKey,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetRecentMessagesAsync(message.MessageThreadId);
+                }
+            };
+            _eventBus.Publish(recentMessagesEvent);
 
-            await UpdateCacheAsync(threadKey, async (scope) =>
+            var threadEvent = new DataUpdatedEvent<MessageThread>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                return await repository.GetThreadByIdAsync(message.MessageThreadId);
-            });
+                Key = threadKey,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetThreadByIdAsync(message.MessageThreadId);
+                }
+            };
+            _eventBus.Publish(threadEvent);
         }
+
 
         public async Task CreateMessageThreadAsync(MessageThread thread)
         {
-            var key = $"Threads-{thread.MessageThreadId}";
+            var key = $"Thread-{thread.MessageThreadId}";
             using (var scope = _serviceProvider.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                 await repository.CreateThreadAsync(thread);
             }
-            InvalidateCache(key);
-            await UpdateCacheAsync(key, async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                return await repository.GetThreadByIdAsync(thread.MessageThreadId);
-            });
-        }
 
-        public async Task<List<Message>> GetRecentMessagesAsync(string threadId) =>
-            await GetOrSetCacheAsync($"RecentMessages-{threadId}", async (scope) =>
+            var threadEvent = new DataUpdatedEvent<MessageThread>
             {
-                var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                return await repository.GetRecentMessagesAsync(threadId);
-            });
-
-        public async Task<MessageThread> GetMessageThreadByIdAsync(string threadId) =>
-            await GetOrSetCacheAsync($"Threads-{threadId}", async (scope) =>
-            {
-                var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                return await repository.GetThreadByIdAsync(threadId);
-            });
-
-        private async Task<List<T>> GetOrSetCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
-        {
-            if (!_memoryCache.TryGetValue(cacheKey, out List<T> cachedData))
-            {
-                using (var scope = _serviceProvider.CreateScope())
+                Key = key,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
                 {
-                    cachedData = await getDataFunc(scope);
-                    _memoryCache.Set(cacheKey, cachedData);
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetThreadByIdAsync(thread.MessageThreadId);
                 }
-            }
-            return cachedData;
+            };
+            _eventBus.Publish(threadEvent);
         }
 
-        private async Task<T> GetOrSetCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<T>> getDataFunc)
-        {
-            if (!_memoryCache.TryGetValue(cacheKey, out T cachedData))
-            {
-                using (var scope = _serviceProvider.CreateScope())
-                {
-                    cachedData = await getDataFunc(scope);
-                    _memoryCache.Set(cacheKey, cachedData);
-                }
-            }
-            return cachedData;
-        }
-
-        public void InvalidateCache(string cacheKey)
-        {
-            if (string.IsNullOrEmpty(cacheKey))
-            {
-                throw new ArgumentException("Cache key cannot be null or empty", nameof(cacheKey));
-            }
-
-            _memoryCache.Remove(cacheKey);
-        }
-
-        public async Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc)
+        public async Task<List<Message>> GetRecentMessagesAsync(string threadId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var freshData = await getDataFunc(scope);
-                _memoryCache.Set(cacheKey, freshData);
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync($"RecentMessages-{threadId}", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetRecentMessagesAsync(threadId);
+                });
             }
         }
 
-        public async Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<T>> getDataFunc)
+        public async Task<MessageThread> GetMessageThreadByIdAsync(string threadId) 
         {
             using (var scope = _serviceProvider.CreateScope())
             {
-                var freshData = await getDataFunc(scope);
-                _memoryCache.Set(cacheKey, freshData);
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync($"Thread-{threadId}", _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetThreadByIdAsync(threadId);
+                });
             }
         }
     }
