@@ -67,12 +67,16 @@
             <div class="max-h-[calc(100%-100px)] min-h-[calc(100%-100px)] mx-4 flex flex-col rounded-lg border border-gray-200 bg-gray-50">
                 <!-- Scrollable Chat Messages -->
                 <div class="flex flex-grow flex-col overflow-y-auto p-4" id="messageList">
+                    <div id="loadingIndicator" class="hidden text-center">
+                        <div class="loader"></div>
+                        <p>Loading messages...</p>
+                    </div>
                     <!-- Message Div -->
                 </div>
                 <form id="sendForm">
                     <div class="flex items-center border-t border-gray-200 p-4">
-                        <input id="messageInput" type="text" class="flex-grow rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2" placeholder="Type your message...">
-                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed">
+                        <input id="messageInput" type="text" class="flex-grow rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2" placeholder="Type your message..." @(User.IsInRole("NLO") ? "hidden" : "")>
+                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed " @(User.IsInRole("NLO") ? "hidden" : "")>
                             Send
                         </button>
                         <input type="hidden" id="threadId" value="@Model.ApplicationId" />
@@ -101,9 +105,7 @@
         const currentUserId = '@ViewBag.UserId';
         const messageList = document.getElementById("messageList");
         const connection = new signalR.HubConnectionBuilder()
-            .withUrl(`/chathub?threadId=${threadId}`, {
-                transport: signalR.HttpTransportType.WebSockets
-            })
+            .withUrl(`/chathub?threadId=${threadId}`)
             .withAutomaticReconnect()
             .build();
 
@@ -152,9 +154,10 @@
             document.getElementById("messageList").appendChild(messageDiv);
             messageList.scrollTop = messageList.scrollHeight;
         });
-
+        document.getElementById("loadingIndicator").classList.remove("hidden");
         connection.start().then(function () {
             connection.invoke("GetThreadMessages", threadId).then(function (messages) {
+                document.getElementById("loadingIndicator").classList.add("hidden");
                 messages.forEach(function (message) {
                     const { content, timestamp, userId } = message;
                     const timeFormatted = new Date(timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
@@ -188,9 +191,11 @@
                     messageList.scrollTop = messageList.scrollHeight;
                 });
             }).catch(function (err) {
+                document.getElementById("loadingIndicator").classList.add("hidden");
                 console.error("Failed to load messages: ", err);
             });
         }).catch(function (err) {
+            document.getElementById("loadingIndicator").classList.add("hidden");
             return console.error(err.toString());
         });
 
