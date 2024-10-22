@@ -13,6 +13,8 @@ using static Services.Exceptions.UserExceptions;
 using static Services.Exceptions.EmailExceptions;
 using static Resources.Messages.ErrorMessages;
 using Services.Interfaces;
+using static Services.Exceptions.JobApplicationExceptions;
+using static Services.Exceptions.JobExceptions;
 
 namespace WebApp.Mvc
 {
@@ -242,6 +244,22 @@ namespace WebApp.Mvc
             {
                 return RedirectToAction(actionName, new { id = ex.Id });
             }
+            catch (JobApplicationException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName);
+            }
+            catch (JobApplicationException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName, new { id = ex.Id });
+            }
+            catch (JobException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName);
+            }
+            catch (JobException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName, new { id = ex.Id });
+            }
             catch (CompanyException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 return RedirectToAction(actionName);
@@ -263,10 +281,10 @@ namespace WebApp.Mvc
                 TempData["ErrorMessageLogin"] = ex.Message;
                 return RedirectToAction(actionName);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 _logger.LogError(ex, $"Error in {actionName}");
-                return View("Error");
+                return RedirectToAction(actionName);
             }
             finally
             {
@@ -307,6 +325,18 @@ namespace WebApp.Mvc
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (InvalidOperationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+                _logger.LogError(ex, $"Error in {actionName}");
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+            catch (JobApplicationException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+                _logger.LogError(ex, $"Error in {actionName}");
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+            catch (JobException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
                 _logger.LogError(ex, $"Error in {actionName}");

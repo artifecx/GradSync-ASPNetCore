@@ -117,4 +117,22 @@
   <resheader name="writer">
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
+  <data name="AppStatus_Rejected" xml:space="preserve">
+    <value>Rejected</value>
+  </data>
+  <data name="AppStatus_Accepted" xml:space="preserve">
+    <value>Accepted</value>
+  </data>
+  <data name="AppStatus_Shortlisted" xml:space="preserve">
+    <value>Shortlisted</value>
+  </data>
+  <data name="AppStatus_Withdrawn" xml:space="preserve">
+    <value>Withdrawn</value>
+  </data>
+  <data name="AppStatus_Viewed" xml:space="preserve">
+    <value>Viewed</value>
+  </data>
+  <data name="AppStatus_Submitted" xml:space="preserve">
+    <value>Submitted</value>
+  </data>
 </root>

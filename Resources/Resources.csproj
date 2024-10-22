@@ -7,8 +7,23 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Update="Constants\CacheKeys.Designer.cs">
+      <DependentUpon>CacheKeys.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Constants\Types.Designer.cs">
+      <DependentUpon>Types.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
     <Compile Update="Constants\Routes.Designer.cs">
       <DependentUpon>Routes.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+    <Compile Update="Constants\ExpirationTimes.Designer.cs">
+      <DependentUpon>ExpirationTimes.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
@@ -75,8 +90,20 @@
   </ItemGroup>
 
   <ItemGroup>
+    <EmbeddedResource Update="Constants\CacheKeys.resx">
+      <LastGenOutput>CacheKeys.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Constants\Types.resx">
+      <LastGenOutput>Types.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
     <EmbeddedResource Update="Constants\Routes.resx">
       <LastGenOutput>Routes.Designer.cs</LastGenOutput>
+      <Generator>PublicResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+    <EmbeddedResource Update="Constants\ExpirationTimes.resx">
+      <LastGenOutput>ExpirationTimes.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Constants\UserRoles.resx">

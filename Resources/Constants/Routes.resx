@@ -138,4 +138,22 @@
   <data name="Account_Login" xml:space="preserve">
     <value>Login</value>
   </data>
+  <data name="Application_GetAll" xml:space="preserve">
+    <value>GetAllApplications</value>
+  </data>
+  <data name="Application_ActionSend" xml:space="preserve">
+    <value>SendApplication</value>
+  </data>
+  <data name="Application_ActionUpdate" xml:space="preserve">
+    <value>UpdateApplication</value>
+  </data>
+  <data name="Application_ActionWithdraw" xml:space="preserve">
+    <value>WithdrawApplication</value>
+  </data>
+  <data name="Application_GetApplication" xml:space="preserve">
+    <value>GetApplication</value>
+  </data>
+  <data name="Home_InvalidAccess" xml:space="preserve">
+    <value>InvalidAccess</value>
+  </data>
 </root>

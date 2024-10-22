@@ -141,4 +141,7 @@
   <data name="Success_UserPasswordUpdate" xml:space="preserve">
     <value>Password updated successfully!</value>
   </data>
+  <data name="Success_ApplicationActionSuccess" xml:space="preserve">
+    <value>Successfully {0} the application!</value>
+  </data>
 </root>
