@@ -8,6 +8,7 @@ using System;
 using Microsoft.Extensions.Caching.Memory;
 using Services.ServiceModels;
 using Services.EventBus;
+using static Resources.Constants.ExpirationTimes;
 
 namespace Services.Services 
 {
@@ -16,6 +17,8 @@ namespace Services.Services
         private readonly IServiceProvider _serviceProvider;
         private readonly IMemoryCache _memoryCache;
         private readonly IEventBus _eventBus;
+        private static TimeSpan cacheExpirationMinutes = 
+            TimeSpan.FromMinutes(Convert.ToInt32(Expiration_Messages));
 
         public MessageService(IServiceProvider serviceProvider, IMemoryCache memoryCache, IEventBus eventBus)
         {
@@ -44,7 +47,8 @@ namespace Services.Services
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetRecentMessagesAsync(message.MessageThreadId);
-                }
+                },
+                ExpirationMinutes = cacheExpirationMinutes
             };
             _eventBus.Publish(recentMessagesEvent);
 
@@ -57,11 +61,11 @@ namespace Services.Services
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetThreadByIdAsync(message.MessageThreadId);
-                }
+                },
+                ExpirationMinutes = cacheExpirationMinutes
             };
             _eventBus.Publish(threadEvent);
         }
-
 
         public async Task CreateMessageThreadAsync(MessageThread thread)
         {
@@ -81,7 +85,8 @@ namespace Services.Services
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetThreadByIdAsync(thread.MessageThreadId);
-                }
+                },
+                ExpirationMinutes = cacheExpirationMinutes
             };
             _eventBus.Publish(threadEvent);
         }
@@ -95,7 +100,7 @@ namespace Services.Services
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetRecentMessagesAsync(threadId);
-                });
+                }, cacheExpirationMinutes);
             }
         }
 
@@ -108,7 +113,7 @@ namespace Services.Services
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetThreadByIdAsync(threadId);
-                });
+                }, cacheExpirationMinutes);
             }
         }
     }
