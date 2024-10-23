@@ -8,7 +8,7 @@ namespace Services.Interfaces
     {
         Task AddMessageAsync(Message message);
         Task CreateMessageThreadAsync(MessageThread thread);
-        Task<List<Message>> GetRecentMessagesAsync(string threadId);
+        Task<List<Message>> GetRecentMessagesOfThreadAsync(string threadId);
         Task<MessageThread> GetMessageThreadByIdAsync(string threadId);
     }
 }

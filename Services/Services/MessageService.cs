@@ -9,6 +9,7 @@ using Microsoft.Extensions.Caching.Memory;
 using Services.ServiceModels;
 using Services.EventBus;
 using static Resources.Constants.ExpirationTimes;
+using System.Linq;
 
 namespace Services.Services 
 {
@@ -29,76 +30,40 @@ namespace Services.Services
 
         public async Task AddMessageAsync(Message message)
         {
-            var messageKey = $"RecentMessages-{message.MessageThreadId}";
-            var threadKey = $"Thread-{message.MessageThreadId}";
-
             using (var scope = _serviceProvider.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                 await repository.AddMessageAsync(message);
             }
 
-            var recentMessagesEvent = new DataListUpdatedEvent<Message>
-            {
-                Key = messageKey,
-                Cache = _memoryCache,
-                ServiceProvider = _serviceProvider,
-                FetchUpdatedData = async (scope) =>
-                {
-                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                    return await repository.GetRecentMessagesAsync(message.MessageThreadId);
-                },
-                ExpirationMinutes = cacheExpirationMinutes
-            };
-            _eventBus.Publish(recentMessagesEvent);
+            var messageKey = $"RecentMessages-{message.MessageThreadId}";
+            var threadKey = $"Thread-{message.MessageThreadId}";
+            var threadId = message.MessageThreadId;
 
-            var threadEvent = new DataUpdatedEvent<MessageThread>
-            {
-                Key = threadKey,
-                Cache = _memoryCache,
-                ServiceProvider = _serviceProvider,
-                FetchUpdatedData = async (scope) =>
-                {
-                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                    return await repository.GetThreadByIdAsync(message.MessageThreadId);
-                },
-                ExpirationMinutes = cacheExpirationMinutes
-            };
-            _eventBus.Publish(threadEvent);
+            await UpdateThreadCacheByIdAsync(threadKey, threadId);
+            await UpdateRecentMessagesCacheByIdAsync(messageKey, threadId);
         }
 
         public async Task CreateMessageThreadAsync(MessageThread thread)
         {
-            var key = $"Thread-{thread.MessageThreadId}";
+            var threadKey = $"Thread-{thread.MessageThreadId}";
             using (var scope = _serviceProvider.CreateScope())
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                 await repository.CreateThreadAsync(thread);
             }
 
-            var threadEvent = new DataUpdatedEvent<MessageThread>
-            {
-                Key = key,
-                Cache = _memoryCache,
-                ServiceProvider = _serviceProvider,
-                FetchUpdatedData = async (scope) =>
-                {
-                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
-                    return await repository.GetThreadByIdAsync(thread.MessageThreadId);
-                },
-                ExpirationMinutes = cacheExpirationMinutes
-            };
-            _eventBus.Publish(threadEvent);
+            await UpdateThreadCacheByIdAsync(threadKey, thread.MessageThreadId);
         }
 
-        public async Task<List<Message>> GetRecentMessagesAsync(string threadId)
+        public async Task<List<Message>> GetRecentMessagesOfThreadAsync(string threadId)
         {
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
                 return await cachingService.GetOrCacheAsync($"RecentMessages-{threadId}", _memoryCache, _serviceProvider, async (innerScope) =>
                 {
-                    var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetRecentMessagesAsync(threadId);
                 }, cacheExpirationMinutes);
             }
@@ -115,6 +80,42 @@ namespace Services.Services
                     return await repository.GetThreadByIdAsync(threadId);
                 }, cacheExpirationMinutes);
             }
+        }
+
+        private async Task UpdateRecentMessagesCacheByIdAsync(string messageKey, string threadId)
+        {
+            var recentMessagesEvent = new DataListUpdatedEvent<Message>
+            {
+                Key = messageKey,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetRecentMessagesAsync(threadId);
+                },
+                ExpirationMinutes = cacheExpirationMinutes
+            };
+            _eventBus.Publish(recentMessagesEvent);
+            await Task.CompletedTask;
+        }
+
+        private async Task UpdateThreadCacheByIdAsync(string threadKey, string threadId)
+        {
+            var threadEvent = new DataUpdatedEvent<MessageThread>
+            {
+                Key = threadKey,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
+                    return await repository.GetThreadByIdAsync(threadId);
+                },
+                ExpirationMinutes = cacheExpirationMinutes
+            };
+            _eventBus.Publish(threadEvent);
+            await Task.CompletedTask;
         }
     }
 }

@@ -9,12 +9,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Linq;
 using System.Threading.Tasks;
-using Resources.Messages;
-using System.Collections.Generic;
-using Services.Services;
-using System.Security.Claims;
 
 namespace WebApp.Controllers
 {

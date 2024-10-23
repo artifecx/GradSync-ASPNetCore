@@ -252,8 +252,8 @@ namespace Services.Services
                 string applicationUserKey = string.Format(Key_ApplicationsByUserId, userId);
                 return await cachingService.GetOrCacheAsync(applicationUserKey, _memoryCache, _serviceProvider, async (innerScope) =>
                 {
-                    var applications = await GetOrCacheAllApplicationsAsync();
-                    return applications.Where(a => a.UserId == userId).ToList();
+                    var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetAllApplicationsByUserAsync(userId);
                 }, cacheExpirationMinutes);
             }
         }
@@ -271,8 +271,8 @@ namespace Services.Services
                 string applicationKey = string.Format(Key_ApplicationById, id);
                 return await cachingService.GetOrCacheAsync(applicationKey, _memoryCache, _serviceProvider, async (innerScope) =>
                 {
-                    var applications = await GetOrCacheAllApplicationsAsync();
-                    return applications.Find(a => a.ApplicationId == id);
+                    var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetApplicationByIdAsync(id);
                 }, cacheExpirationMinutes);
             }
         }
