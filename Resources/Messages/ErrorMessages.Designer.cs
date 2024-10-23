@@ -61,6 +61,51 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to An error occured while {0} application..
+        /// </summary>
+        public static string Error_ApplicationActionError {
+            get {
+                return ResourceManager.GetString("Error_ApplicationActionError", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application cannot be archived. Must be withdrawn, rejected, or accepted first..
+        /// </summary>
+        public static string Error_ApplicationCannotArchive {
+            get {
+                return ResourceManager.GetString("Error_ApplicationCannotArchive", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to An application already exists for this job..
+        /// </summary>
+        public static string Error_ApplicationExists {
+            get {
+                return ResourceManager.GetString("Error_ApplicationExists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application cannot be found..
+        /// </summary>
+        public static string Error_ApplicationNotFound {
+            get {
+                return ResourceManager.GetString("Error_ApplicationNotFound", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Application status is already set to this value..
+        /// </summary>
+        public static string Error_ApplicationStatusUnchanged {
+            get {
+                return ResourceManager.GetString("Error_ApplicationStatusUnchanged", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to An error has occurred..
         /// </summary>
         public static string Error_Default {

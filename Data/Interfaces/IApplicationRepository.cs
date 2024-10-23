@@ -1,4 +1,5 @@
 using Data.Models;
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
@@ -8,8 +9,9 @@ namespace Data.Interfaces
     {
         Task AddApplicationAsync(Application application);
         Task UpdateApplicationAsync(Application application);
-        Task DeleteApplicationAsync(Application application);
-        Task<List<Application>> GetAllApplications(bool includes);
+        Task<List<Application>> GetAllApplicationsAsync(bool includes);
         Task<Application> GetApplicationByIdAsync(string id);
+        Task<List<Application>> GetAllApplicationsByUserAsync(string userId);
+        Task<int> ArchiveApplicationsUpdatedBeforeDateAsync(DateTime date, HashSet<string> validStatuses);
     }
 }

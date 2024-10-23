@@ -16,7 +16,5 @@ namespace Services.Interfaces
         Task<List<Skill>> GetSkillsAsync();
         Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
         Task<List<Role>> GetUserRolesAsync();
-        void InvalidateCache(string cacheKey);
-        Task UpdateCacheAsync<T>(string cacheKey, Func<IServiceScope, Task<List<T>>> getDataFunc);
     }
 }

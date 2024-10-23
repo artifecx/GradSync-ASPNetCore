@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using MathNet.Numerics;
+using Services.EventBus;
 
 namespace WebApp
 {
@@ -35,17 +37,20 @@ namespace WebApp
             // Services
             this._services.TryAddSingleton<TokenValidationParametersFactory>();
             this._services.TryAddSingleton<IReferenceDataService, ReferenceDataService>();
+            this._services.TryAddSingleton<IEmailQueue, EmailQueue>();
+            this._services.TryAddSingleton<IEmailService, EmailService>();
+            this._services.AddHostedService<EmailBackgroundService>();
+            this._services.AddHostedService<ArchiverBackgroundService>();
             this._services.AddScoped<IAccountService, AccountService>();
             this._services.AddScoped<IUserService, UserService>();
             this._services.AddScoped<IJobService, JobService>();
             this._services.AddScoped<ICompanyService, CompanyService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
-            this._services.AddSingleton<IEmailQueue, EmailQueue>();
-            this._services.AddSingleton<IEmailService, EmailService>();
-            this._services.AddHostedService<EmailBackgroundService>();
             this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
-            this._services.AddScoped<IApplicationService, ApplicationService>();
+            this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
+            this._services.TryAddSingleton<IEventBus, EventBus>();
+            this._services.AddScoped<ICachingService, CachingService>();
 
             // Repositories
             this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();

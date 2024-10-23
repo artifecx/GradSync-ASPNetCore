@@ -63,13 +63,13 @@ namespace Resources.Messages {
         /// <summary>
         ///   Looks up a localized string similar to Hello {0},
         ///
-        ///Your password has been successfully reset. Please use the temporary password provided below to log in to your account:
+        ///Your password has been successfully reset. Please use the temporary password below to log in:
         ///
         ///Temporary Password: {1}
         ///
-        ///For your security, we recommend changing this password immediately after logging in.
+        ///For your security, we recommend changing this password as soon as you log in.
         ///
-        ///If you did not request this password reset, please contact us by replying to this email right away.
+        ///If you didn’t request this reset, please email support@gradsync.org or admin@gradsync.org immediately.
         ///
         ///Best regards,
         ///The GradSync Team.
@@ -83,13 +83,13 @@ namespace Resources.Messages {
         /// <summary>
         ///   Looks up a localized string similar to Hello {0},
         ///
-        ///Thank you for registering with GradSync! To complete your registration and activate your account, please verify your email by clicking the link below:
+        ///Thank you for joining GradSync! To complete your registration, please verify your email by clicking the link below:
         ///
         ///Verify Account: {1}
         ///
-        ///For security reasons, this link will expire in 1 hour. If the link doesn&apos;t work, you can copy and paste it directly into your browser&apos;s address bar.
+        ///This link will expire in 1 hour. If it doesn’t work, copy and paste the URL into your browser.
         ///
-        ///If you did not sign up for a GradSync account, please disregard this email.
+        ///If you didn’t sign up for GradSync, you can ignore this email.
         ///
         ///Best regards,
         ///The GradSync Team.
@@ -103,13 +103,13 @@ namespace Resources.Messages {
         /// <summary>
         ///   Looks up a localized string similar to Hello {0},
         ///
-        ///We received a request to reset the password for your GradSync account. To proceed, please use the link below:
+        ///We received a request to reset your GradSync password. To continue, please click the link below:
         ///
         ///Reset Password: {1}
         ///
-        ///This link will expire in 1 hour for your security. If the link doesn&apos;t work, you can copy and paste it directly into your browser&apos;s address bar.
+        ///This link will expire in 1 hour. If it doesn’t work, copy and paste the URL into your browser.
         ///
-        ///If you did not request this reset, please ignore this email—no action is required.
+        ///If you didn’t request this reset, you can safely ignore this email.
         ///
         ///Thank you,
         ///The GradSync Team.
@@ -121,7 +121,7 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Your Password Has Been Reset.
+        ///   Looks up a localized string similar to Your GradSync Password Has Been Reset.
         /// </summary>
         public static string Email_SubjectUserPasswordReset {
             get {
@@ -130,7 +130,7 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Verify Your Account.
+        ///   Looks up a localized string similar to Verify Your GradSync Account.
         /// </summary>
         public static string Email_SubjectUserRegistration {
             get {
@@ -139,7 +139,7 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Password Reset Request.
+        ///   Looks up a localized string similar to Password Reset Request for Your GradSync Account.
         /// </summary>
         public static string Email_SubjectUserRequestPasswordReset {
             get {

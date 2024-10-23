@@ -61,6 +61,15 @@ namespace Resources.Messages {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Successfully {0} the application!.
+        /// </summary>
+        public static string Success_ApplicationActionSuccess {
+            get {
+                return ResourceManager.GetString("Success_ApplicationActionSuccess", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Successfully {0} user!.
         /// </summary>
         public static string Success_UserActionSuccess {

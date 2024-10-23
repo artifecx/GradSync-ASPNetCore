@@ -70,6 +70,51 @@ namespace Resources.Constants {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to SendApplication.
+        /// </summary>
+        public static string Application_ActionSend {
+            get {
+                return ResourceManager.GetString("Application_ActionSend", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to UpdateApplication.
+        /// </summary>
+        public static string Application_ActionUpdate {
+            get {
+                return ResourceManager.GetString("Application_ActionUpdate", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to WithdrawApplication.
+        /// </summary>
+        public static string Application_ActionWithdraw {
+            get {
+                return ResourceManager.GetString("Application_ActionWithdraw", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetAllApplications.
+        /// </summary>
+        public static string Application_GetAll {
+            get {
+                return ResourceManager.GetString("Application_GetAll", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to GetApplication.
+        /// </summary>
+        public static string Application_GetApplication {
+            get {
+                return ResourceManager.GetString("Application_GetApplication", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Account.
         /// </summary>
         public static string Controller_Account {
@@ -111,6 +156,15 @@ namespace Resources.Constants {
         public static string Home_Index {
             get {
                 return ResourceManager.GetString("Home_Index", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to InvalidAccess.
+        /// </summary>
+        public static string Home_InvalidAccess {
+            get {
+                return ResourceManager.GetString("Home_InvalidAccess", resourceCulture);
             }
         }
         

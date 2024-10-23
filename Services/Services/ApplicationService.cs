@@ -1,56 +1,142 @@
 ﻿using AutoMapper;
+using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.DependencyInjection;
+using Data.Interfaces;
 using Data.Models;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Logging;
 using Services.Interfaces;
+using Services.EventBus;
 using Services.ServiceModels;
 using System;
-using System.Threading.Tasks;
-using Data.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
-using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+using static Resources.Constants.CacheKeys;
+using static Resources.Constants.ExpirationTimes;
 using static Resources.Constants.UserRoles;
+using static Resources.Constants.Types;
+using static Resources.Messages.ErrorMessages;
+using static Services.Exceptions.JobApplicationExceptions;
 
 namespace Services.Services
 {
     /// <summary>
-    /// Service class for handling operations related to teams.
+    /// Service class for handling operations related to job applications.
     /// </summary>
     public class ApplicationService : IApplicationService
     {
-        private readonly IApplicationRepository _repository;
+        private readonly IServiceProvider _serviceProvider;
+        private readonly IMemoryCache _memoryCache;
+        private readonly IEventBus _eventBus;
         private readonly IMapper _mapper;
+        private static TimeSpan cacheExpirationMinutes = TimeSpan.FromMinutes(Convert.ToInt32(Expiration_Applications));
 
-        public ApplicationService(IApplicationRepository repository, IMapper mapper, ILogger<ApplicationService> logger)
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ApplicationService"/> class.
+        /// </summary>
+        /// <param name="serviceProvider">Service provider for dependency injection.</param>
+        /// <param name="memoryCache">In-memory cache for storing application data.</param>
+        /// <param name="eventBus">Event bus for publishing events related to application data.</param>
+        /// <param name="mapper">Object mapper for converting between data and service models.</param>
+        public ApplicationService(IServiceProvider serviceProvider, IMemoryCache memoryCache, IEventBus eventBus, IMapper mapper)
         {
-            _repository = repository;
+            _serviceProvider = serviceProvider;
+            _memoryCache = memoryCache;
+            _eventBus = eventBus;
             _mapper = mapper;
         }
 
-        public async Task AddApplicationAsync(ApplicationViewModel model)
+        /// <summary>
+        /// Sends a job application for a specific user and job.
+        /// </summary>
+        /// <param name="userId">The ID of the user submitting the application.</param>
+        /// <param name="jobId">The ID of the job for which the application is submitted.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task SendApplicationAsync(string userId, string jobId)
         {
-            var application = _mapper.Map<Application>(model);
-            application.ApplicationId = Guid.NewGuid().ToString();      
-            application.ApplicationStatusTypeId = "Submitted";
-            application.UserId = Guid.NewGuid().ToString();
-            application.JobId = Guid.NewGuid().ToString();
-            application.CreatedDate = DateTime.Now;
+            if(await HasExistingApplicationAsync(userId, jobId))
+                throw new JobApplicationException(Error_ApplicationExists);
+
+            string applicationId = Guid.NewGuid().ToString();
+            var application = new Application
+            {
+                ApplicationId = applicationId,
+                ApplicationStatusTypeId = AppStatus_Submitted,
+                UserId = userId,
+                JobId = jobId,
+                CreatedDate = DateTime.Now,
+                UpdatedDate = DateTime.Now
+            };
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                await repository.AddApplicationAsync(application);
+            }
+
+            await UpdateApplicationCacheAsync(userId, applicationId);
+        }
+
+        /// <summary>
+        /// Updates the status of an existing application.
+        /// </summary>
+        /// <param name="userId">The ID of the user updating the application.</param>
+        /// <param name="applicationId">The ID of the application to be updated.</param>
+        /// <param name="applicationStatusTypeId">The new status type ID to apply to the application.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId)
+        {
+            var application = await GetOrCacheApplicationByIdAsync(applicationId);
+
+            if (application == null)
+                throw new JobApplicationException(Error_ApplicationNotFound);
+            if (application.ApplicationStatusTypeId == applicationStatusTypeId)
+                throw new JobApplicationException(Error_ApplicationStatusUnchanged);
+
+            application.ApplicationStatusTypeId = applicationStatusTypeId;
             application.UpdatedDate = DateTime.Now;
 
-            await _repository.AddApplicationAsync(application);
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                await repository.UpdateApplicationAsync(application);
+            }
+
+            await UpdateApplicationCacheAsync(userId, applicationId);
         }
 
-        public async Task UpdateApplicationAsync(ApplicationViewModel model)
+        /// <summary>
+        /// Archives a specified application.
+        /// </summary>
+        /// <param name="userId">The ID of the user requesting the archive.</param>
+        /// <param name="applicationId">The ID of the application to be archived.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        public async Task ArchiveApplicationAsync(string userId, string applicationId)
         {
-            throw new NotImplementedException();
+            var validStatuses = new HashSet<string> { AppStatus_Withdrawn, AppStatus_Rejected, AppStatus_Accepted };
+            if (!validStatuses.Contains(applicationId))
+                throw new JobApplicationException(Error_ApplicationCannotArchive);
+
+            var application = await GetOrCacheApplicationByIdAsync(applicationId);
+            if (application == null)
+                throw new JobApplicationException(Error_ApplicationNotFound);
+
+            application.IsArchived = true;
+            application.UpdatedDate = DateTime.Now;
+
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                await repository.UpdateApplicationAsync(application);
+            }
+
+            await UpdateApplicationCacheAsync(userId, applicationId);
         }
 
-        public async Task DeleteApplicationAsync(string id)
-        {
-            throw new NotImplementedException();
-        }
-
+        /// <summary>
+        /// Retrieves a paginated list of all applications based on the provided filters.
+        /// </summary>
+        /// <param name="filters">The filter criteria for retrieving applications.</param>
+        /// <returns>A task representing the asynchronous operation, containing a paginated list of application view models.</returns>
         public async Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters)
         {
             var pageIndex = filters.PageIndex;
@@ -63,7 +149,8 @@ namespace Services.Services
             var userId = filters.UserId;
             var userRole = filters.UserRole;
 
-            var applications = _mapper.Map<List<ApplicationViewModel>>(await _repository.GetAllApplications(true));
+            var applications = _mapper.Map<List<ApplicationViewModel>>(await GetOrCacheAllApplicationsAsync());
+
             applications = userRole switch
             {
                 "Admin" => applications,
@@ -96,12 +183,12 @@ namespace Services.Services
                             a.Job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                             a.Job.Company.ContactEmail.Contains(search, StringComparison.OrdinalIgnoreCase) ||
                             a.Job.Company.ContactNumber.Contains(search, StringComparison.OrdinalIgnoreCase)
-                        ) 
+                        )
                     ) ||
                     a.Job.Location.Contains(search, StringComparison.OrdinalIgnoreCase)
                     ).ToList();
             }
-                
+
             if (!string.IsNullOrEmpty(statusFilter))
                 applications = applications.Where(a => a.ApplicationStatusTypeId == statusFilter).ToList();
 
@@ -126,7 +213,173 @@ namespace Services.Services
             return new PaginatedList<ApplicationViewModel>(items, totalCount, pageIndex, pageSize);
         }
 
+        /// <summary>
+        /// Retrieves an application by its ID.
+        /// </summary>
+        /// <param name="id">The ID of the application to retrieve.</param>
+        /// <returns>A task representing the asynchronous operation, containing the application view model.</returns>
         public async Task<ApplicationViewModel> GetApplicationByIdAsync(string id) =>
-            _mapper.Map<ApplicationViewModel>(await _repository.GetApplicationByIdAsync(id));
+            _mapper.Map<ApplicationViewModel>(await GetOrCacheApplicationByIdAsync(id));
+
+        #region Get or Cache Methods
+        /// <summary>
+        /// Retrieves all applications from the cache or database, caching the result if necessary.
+        /// </summary>
+        /// <returns>A task representing the asynchronous operation, containing a list of applications.</returns>
+        private async Task<List<Application>> GetOrCacheAllApplicationsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync(Key_ApplicationsAll, _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetAllApplicationsAsync(true);
+                }, cacheExpirationMinutes);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves all applications for a specific user from the cache or database, caching the result if necessary.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose applications to retrieve.</param>
+        /// <returns>A task representing the asynchronous operation, containing a list of applications.</returns>
+        private async Task<List<Application>> GetOrCacheAllApplicationsByUserAsync(string userId)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                string applicationUserKey = string.Format(Key_ApplicationsByUserId, userId);
+                return await cachingService.GetOrCacheAsync(applicationUserKey, _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var applications = await GetOrCacheAllApplicationsAsync();
+                    return applications.Where(a => a.UserId == userId).ToList();
+                }, cacheExpirationMinutes);
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a specific application by its ID from the cache or database, caching the result if necessary.
+        /// </summary>
+        /// <param name="id">The ID of the application to retrieve.</param>
+        /// <returns>A task representing the asynchronous operation, containing the application.</returns>
+        private async Task<Application> GetOrCacheApplicationByIdAsync(string id)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                string applicationKey = string.Format(Key_ApplicationById, id);
+                return await cachingService.GetOrCacheAsync(applicationKey, _memoryCache, _serviceProvider, async (innerScope) =>
+                {
+                    var applications = await GetOrCacheAllApplicationsAsync();
+                    return applications.Find(a => a.ApplicationId == id);
+                }, cacheExpirationMinutes);
+            }
+        }
+        #endregion
+
+        #region Helper Methods
+        /// <summary>
+        /// Updates the cache for the specified application and related data.
+        /// </summary>
+        /// <param name="userId">The ID of the user whose application cache needs updating.</param>
+        /// <param name="applicationId">The ID of the application to update in the cache.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task UpdateApplicationCacheAsync(string userId, string applicationId)
+        {
+            var applicationUserKey = string.Format(Key_ApplicationsByUserId, userId);
+            var applicationKey = string.Format(Key_ApplicationById, applicationId);
+
+            await UpdateApplicationsCacheAsync(Key_ApplicationsAll);
+            await UpdateUserApplicationsCacheAsync(applicationUserKey, userId);
+            await UpdateApplicationCacheByIdAsync(applicationKey, applicationId);
+        }
+
+        /// <summary>
+        /// Checks if an existing application exists for the specified user and job.
+        /// </summary>
+        /// <param name="userId">The ID of the user to check for existing applications.</param>
+        /// <param name="jobId">The ID of the job to check for existing applications.</param>
+        /// <returns>A task representing the asynchronous operation, returning true if an application exists.</returns>
+        private async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
+        {
+            var applications = await GetOrCacheAllApplicationsByUserAsync(userId);
+            return applications.Exists(a => a.JobId == jobId);
+        }
+
+        /// <summary>
+        /// Updates the cache for all applications based on the specified key.
+        /// </summary>
+        /// <param name="key">The cache key for the applications.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task UpdateApplicationsCacheAsync(string key)
+        {
+            var threadEvent = new DataListUpdatedEvent<Application>
+            {
+                Key = key,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetAllApplicationsAsync(true);
+                },
+                ExpirationMinutes = cacheExpirationMinutes
+            };
+            _eventBus.Publish(threadEvent);
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Updates the cache for applications associated with a specific user based on the specified key.
+        /// </summary>
+        /// <param name="key">The cache key for the user's applications.</param>
+        /// <param name="userId">The ID of the user whose application cache needs updating.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task UpdateUserApplicationsCacheAsync(string key, string userId)
+        {
+            var threadEvent = new DataListUpdatedEvent<Application>
+            {
+                Key = key,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetAllApplicationsByUserAsync(userId);
+                },
+                ExpirationMinutes = cacheExpirationMinutes
+            };
+            _eventBus.Publish(threadEvent);
+
+            await Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// Updates the cache for a specific application based on its ID and cache key.
+        /// </summary>
+        /// <param name="key">The cache key for the application.</param>
+        /// <param name="applicationId">The ID of the application to update in the cache.</param>
+        /// <returns>A task representing the asynchronous operation.</returns>
+        private async Task UpdateApplicationCacheByIdAsync(string key, string applicationId)
+        {
+            var threadEvent = new DataUpdatedEvent<Application>
+            {
+                Key = key,
+                Cache = _memoryCache,
+                ServiceProvider = _serviceProvider,
+                FetchUpdatedData = async (scope) =>
+                {
+                    var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                    return await repository.GetApplicationByIdAsync(applicationId);
+                },
+                ExpirationMinutes = cacheExpirationMinutes
+            };
+            _eventBus.Publish(threadEvent);
+
+            await Task.CompletedTask;
+        }
+        #endregion
     }
 }

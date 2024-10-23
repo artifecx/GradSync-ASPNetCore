@@ -1,15 +1,13 @@
-﻿using Data.Models;
-using Services.ServiceModels;
-using System.Collections.Generic;
+﻿using Services.ServiceModels;
 using System.Threading.Tasks;
 
 namespace Services.Interfaces
 {
     public interface IApplicationService
     {
-        Task AddApplicationAsync(ApplicationViewModel model);
-        Task UpdateApplicationAsync(ApplicationViewModel model);
-        Task DeleteApplicationAsync(string id);
+        Task SendApplicationAsync(string userId, string jobId);
+        Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId);
+        Task ArchiveApplicationAsync(string userId, string applicationId);
         Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters);
         Task<ApplicationViewModel> GetApplicationByIdAsync(string id);
     }

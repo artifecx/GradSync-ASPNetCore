@@ -8,7 +8,7 @@
 // </auto-generated>
 //------------------------------------------------------------------------------
 
-namespace Resources.Messages {
+namespace Resources.Constants {
     using System;
     
     
@@ -22,14 +22,14 @@ namespace Resources.Messages {
     [global::System.CodeDom.Compiler.GeneratedCodeAttribute("System.Resources.Tools.StronglyTypedResourceBuilder", "17.0.0.0")]
     [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
     [global::System.Runtime.CompilerServices.CompilerGeneratedAttribute()]
-    public class Common {
+    public class Types {
         
         private static global::System.Resources.ResourceManager resourceMan;
         
         private static global::System.Globalization.CultureInfo resourceCulture;
         
         [global::System.Diagnostics.CodeAnalysis.SuppressMessageAttribute("Microsoft.Performance", "CA1811:AvoidUncalledPrivateCode")]
-        internal Common() {
+        internal Types() {
         }
         
         /// <summary>
@@ -39,7 +39,7 @@ namespace Resources.Messages {
         public static global::System.Resources.ResourceManager ResourceManager {
             get {
                 if (object.ReferenceEquals(resourceMan, null)) {
-                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Resources.Messages.Common", typeof(Common).Assembly);
+                    global::System.Resources.ResourceManager temp = new global::System.Resources.ResourceManager("Resources.Constants.Types", typeof(Types).Assembly);
                     resourceMan = temp;
                 }
                 return resourceMan;
@@ -57,6 +57,60 @@ namespace Resources.Messages {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Accepted.
+        /// </summary>
+        public static string AppStatus_Accepted {
+            get {
+                return ResourceManager.GetString("AppStatus_Accepted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Rejected.
+        /// </summary>
+        public static string AppStatus_Rejected {
+            get {
+                return ResourceManager.GetString("AppStatus_Rejected", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Shortlisted.
+        /// </summary>
+        public static string AppStatus_Shortlisted {
+            get {
+                return ResourceManager.GetString("AppStatus_Shortlisted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Submitted.
+        /// </summary>
+        public static string AppStatus_Submitted {
+            get {
+                return ResourceManager.GetString("AppStatus_Submitted", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Viewed.
+        /// </summary>
+        public static string AppStatus_Viewed {
+            get {
+                return ResourceManager.GetString("AppStatus_Viewed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Withdrawn.
+        /// </summary>
+        public static string AppStatus_Withdrawn {
+            get {
+                return ResourceManager.GetString("AppStatus_Withdrawn", resourceCulture);
             }
         }
     }

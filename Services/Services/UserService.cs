@@ -231,7 +231,7 @@ namespace Services.Services
         /// <exception cref="UserException">Thrown when going to an administrative role from a non-administrative role and vice versa</exception>
         private async Task<string> SetUserRole(string userId, string currentRole, string newRole)
         {
-            string[] administrativeRoles = { Role_Admin, Role_NLO };
+            var administrativeRoles = new HashSet<string> { Role_Admin, Role_NLO };
             if ((administrativeRoles.Contains(currentRole) && !administrativeRoles.Contains(newRole)) ||
                 (!administrativeRoles.Contains(currentRole) && administrativeRoles.Contains(newRole)))
                 throw new UserException(string.Format(Error_UserIllegalRoleSwitch, currentRole, newRole));

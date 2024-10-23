@@ -13,6 +13,7 @@ using static Resources.Messages.EmailMessages;
 using static Resources.Messages.ErrorMessages;
 using static Resources.Messages.SuccessMessages;
 using static Services.Exceptions.UserExceptions;
+using System.Security.Claims;
 
 namespace Services.Services
 {
@@ -246,11 +247,18 @@ namespace Services.Services
             _repository.GetAllUsersAsync().Result.Exists(x => x.Email == Email);
 
         /// <summary>
+        /// Checks if a user id exists.
+        /// </summary>
+        /// <returns><see cref="bool"/> true if user id exists; otherwise false</returns>
+        public bool UserIdExists(string id) =>
+            _repository.GetAllUsersAsync().Result.Exists(x => x.UserId == id);
+
+        /// <summary>
         /// Retrieves the currently logged in user's role.
         /// </summary>
         /// <returns>The <see cref="string"/> role name</returns>
         public string GetCurrentUserRole() =>
-            _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
+            _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role)?.Value;
 
         /// <summary>
         /// A helper method to generate a token for a user with a 1-hour expiry.

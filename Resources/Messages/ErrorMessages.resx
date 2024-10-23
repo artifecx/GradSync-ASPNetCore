@@ -176,4 +176,19 @@ If you have not received anything, contact us at support@gradsync.org</value>
   <data name="Error_UserPreferenceUpdateDefault" xml:space="preserve">
     <value>An error has occurred while updating preferences.</value>
   </data>
+  <data name="Error_ApplicationCannotArchive" xml:space="preserve">
+    <value>Application cannot be archived. Must be withdrawn, rejected, or accepted first.</value>
+  </data>
+  <data name="Error_ApplicationStatusUnchanged" xml:space="preserve">
+    <value>Application status is already set to this value.</value>
+  </data>
+  <data name="Error_ApplicationNotFound" xml:space="preserve">
+    <value>Application cannot be found.</value>
+  </data>
+  <data name="Error_ApplicationExists" xml:space="preserve">
+    <value>An application already exists for this job.</value>
+  </data>
+  <data name="Error_ApplicationActionError" xml:space="preserve">
+    <value>An error occured while {0} application.</value>
+  </data>
 </root>
