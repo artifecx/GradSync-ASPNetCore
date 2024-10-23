@@ -1,9 +1,11 @@
 ﻿using Data.Interfaces;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using static Resources.Constants.Types;
 
 namespace Data.Repositories
 {
@@ -214,5 +216,25 @@ namespace Data.Repositories
         /// <returns>A task representing the asynchronous operation, containing a list of applications.</returns>
         public async Task<List<Application>> GetAllApplicationsByUserAsync(string userId) =>
             await this.GetDbSet<Application>().Where(a => a.UserId == userId).AsNoTracking().ToListAsync();
+
+        /// <summary>
+        /// Archives applications that were last updated before a specified date.
+        /// </summary>
+        /// <param name="date">The date limit.</param>
+        /// <param name="validStatuses">A hashset containing a list of application statuses that should be unchanged.</param>
+        /// <returns>A task representing the asynchronous operation, containing number of affected rows.</returns>
+        public async Task<int> ArchiveApplicationsUpdatedBeforeDateAsync(DateTime date, HashSet<string> validStatuses)
+        {
+            var affectedRows = await GetDbSet<Application>()
+                .Where(a => a.UpdatedDate < date)
+                .ExecuteUpdateAsync(s => s
+                    .SetProperty(a => a.IsArchived, true)
+                    .SetProperty(a => a.ApplicationStatusTypeId,
+                        a => validStatuses.Contains(a.ApplicationStatusTypeId) ? 
+                        a.ApplicationStatusTypeId : AppStatus_Rejected));
+
+            await UnitOfWork.SaveChangesAsync();
+            return affectedRows;
+        }
     }
 }

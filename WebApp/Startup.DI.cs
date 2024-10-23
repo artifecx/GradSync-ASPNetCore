@@ -40,6 +40,7 @@ namespace WebApp
             this._services.TryAddSingleton<IEmailQueue, EmailQueue>();
             this._services.TryAddSingleton<IEmailService, EmailService>();
             this._services.AddHostedService<EmailBackgroundService>();
+            this._services.AddHostedService<ArchiverBackgroundService>();
             this._services.AddScoped<IAccountService, AccountService>();
             this._services.AddScoped<IUserService, UserService>();
             this._services.AddScoped<IJobService, JobService>();
