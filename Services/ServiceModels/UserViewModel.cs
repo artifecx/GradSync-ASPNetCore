@@ -57,7 +57,7 @@ namespace Services.ServiceModels
         /// Gets or sets the avatar identifier.
         /// </summary>
         [Display(Name = "AvatarId")]
-        public string AvatarId { get; set; } // Add this line
+        public string AvatarId { get; set; }
 
 
         /// <summary>

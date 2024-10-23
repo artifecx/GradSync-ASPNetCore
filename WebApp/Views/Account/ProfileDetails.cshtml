@@ -2,8 +2,8 @@
 
 <div class="container mt-12">
     <h2 class="text-2xl font-bold text-[#7A1515]">Profile Details</h2>
-    <form id="editUserForm" enctype="multipart/form-data">
-        <!-- Add enctype for file upload -->
+    <form id="editUserForm" enctype="multipart/form-data" method="post" action="/User/Edit">
+        <!-- Add the action and method for form submission -->
         <!-- Hidden Fields -->
         <input type="hidden" id="editUserId" name="UserId" value="@Model.UserId" />
         <input type="hidden" id="editUserIsVerified" name="IsVerified" value="True" />
@@ -16,7 +16,11 @@
             <div class="mt-2">
                 <img id="avatarPreview" src="@Url.Content(Model.AvatarId != null ? Url.Action("GetAvatar", "Avatar", new { id = Model.AvatarId }) : "~/images/default-avatar.png")" alt="Avatar Preview" class="rounded-full" style="width: 100px; height: 100px; object-fit: cover;" />
             </div>
-            // //
+        </div>
+
+        <!-- New Button to Upload Avatar -->
+        <div class="form-group text-right mt-4">
+            <button type="button" class="bg-[#7A1515] text-white font-medium px-3 py-2 rounded-md hover:bg-[#A53D3D]" onclick="uploadAvatar()">Upload Avatar</button>
         </div>
 
         <!-- First Name -->
@@ -63,17 +67,4 @@
 
 @section Scripts {
     <script src="~/js/user.js"></script>
-    <script>
-        function previewAvatar(event) {
-            const avatarPreview = document.getElementById('avatarPreview');
-            const file = event.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = function (e) {
-                    avatarPreview.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-        }
-    </script>
 }

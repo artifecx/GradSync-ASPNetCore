@@ -220,12 +220,7 @@ namespace Data.Repositories
             return this.GetDbSet<Admin>().Any(a => a.UserId == adminId && a.IsSuper == true);
         }
 
-        public async Task<Avatar> UploadAvatarAsync(Avatar avatar)
-        {
-            await GetDbSet<Avatar>().AddAsync(avatar);
-            await UnitOfWork.SaveChangesAsync();
-            return avatar;
-        }
+
 
     }
 }

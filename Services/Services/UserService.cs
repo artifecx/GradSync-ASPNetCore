@@ -219,37 +219,6 @@ namespace Services.Services
         public async Task DeleteUserAsync(string userId) =>
             await _repository.DeleteUserAsync(userId);
 
-        public async Task<Avatar> UploadAvatarAsync(string userId, IFormFile file)
-        {
-            if (file == null || file.Length == 0)
-                throw new UserException("File is empty.");
-
-            var avatar = new Avatar
-            {
-                FileName = file.FileName,
-                FileContent = await ConvertToByteArray(file), 
-                FileType = file.ContentType,
-                UploadedDate = DateTime.UtcNow
-            };
-
-            await _repository.UploadAvatarAsync(avatar);
-
-            var user = await _repository.GetUserByIdAsync(userId);
-            user.AvatarId = avatar.AvatarId; 
-            await _repository.UpdateUserAsync(user);
-
-            return avatar;
-        }
-
-        private async Task<byte[]> ConvertToByteArray(IFormFile file)
-        {
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                return memoryStream.ToArray();
-            }
-        }
-
         #endregion
 
         #region Helper Methods

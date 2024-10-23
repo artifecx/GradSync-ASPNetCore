@@ -11,6 +11,9 @@ using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using static Resources.Messages.SuccessMessages;
 using static Resources.Messages.ErrorMessages;
+using static Services.Exceptions.UserExceptions;
+using System;
+using System.Linq;
 
 namespace WebApp.Controllers
 {
@@ -169,7 +172,8 @@ namespace WebApp.Controllers
                 TempData["ErrorMessage"] = TempData["ErrorMessage"] = string.Format(Error_UserActionError, "deleting");
                 return Json(new { success = false });
             }, "Delete");
-        }
+        } 
+
         #endregion POST Methods
     }
 }
