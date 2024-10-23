@@ -81,6 +81,8 @@ function displayEditModal(userId, firstname, lastname, middlename, suffix, email
 
 function submitEditUser() {
     var form = $('#editUserForm');
+    console.log("Submitting form..."); // Log when the function is called
+    console.log(form.serialize()); // Log the serialized form data
 
     form.validate();
     if (!form.valid()) {
@@ -107,3 +109,4 @@ function submitEditUser() {
         }
     });
 }
+

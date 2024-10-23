@@ -52,7 +52,7 @@ namespace WebApp.Controllers
         [HttpGet]
         [Route("")]
         public async Task<IActionResult> GetUserPreferences()
-        {
+        {       
             var preferences = await _userPreferencesService.GetUserPreferencesAsync(UserId);
             return View("ViewPreferences", preferences);
         }
@@ -77,7 +77,7 @@ namespace WebApp.Controllers
                 TempData["ErrorMessage"] = Error_UserPreferenceUpdateDefault;
                 return Json(new { success = false });
             }, "UpdateUserPreferences");
-        }
+        } 
 
         /// <summary>
         /// Updates the user password.
@@ -101,5 +101,18 @@ namespace WebApp.Controllers
                 return Json(new { success = false });
             }, "UpdatePassword");
         }
+
+        /// <summary>
+        /// Opens the Edit Profile view.
+        /// </summary>
+        /// <returns>The EditProfile view.</returns>
+        [HttpGet]
+        [Route("EditProfile")]
+        public IActionResult EditProfile()
+        {
+            // Render the EditProfile view.
+            return View("EditProfile");
+        }
+
     }
 }

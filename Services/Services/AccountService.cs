@@ -237,6 +237,22 @@ namespace Services.Services
             return Error_UserPasswordTokenExpired;
         }
 
+        public async Task<User> GetCurrentUserAsync()
+        {
+            var userId = _httpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
+
+            if (string.IsNullOrEmpty(userId))
+                throw new UnauthorizedAccessException("User is not authenticated.");
+
+            var user = await _repository.GetUserByIdAsync(userId);
+
+            if (user == null)
+                throw new Exception("User not found.");
+
+            return user;
+        }
+
+
         #region Helper Methods
         /// <summary>
         /// Checks if a user with the provided email already exists.

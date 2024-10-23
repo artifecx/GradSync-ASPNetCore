@@ -18,7 +18,7 @@ namespace WebApp.Controllers
     /// Controller for handling user-related operations.
     /// </summary>
     [Route("users")]
-    [Authorize(Policy = "Admin")]
+   [Authorize(Policy = "Admin")]
     public class UserController : ControllerBase<UserController>
     {
         private readonly IUserService _userService;
@@ -109,6 +109,7 @@ namespace WebApp.Controllers
         /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
         [Route("update")]
+        [AllowAnonymous]
         public async Task<IActionResult> Update(UserViewModel model)
         {
             return await HandleExceptionAsync(async () =>

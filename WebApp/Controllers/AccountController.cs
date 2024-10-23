@@ -250,5 +250,35 @@ namespace WebApp.Controllers
                 return RedirectToAction(Account_Login);
             }, "ResetPassword");
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("profiledetails")]
+        public async Task<IActionResult> GetLoggedInUser()
+        {
+            var user = await _accountService.GetCurrentUserAsync();
+
+            if (user == null)
+            {
+                return NotFound("User not found.");
+            }
+
+            // Convert User to UserViewModel
+            var userViewModel = new UserViewModel
+            {
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Suffix = user.Suffix,
+                Email = user.Email,
+                UserId = user.UserId,
+                IsVerified = user.IsVerified,
+                AvatarId = user.AvatarId
+                // Map other properties as needed
+            };
+
+            // Return the ProfileDetails view with the UserViewModel
+            return View("ProfileDetails", userViewModel);
+        }
     }
 }

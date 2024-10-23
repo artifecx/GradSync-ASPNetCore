@@ -54,6 +54,13 @@ namespace Services.ServiceModels
         public bool IsVerified { get; set; }
 
         /// <summary>
+        /// Gets or sets the avatar identifier.
+        /// </summary>
+        [Display(Name = "AvatarId")]
+        public string AvatarId { get; set; } // Add this line
+
+
+        /// <summary>
         /// Gets or sets the roles.
         /// </summary>
         public List<Role> Roles { get; set; }

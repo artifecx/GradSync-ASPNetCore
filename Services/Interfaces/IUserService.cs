@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Microsoft.AspNetCore.Http;
 using Services.ServiceModels;
 using System;
 using System.Collections.Generic;
@@ -17,5 +18,7 @@ namespace Services.Interfaces
         Task ResetUserPasswordAsync(string id);
         Task DeleteUserAsync(string userId);
         Task<List<Role>> GetRolesAsync();
+        Task<Avatar> UploadAvatarAsync(string userId, IFormFile file);
+
     }
 }

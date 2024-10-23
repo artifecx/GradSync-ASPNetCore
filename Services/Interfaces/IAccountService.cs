@@ -17,5 +17,7 @@ namespace Services.Interfaces
         Task ResetUserPasswordAsync(string id, string type = null);
         Task<string> VerifyUserEmail(string token);
         Task<string> CompleteUserPasswordRequestAsync(string token);
+        public Task<User> GetCurrentUserAsync();
+
     }
 }

@@ -25,7 +25,8 @@ namespace Data.Interfaces
         Task DeleteApplicantAsync(string applicantId);
         void AddRecruiter(Recruiter recruiter);
         Task DeleteRecruiterAsync(string recruiterId);
-
         bool IsSuperAdmin(string adminId);
+        Task<Avatar> UploadAvatarAsync(Avatar avatar);
+
     }
 }
