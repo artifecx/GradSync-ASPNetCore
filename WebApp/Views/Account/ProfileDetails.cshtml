@@ -9,20 +9,6 @@
         <input type="hidden" id="editUserIsVerified" name="IsVerified" value="True" />
         <input type="hidden" id="editUserRole" name="RoleId" value="Applicant" />
 
-        <!-- Avatar Upload -->
-        <div class="form-group">
-            <label for="avatarUpload" class="control-label">Add Avatar Picture</label>
-            <input type="file" id="avatarUpload" name="Avatar" accept="image/*" class="form-control" onchange="previewAvatar(event)" />
-            <div class="mt-2">
-                <img id="avatarPreview" src="@Url.Content(Model.AvatarId != null ? Url.Action("GetAvatar", "Avatar", new { id = Model.AvatarId }) : "~/images/default-avatar.png")" alt="Avatar Preview" class="rounded-full" style="width: 100px; height: 100px; object-fit: cover;" />
-            </div>
-        </div>
-
-        <!-- New Button to Upload Avatar -->
-        <div class="form-group text-right mt-4">
-            <button type="button" class="bg-[#7A1515] text-white font-medium px-3 py-2 rounded-md hover:bg-[#A53D3D]" onclick="uploadAvatar()">Upload Avatar</button>
-        </div>
-
         <!-- First Name -->
         <div class="form-row">
             <div class="form-group col-md-6">
