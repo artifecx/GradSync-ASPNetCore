@@ -40,20 +40,20 @@
                         {
                             <!-- Save -->
                             <button onclick="saveJobHandler('@Model.JobId')"
-                                    class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
+                                    class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
                                 <i class="fa-regular fa-bookmark"></i>
                             </button>
 
                             <!-- Apply -->
                             <button onclick="applyJobHandler('@Model.JobId')"
-                                    class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
+                                    class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
                                 <i class="fa-regular fa-paper-plane pr-1"></i> Apply
                             </button>
                         }
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
                         {
                             <!-- Edit -->
-                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white"
+                            <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white"
                                     data-toggle="modal"
                                     data-target="#editJobModal">
                                 <i class="fas fa-edit pr-2"></i> Edit
