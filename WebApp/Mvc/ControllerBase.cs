@@ -167,20 +167,20 @@ namespace WebApp.Mvc
         /// Starts the log.
         /// </summary>
         /// <param name="methodName">Name of the method.</param>
-        public void StartLog(object action, string methodName)
+        protected void StartLog(object action, string methodName)
         {
             string controllerName = GetControllerNameFromAction(action);
-            _logger.LogInformation($"======={controllerName} : {methodName} Started=======");
+            _logger.LogInformation("======= {Controller} : {Method} Started =======", controllerName, methodName);
         }
 
         /// <summary>
         /// Ends the log.
         /// </summary>
         /// <param name="methodName">Name of the method.</param>
-        public void EndLog(object action, string methodName)
+        protected void EndLog(object action, string methodName)
         {
             string controllerName = GetControllerNameFromAction(action);
-            _logger.LogInformation($"======={controllerName} : {methodName} Ended=======");
+            _logger.LogInformation("======= {Controller} : {Method} Ended=======", controllerName, methodName);
         }
 
         /// <summary>
@@ -218,7 +218,7 @@ namespace WebApp.Mvc
         private bool LogAndSetErrorMessage(Exception ex, string actionName)
         {
             TempData["ErrorMessage"] = string.Equals("Login", actionName) ? null : ex.Message.ToString();
-            _logger.LogError(ex, $"Error in {actionName}");
+            _logger.LogError(ex, "Error in {Action}", actionName);
             return true;
         }
 
@@ -309,42 +309,42 @@ namespace WebApp.Mvc
             catch (CompanyException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (UserException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (EmailException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (JobApplicationException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (JobException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return new JsonResult(new { success = false, error = "An error has occured. Please try again later." });
             }
             finally
