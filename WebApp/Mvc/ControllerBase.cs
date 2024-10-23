@@ -15,6 +15,7 @@ using static Resources.Messages.ErrorMessages;
 using Services.Interfaces;
 using static Services.Exceptions.JobApplicationExceptions;
 using static Services.Exceptions.JobExceptions;
+using System.Diagnostics;
 
 namespace WebApp.Mvc
 {
@@ -364,8 +365,7 @@ namespace WebApp.Mvc
             long ticks;
             if (long.TryParse(FormLoadTime, out ticks))
             {
-                var loadTime = new DateTime(ticks);
-                var timeTaken = DateTime.Now - loadTime;
+                var timeTaken = TimeSpan.FromTicks(Stopwatch.GetTimestamp() - ticks);
                 if (timeTaken.TotalSeconds < 8)
                 {
                     throw new UserException(Error_UserRegistrationDefault);

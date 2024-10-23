@@ -1,4 +1,5 @@
 ﻿@model Services.ServiceModels.AccountServiceModel
+@using System.Diagnostics;
 
 <div class="modal fade" id="registerUserModal" tabindex="-1" role="dialog" aria-labelledby="registerUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
@@ -84,7 +85,7 @@
                     </button>
                 </div>
 
-                <input type="hidden" name="FormLoadTime" value="@DateTime.Now.Ticks" />
+                <input type="hidden" name="FormLoadTime" value="@Stopwatch.GetTimestamp()" />
             </form>
         </div>
     </div>
