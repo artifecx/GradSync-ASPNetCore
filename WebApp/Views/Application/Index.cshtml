@@ -76,7 +76,7 @@
                                 <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Applicant)</th>
                                 <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                                     <div class="dropdown relative">
-                                        <a class="cursor-pointer href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <a class="cursor-pointer" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             @if (string.IsNullOrEmpty(filterByProgram))
                                             {
                                                 @Html.DisplayNameFor(model => model.First().Applicant.EducationalDetail.Program)
@@ -124,7 +124,7 @@
                                 </th>
 
                                 <!-- Job title/Position | SORT -->
-                                <th class="pl-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-600">
+                                <th class="py-3 pl-3 text-xs font-medium uppercase tracking-wider text-gray-600">
                                     <a asp-action="@aspAction"
                                        asp-route-sortBy="@sortByTitle"
                                        asp-route-search="@search"
@@ -182,7 +182,7 @@
                                 </th>
 
                                 <!-- Application date | SORT -->
-                                <th class="pl-2 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
+                                <th class="py-3 pl-2 text-xs font-medium uppercase tracking-wider text-gray-900">
                                     <a asp-action="@aspAction"
                                        asp-route-sortBy="@sortByCreatedDate"
                                        asp-route-search="@search"
@@ -310,7 +310,7 @@
                                     </a>
                                 </th>
                                 <!-- Application Status | FILTER -->
-                                <th class="pl-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
+                                <th class="py-3 pl-6 text-xs font-medium uppercase tracking-wider text-gray-900">
                                     <div class="dropdown relative">
                                         <a class="cursor-pointer text-black" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             @if (string.IsNullOrEmpty(filterByStatus))
@@ -384,12 +384,12 @@
                                 <tr class="hover:bg-gray-100">
                                     @if (isAdministrative || isRecruiter)
                                     {
-                                        <td class="w-24 pl-3 py-3 text-sm text-gray-700">
-                                           <div class="font-medium text-[#7A1515] text-xs">@applicantEducation.IdNumber</div>
+                                        <td class="py-3 pl-3 text-sm text-gray-700">
+                                           <div class="text-xs font-medium text-[#7A1515]">@applicantEducation.IdNumber</div>
                                         </td>
 
                                         <!-- Applicant details | FILTER -->
-                                        <td class="w-24 pr-3 py-3 text-sm text-gray-700">
+                                        <td class="py-3 pr-3 text-sm text-gray-700">
                                             <div>
                                                 <a href="@Url.Action("GetApplication", "Application", 
                                                            new { 
@@ -401,7 +401,7 @@
                                                                   filterByProgram = filterByProgram, 
                                                                   filterByStatus = filterByStatus 
                                                                 })"
-                                                   class="font-semibold text-[#7A1515] text-sm hover:underline hover:text-[#A53D3D]">
+                                                   class="text-sm font-semibold text-[#7A1515] hover:underline hover:text-[#A53D3D]">
                                                     @item.ApplicantName
                                                 </a>
                                                 <div class="text-xs">@applicantUser.Email</div>
@@ -410,29 +410,29 @@
                                         </td>
 
                                         <!-- Applicant's program | FILTER -->
-                                        <td class="cursor-pointer w-24 px-2 py-3 text-xs text-gray-700" title="@applicantProgram.Name">
+                                        <td class="cursor-pointer px-2 py-3 text-xs text-gray-700" title="@applicantProgram.Name">
                                             @applicantProgram.ProgramId
                                         </td>
                                         <!-- Job title | FILTER -->
-                                        <td class="w-24 px-3 py-3 text-xs text-gray-700">@item.Job.Title</td>
+                                        <td class="px-3 py-3 text-xs text-gray-700">@item.Job.Title</td>
                                         if (isAdministrative)
                                         {
                                              <!-- Company details | FILTER -->
                                             <td class="px-6 py-3 text-xs text-gray-700">@Html.Raw(companyDetails.Replace("\n", "<br>"))</td>
                                         }
                                         <!-- Job location | FILTER -->
-                                        <td class="w-24 px-3 py-3 text-xs text-gray-700">@job.Location</td>
+                                        <td class="px-3 py-3 text-xs text-gray-700">@job.Location</td>
                                         <!-- Setup type | FILTER -->
-                                        <td class="w-24 px-3 py-3 text-xs text-gray-700">@jobSetup.Name</td>
+                                        <td class="px-3 py-3 text-xs text-gray-700">@jobSetup.Name</td>
                                         <!-- Application date | SORT -->
-                                        <td class="w-30 pl-2 py-3 text-xs text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
+                                        <td class="w-30 py-3 pl-2 text-xs text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
                                         if (isRecruiter)
                                         {
                                         <!-- Applicant Resume | SORT -->
                                         <td class="w-24 py-3 text-xs font-semibold"><a href="# text-[#7A1515] hover:underline hover:text-[#A53D3D]">View Resume</a></td>
                                         }
                                         <!-- Application Status | FILTER -->
-                                        <td class="w-24 px-3 py-3 text-xs text-gray-700">@item.ApplicationStatusType.Name</td>
+                                        <td class="px-3 py-3 text-xs text-gray-700">@item.ApplicationStatusType.Name</td>
                                     }
                                     else
                                     {
