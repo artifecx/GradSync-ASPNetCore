@@ -15,6 +15,10 @@ public partial class Message
 
     public DateTime Timestamp { get; set; }
 
+    public DateTime? ReadAt { get; set; }
+
+    public bool IsRead { get; set; }
+
     public virtual MessageThread MessageThread { get; set; }
 
     public virtual User User { get; set; }
