@@ -569,7 +569,6 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.MessageThreadId)
                 .IsRequired()
                 .HasMaxLength(255);
-            entity.Property(e => e.ReadAt).HasColumnType("datetime");
             entity.Property(e => e.Timestamp)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");

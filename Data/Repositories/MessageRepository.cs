@@ -17,6 +17,12 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
+        public async Task UpdateMessageAsync(Message message)
+        {
+            this.GetDbSet<Message>().Update(message);
+            await UnitOfWork.SaveChangesAsync();
+        }
+
         public async Task CreateThreadAsync(MessageThread thread)
         {
             this.GetDbSet<MessageThread>().Add(thread);
@@ -66,7 +72,10 @@ namespace Data.Repositories
                             UserId = m.User.UserId,
                             FirstName = m.User.FirstName
                         }
-                    }).ToList(),
+                    })
+                    .OrderByDescending(m => m.Timestamp)
+                    .Take(50)
+                    .ToList(),
                     MessageParticipants = t.MessageParticipants
                 })
                 .AsNoTracking()

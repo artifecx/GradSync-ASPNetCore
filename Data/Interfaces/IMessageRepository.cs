@@ -7,6 +7,7 @@ namespace Data.Interfaces
     public interface IMessageRepository
     {
         Task AddMessageAsync(Message message);
+        Task UpdateMessageAsync(Message message);
         Task CreateThreadAsync(MessageThread thread);
         Task<List<Message>> GetRecentMessagesAsync(string threadId);
         Task<MessageThread> GetThreadByIdAsync(string threadId);
