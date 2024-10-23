@@ -112,8 +112,8 @@ namespace Services.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task ArchiveApplicationAsync(string userId, string applicationId)
         {
-            string[] validStatuses = { AppStatus_Withdrawn, AppStatus_Rejected, AppStatus_Accepted };
-            if(!validStatuses.Contains(applicationId))
+            var validStatuses = new HashSet<string> { AppStatus_Withdrawn, AppStatus_Rejected, AppStatus_Accepted };
+            if (!validStatuses.Contains(applicationId))
                 throw new JobApplicationException(Error_ApplicationCannotArchive);
 
             var application = await GetOrCacheApplicationByIdAsync(applicationId);

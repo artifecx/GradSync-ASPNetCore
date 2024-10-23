@@ -129,11 +129,12 @@ namespace WebApp.Mvc
         }
 
         /// <summary>
-        /// Return filter default if expiration session.
+        /// OnActionExecuting.
         /// </summary>
         /// <param name="context">context</param>
         public override void OnActionExecuting(ActionExecutingContext context)
         {
+            // do nothing
         }
 
         /// <summary>
@@ -142,6 +143,7 @@ namespace WebApp.Mvc
         /// <param name="context">context</param>
         public override void OnActionExecuted(ActionExecutedContext context)
         {
+            // do nothing
         }
 
         /// <summary>
@@ -284,7 +286,7 @@ namespace WebApp.Mvc
             }
             catch (Exception ex) when (LogAndSetErrorMessage(ex, actionName))
             {
-                _logger.LogError(ex, $"Error in {actionName}");
+                _logger.LogError(ex, "Error in {Action}", actionName);
                 return RedirectToAction(actionName);
             }
             finally

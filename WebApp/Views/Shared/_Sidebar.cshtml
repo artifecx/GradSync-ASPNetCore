@@ -6,8 +6,6 @@
     bool isSuper = User.HasClaim("IsSuperAdmin", "true");
     bool isRecruiter = User.IsInRole("Recruiter");
     var userId = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
-    bool hasUnreadNotifications = false;
-    int notificationCount = 0;
     var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
 }
 

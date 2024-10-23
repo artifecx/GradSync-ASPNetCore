@@ -25,41 +25,30 @@ namespace WebApp.Controllers
     {
         private readonly SessionManager _sessionManager;
         private readonly SignInManager _signInManager;
-        private readonly TokenValidationParametersFactory _tokenValidationParametersFactory;
-        private readonly TokenProviderOptionsFactory _tokenProviderOptionsFactory;
-        private readonly IConfiguration _appConfiguration;
         private readonly IAccountService _accountService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="AccountController"/> class.
         /// </summary>
+        /// <param name="userService">The user service.</param>"
         /// <param name="signInManager">The sign in manager.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="configuration">The configuration.</param>
         /// <param name="mapper">The mapper.</param>
-        /// <param name="userService">The user service.</param>"
-        /// <param name="tokenValidationParametersFactory">The token validation parameters factory.</param>
-        /// <param name="tokenProviderOptionsFactory">The token provider options factory.</param>
-
         public AccountController
             (
+                IAccountService userService,
                 SignInManager signInManager,
                 IHttpContextAccessor httpContextAccessor,
                 ILoggerFactory loggerFactory,
                 IConfiguration configuration,
-                IMapper mapper,
-                IAccountService userService,
-                TokenValidationParametersFactory tokenValidationParametersFactory,
-                TokenProviderOptionsFactory tokenProviderOptionsFactory
+                IMapper mapper
             ) : 
             base (httpContextAccessor, loggerFactory, configuration, mapper)
         {
             this._sessionManager = new SessionManager(this._session);
             this._signInManager = signInManager;
-            this._tokenProviderOptionsFactory = tokenProviderOptionsFactory;
-            this._tokenValidationParametersFactory = tokenValidationParametersFactory;
-            this._appConfiguration = configuration;
             this._accountService = userService;
         }
 
@@ -73,6 +62,12 @@ namespace WebApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Login(string returnUrl)
         {
+            if (!ModelState.IsValid)
+            {
+                TempData["ErrorMessageLogin"] = Error_UserLoginDefault;
+                return RedirectToAction(Account_Login, Controller_Account);
+            }
+
             if (User.Identity.IsAuthenticated)
             {
                 bool isAdminOrNLO = User.IsInRole(Role_Admin) || User.IsInRole(Role_NLO);
