@@ -1,7 +1,7 @@
 ﻿@model LoginViewModel
 @{
     ViewBag.LoginView = true;
-    ViewData["Title"] = "Login Page";
+    ViewData["Title"] = "Login | GradSync";
 
     await Html.RenderPartialAsync("_RegisterModal", new Services.ServiceModels.AccountServiceModel());
     await Html.RenderPartialAsync("_ForgotPasswordModal", new LoginViewModel());
