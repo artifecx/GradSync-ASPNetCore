@@ -230,6 +230,8 @@ namespace WebApp
             this._app.UseAuthentication();
             this._app.UseAuthorization();
 
+            this._app.UseMiddleware<UserSessionMiddleware>();
+
             this._app.UseCors();
         }
     }

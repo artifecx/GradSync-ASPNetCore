@@ -80,6 +80,7 @@ namespace Services.Services
         public async Task<CompanyViewModel> GetCompanyByRecruiterId(string userId)
         {
             var recruiter = await _repository.GetRecruiterByIdAsync(userId, false);
+            if (recruiter == null) throw new CompanyException("Recruiter not found.");
             var company = await _repository.GetCompanyByIdAsync(recruiter.CompanyId);
             return _mapper.Map<CompanyViewModel>(company);
         }
