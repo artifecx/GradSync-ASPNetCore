@@ -23,8 +23,7 @@ namespace WebApp.Hubs
 
         public async Task SendMessageToThread(string threadId, string userId1, string userId2, string content, string title)
         {
-            var isAdmin = Context.User.IsInRole("Admin") || Context.User.IsInRole("NLO");
-            var userName = isAdmin ? "Administrator" : Context.User.Identity.Name;
+            var userName = Context.User.Identity.Name;
             var userId = Context.UserIdentifier;
 
             var thread = await _messageService.GetMessageThreadByIdAsync(threadId);
@@ -62,8 +61,8 @@ namespace WebApp.Hubs
                 Title = title,
                 MessageParticipants = new List<MessageParticipant>
                 {
-                    new MessageParticipant { MessageParticipantId = Guid.NewGuid().ToString(), UserId = userId1, IsAdmin = false },
-                    new MessageParticipant { MessageParticipantId = Guid.NewGuid().ToString(), UserId = userId2, IsAdmin = false }
+                    new MessageParticipant { MessageParticipantId = Guid.NewGuid().ToString(), UserId = userId1 },
+                    new MessageParticipant { MessageParticipantId = Guid.NewGuid().ToString(), UserId = userId2 }
                 }
             };
             await _messageService.CreateMessageThreadAsync(thread);
