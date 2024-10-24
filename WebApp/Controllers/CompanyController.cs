@@ -116,7 +116,7 @@ namespace WebApp.Controllers
                     return RedirectToAction("RegisterCompany");
                 }
 
-                return View("CompanyDetails", company);
+                return View("ViewCompany", company);
             }, "GetCompanyRecruiter");
         }
 
