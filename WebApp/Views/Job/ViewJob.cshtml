@@ -8,7 +8,9 @@
     var userId = ViewBag.UserId;
     string aspAction = string.Empty;
 
-    if (User.IsInRole("Admin") || User.IsInRole("NLO"))
+    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("NLO");
+
+    if (isAdmin)
         aspAction = "GetAllJobsAdmin";
     else if (User.IsInRole("Recruiter"))
         aspAction = "GetAllJobsRecruiter";
@@ -50,7 +52,7 @@
                                 <i class="fa-regular fa-paper-plane pr-1"></i> Apply
                             </button>
                         }
-                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
+                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
                         {
                             <!-- Edit -->
                             <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]"

@@ -66,6 +66,20 @@
 
             <!-- Table -->
             <div class="min-w-full rounded-lg bg-white">
+                <div class="float-right py-2">
+                    <button onclick="location.href='@Url.Action("", "",
+                        new {
+                            SortBy = sortBy,
+                            Search = search,
+                            PageIndex = pageIndex,
+                            ProgramFilter = filterByProgram,
+                            WorkSetupFilter = filterByWorkSetup,
+                            StatusFilter = filterByStatus,
+                        })'"
+                            class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
+                        <i class="fa fa-archive"></i> Archived Applications
+                    </button>
+                </div>
                 <table class="min-w-full table-auto rounded-lg border bg-white">
                     <thead class="rounded-lg border bg-gray-100">
                         <tr>

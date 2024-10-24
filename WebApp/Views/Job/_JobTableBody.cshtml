@@ -23,7 +23,7 @@
 @if (!Model.Any())
 {
     <tr>
-        <td colspan="13" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
+        <td colspan="8" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
             @(noResult ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
         </td>
     </tr>
@@ -33,34 +33,35 @@ else
     @foreach (var item in Model)
     {
         <tr class="hover:bg-gray-100">
-            <td class="px-6 py-3 text-sm text-gray-700">
-                <a href="@Url.Action("GetJob", "Job", 
-                    new { 
-                        id = item.JobId,
-                        sortBy = sortBy,
-                        search = search,
-                        pageIndex = Model.PageIndex ,
-                        filterByStatusType = filterByStatusType,
-                        filterByWorkSetup = filterByWorkSetup,
-                        filterByEmploymentType = filterByEmploymentType,
-                        filterByCompany = filterByCompany,
-                    })"
-                   class="hover:text-[#A53D3D] hover:underline">
-                    @Html.DisplayFor(modelItem => item.Title)
-                </a>
+            <td class="py-3 pl-3 text-sm text-gray-700">
+                <div class="text-xs font-medium text-[#7A1515]">
+                    <button onclick="location.href='@Url.Action("GetJob", "Job",
+                        new { 
+                            id = item.JobId,
+                            sortBy = sortBy,
+                            search = search,
+                            pageIndex = Model.PageIndex ,
+                            filterByStatusType = filterByStatusType,
+                            filterByWorkSetup = filterByWorkSetup,
+                            filterByEmploymentType = filterByEmploymentType,
+                            filterByCompany = filterByCompany,
+                        })'">
+                        @Html.DisplayFor(modelItem => item.Title)
+                    </button>
+                </div>
             </td>
             @if (!User.IsInRole("Recruiter"))
             {
-                <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>
+                <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>
             }
             else
             {
-                <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.AvailableSlots)</td>
+                <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.AvailableSlots)</td>
             }
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.EmploymentType.Name)</td>
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.StatusType.Name)</td>
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.SetupType.Name)</td>
-            <td class="px-6 py-3 text-sm text-gray-700">@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.EmploymentType.Name)</td>
+            <td class="py-3 pl-6 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.StatusType.Name)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.SetupType.Name)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.CreatedDate)</td>
             <td class="py-3 pl-6 text-left">
                 <div class="relative">
                     <!-- Dropdown Button -->
@@ -72,7 +73,6 @@ else
                     <div id="actionDropdownJobMenu-@item.JobId"
                          class="actionDropdownJobMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white text-left shadow-lg ring-black">
                         <div class="space-y-1 py-1">
-
                             <!-- Job Details -->
                             <button onclick="location.href='@Url.Action("GetJob", "Job", 
                                     new { 
