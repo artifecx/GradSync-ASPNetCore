@@ -1,5 +1,5 @@
 ﻿@model Services.ServiceModels.ApplicationViewModel
-@using Data.Models 
+@using Data.Models
 @using Humanizer
 
 @{
@@ -7,10 +7,10 @@
     {
         return applicationStatus switch
         {
-            "Viewed" => "#fdbf77",
+            "Viewed" => "#82b8f1",
             "Accepted" => "#54eba2",
             "Rejected" => "#ee6d6b",
-            "Shortlisted" => "#82b8f1",
+            "Shortlisted" => "#fdbf77",
             _ => "#DCDDDF",
         };
     }
@@ -30,10 +30,10 @@
         </div>
     </div>
 
-    <div class="mt-2 flex"> 
+    <div class="mt-2 flex">
         <div class="text-lg font-bold">Status:</div>
-        <div class="border-2 ml-1 rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider text-gray-900" 
-                style="background-color:@GetStatusColor(Model.ApplicationStatusType.Name);">
+        <div class="border-2 ml-1 rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider text-gray-900"
+             style="background-color:@GetStatusColor(Model.ApplicationStatusType.Name);">
             @Model.ApplicationStatusType.Name
         </div>
     </div>

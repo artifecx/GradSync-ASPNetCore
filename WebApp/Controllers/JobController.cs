@@ -58,12 +58,12 @@ namespace WebApp.Controllers
         [Authorize(Policy = "Admin")]
         [Route("admin/all")]
         public async Task<IActionResult> GetAllJobsAdmin(
-            string sortBy, 
-            string search, 
+            string sortBy,
+            string search,
             string filterByCompany,
-            string filterByEmploymentType, 
+            string filterByEmploymentType,
             string filterByStatusType,
-            string filterByWorkSetup, 
+            string filterByWorkSetup,
             int pageIndex = 1)
         {
             return await HandleExceptionAsync(async () =>
@@ -106,7 +106,7 @@ namespace WebApp.Controllers
                 ViewBag.Verified = company.IsVerified;
 
                 var filterByEmploymentTypeList = new List<string>();
-                if(!string.IsNullOrEmpty(filterByEmploymentType))
+                if (!string.IsNullOrEmpty(filterByEmploymentType))
                     filterByEmploymentTypeList.Add(filterByEmploymentType);
                 var filterByWorkSetupList = new List<string>();
                 if (!string.IsNullOrEmpty(filterByWorkSetup))
@@ -201,7 +201,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType, 
+                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType,
                     filterByStatusType, filterByWorkSetup, pageIndex, 10, filterByDatePosted, filterBySalary);
 
                 await InitializeValues(sortBy, search, filterByCompany, filterByStatusType, filterByDatePosted, filterBySalary);
@@ -319,7 +319,7 @@ namespace WebApp.Controllers
                 TempData["ErrorMessage"] = "An error has occurred while creating a new job.";
                 return Json(new { success = false });
             }, "Create");
-        } 
+        }
 
         /// <summary>
         /// Updates the selected job.

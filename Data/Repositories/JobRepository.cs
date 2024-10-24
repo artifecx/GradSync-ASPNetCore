@@ -70,7 +70,9 @@ namespace Data.Repositories
         }
 
         public async Task<Job> GetJobByIdAsync(string id, string isArchived) =>
-            await this.GetDbSet<Job>().FirstOrDefaultAsync(j => j.IsArchived == Convert.ToBoolean(isArchived) && j.JobId == id);
+            await this.GetDbSet<Job>()
+                .Include(j => j.Applications)
+                .FirstOrDefaultAsync(j => j.IsArchived == Convert.ToBoolean(isArchived) && j.JobId == id);
 
         public async Task<List<EmploymentType>> GetEmploymentTypesAsync() =>
             await this.GetDbSet<EmploymentType>().AsNoTracking().ToListAsync();
