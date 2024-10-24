@@ -33,6 +33,6 @@
         /// <summary>
         /// authentication Issuer
         /// </summary>
-        public const string Issuer = "citu.gradsync";
+        public const string Issuer = "gradsync.org";
     }
 }

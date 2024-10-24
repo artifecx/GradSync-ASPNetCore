@@ -4,7 +4,7 @@
 @using System.Text.Json;
 
 @{
-    ViewData["Title"] = "Archived Jobs";
+    ViewData["Title"] = "Archived Jobs | GradSync";
     await Html.RenderPartialAsync("_UnarchiveJobModal", new Services.ServiceModels.JobServiceModel());
 
     string sortBy = ViewData["SortBy"] as string;

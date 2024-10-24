@@ -4,7 +4,7 @@
 @using System.Text.Json;
 
 @{
-    ViewData["Title"] = $"Application | {Model.Job.Title}";
+    ViewData["Title"] = $"{Model.Job.Title} Application | GradSync";
     var userId = ViewBag.UserId;
     string aspAction = "GetAllApplications";
 }
@@ -76,7 +76,7 @@
                 <form id="sendForm">
                     <div class="flex items-center border-t border-gray-200 p-4">
                         <input id="messageInput" type="text" class="flex-grow rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2" placeholder="Type your message..." @(User.IsInRole("NLO") ? "hidden" : "")>
-                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed " @(User.IsInRole("NLO") ? "hidden" : "")>
+                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed" @(User.IsInRole("NLO") ? "hidden" : "")>
                             Send
                         </button>
                         <input type="hidden" id="threadId" value="@Model.ApplicationId" />

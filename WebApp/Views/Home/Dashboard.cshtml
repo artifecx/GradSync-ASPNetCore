@@ -1,60 +1,57 @@
 ﻿@model Services.ServiceModels.DashboardViewModel
-<!--Admin Dashboard-->
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body class="bg-[#F5F7F8]">
-    <div class="flex">
-        <div class="flex-1 p-3 bg-[#F5F7F8]">
-            <div class="flex-1 p-6 bg-white shadow-md rounded-lg">
-                <h1 class="text-4xl font-bold text-left text-[#7A1515] mb-12">Admin Dashboard</h1>
+@{
+    ViewData["Title"] = "Dashboard | GradSync";
+}
 
-                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">User Data</h2>
+<div class="bg-[#F5F7F8]">
+    <div class="flex">
+        <div class="flex-1 bg-[#F5F7F8] p-3">
+            <div class="flex-1 rounded-lg bg-white p-6 shadow-md">
+                <h1 class="mb-12 text-left text-4xl font-bold text-[#7A1515]">Admin Dashboard</h1>
+
+                <div class="grid-cols-1 mb-8 grid gap-6 lg:grid-cols-3">
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">User Data</h2>
                         <canvas id="userChart"></canvas>
                     </div>
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">Application Data</h2>
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Application Data</h2>
                         <canvas id="applicationChart"></canvas>
                     </div>
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">Job Data</h2>
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Job Data</h2>
                         <canvas id="jobChart"></canvas>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">Jobs Salary Distribution</h2>
+                <div class="grid-cols-1 grid gap-6 lg:grid-cols-2">
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Jobs Salary Distribution</h2>
                         <canvas id="jobSalaryDistribution"></canvas>
                     </div>
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">Total Applications vs Total Jobs</h2>
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Total Applications vs Total Jobs</h2>
                         <canvas id="applicationsVsJobsChart"></canvas>
                     </div>
 
-                    <div class="bg-[#F5F7F8] shadow-md rounded-lg p-6">
-                        <h2 class="text-2xl font-semibold text-[#7A1515] mb-6">Applications by Employment Type</h2>
+                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Applications by Employment Type</h2>
                         <canvas id="applicationsByEmploymentTypeChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+</div>
 
+@section Scripts{
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         const userData = {
             totalAdmins: @Model.TotalAdmins,
             totalRecruiters: @Model.TotalRecruiters,
             totalApplicants: @Model.TotalApplicants
-                };
+                        };
 
         const applicationData = {
             totalApplicationsAllTime: @Model.TotalApplicationsAllTime,
@@ -62,13 +59,13 @@
             totalApplicationsPerMonth: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TotalApplicationsPerMonth)),
             applicationsByStatus: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TotalJobsPerStatusType)),
             applicationsByEmploymentType: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TotalJobsPerEmploymentType))
-                };
+                        };
 
         const jobData = {
             totalJobsAllTime: @Model.TotalJobsAllTime,
             totalJobsPerMonth: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.TotalJobsPerMonth)),
             jobSalaryDistribution: @Html.Raw(Newtonsoft.Json.JsonConvert.SerializeObject(Model.JobSalaryDistribution))
-                };
+                        };
 
         // User Roles
         var ctx1 = document.getElementById('userChart').getContext('2d');
@@ -228,5 +225,4 @@
             }
         });
     </script>
-</body>
-</html>
+}

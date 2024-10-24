@@ -1,7 +1,7 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.CompanyViewModel>
 
 @{
-    ViewData["Title"] = "All Companies";
+    ViewData["Title"] = "Company Management | GradSync";
     await Html.RenderPartialAsync("_AddCompanyModal", new Services.ServiceModels.CompanyViewModel());
     await Html.RenderPartialAsync("_DeleteModal"); 
 
