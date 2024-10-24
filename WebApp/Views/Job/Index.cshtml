@@ -35,6 +35,12 @@
     var Skills = ViewBag.Skills as List<Skill>;
 
     bool verified = ViewBag.Verified as bool? ?? false;
+
+    bool hasFilters = !string.IsNullOrEmpty(search) &&
+        !string.IsNullOrEmpty(filterByCompany) &&
+        !string.IsNullOrEmpty(filterByEmploymentType) &&
+        !string.IsNullOrEmpty(filterByStatusType) &&
+        !string.IsNullOrEmpty(filterByWorkSetup);
 }
 
 @if (!verified && User.IsInRole("Recruiter"))
@@ -61,31 +67,41 @@ else
     <div class="min-h-[calc(96vh-60px)] flex bg-[#F5F7F8]">
         <div class="flex-1 flex items-center justify-center p-3">
             <div class="h-full w-full max-w-7xl overflow-auto rounded-lg bg-white p-6 shadow-md">
-
                 <div class="flex items-center justify-between">
                     <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
                         Job Management
                     </h1>
 
-                    <!-- Search and Add Job Button -->
+                    <!-- Search Button -->
                     <div class="flex items-center space-x-2 pb-8">
                         <div class="flex items-center space-x-2">
-                            <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+                            @if (hasFilters)
+                            {
+                                <form method="get" asp-action="@aspAction">
+                                    <button type="submit" class="rounded bg-gray-300 px-2 py-1 text-black">
+                                        <i class="fa-solid fa-xmark"></i>
+                                    </button>
+                                </form>
+                            }
+                            <form method="get" asp-action="@aspAction"
+                                  class="flex items-center space-x-2">
                                 @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
                                 <input type="hidden" name="sortBy" value="@sortBy" />
                             </form>
+
+                            @if (User.IsInRole("NLO"))
+                            {
+                                <div class="ml-3">
+                                    <button type="button"
+                                            class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                                            data-toggle="modal"
+                                            data-target="#createJobModal">
+                                        <i class="fa fa-plus"></i>
+                                        Add Job
+                                    </button>
+                                </div>
+                            }
                         </div>
-                        @if (User.IsInRole("Recruiter"))
-                        {
-                            <div class="flex items-center space-x-2">
-                                <button type="button"
-                                        class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
-                                        data-toggle="modal"
-                                        data-target="#createJobModal">
-                                    <i class="fas fa-plus pr-1"></i> Add Job
-                                </button>
-                            </div>
-                        }
                     </div>
                 </div>
 

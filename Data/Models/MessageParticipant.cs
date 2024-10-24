@@ -11,8 +11,6 @@ public partial class MessageParticipant
 
     public string UserId { get; set; }
 
-    public bool IsAdmin { get; set; }
-
     public virtual MessageThread MessageThread { get; set; }
 
     public virtual User User { get; set; }

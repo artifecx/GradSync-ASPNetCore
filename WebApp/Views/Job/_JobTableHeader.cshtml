@@ -28,16 +28,16 @@
 
 
 <tr>
-    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
+    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
         @Html.DisplayNameFor(model => model.First().Title)
     </th>
 
     @if (!User.IsInRole("Recruiter"))
     {   
         <!-- Company Column (with dropdown) -->
-        <th class="px-6 py-3 text-sm font-medium uppercase tracking-wider text-gray-900">
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-black" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <a class="cursor-pointer text-gray-500" href="#" id="companyDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                     @if (filterByCompany == null)
                     {
                         @Html.DisplayNameFor(model => model.First().Company)
@@ -49,8 +49,8 @@
                     <i class="fa-solid fa-chevron-down"></i>
                 </a>
 
-                <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="companyDropdown">
-                    <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="companyDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                        asp-action="@aspAction"
                        asp-route-sortBy="@sortBy"
                        asp-route-search="@search"
@@ -62,7 +62,16 @@
                     {
                         foreach (var c in companies)
                         {
-                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" asp-route-filterByCompany="@c.Name" asp-route-filterByEmploymentType="@filterByEmploymentType" asp-route-filterByStatusType="@filterByStatusType" asp-route-filterByWorkSetup="@filterByWorkSetup">@c.Name</a>
+                            <a class="dropdown-item block px-4 text-sm hover:bg-gray-100" 
+                                asp-action="@aspAction" 
+                                asp-route-sortBy="@sortBy" 
+                                asp-route-search="@search" 
+                                asp-route-filterByCompany="@c.Name" 
+                                asp-route-filterByEmploymentType="@filterByEmploymentType" 
+                                asp-route-filterByStatusType="@filterByStatusType" 
+                                asp-route-filterByWorkSetup="@filterByWorkSetup">
+                                @c.Name
+                            </a>
                         }
                     }
                 </div>
@@ -71,15 +80,15 @@
     }
     else
     {
-        <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
             @Html.DisplayNameFor(model => model.First().AvailableSlots)
         </th>
     }
 
     <!-- Employment Type Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-gray-900" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-gray-500" href="#" id="employmentTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByEmploymentType))
                 {
                     @Html.DisplayNameFor(model => model.First().EmploymentType)
@@ -90,8 +99,8 @@
                 }
                 <i class="fa-solid fa-chevron-down"></i>
             </a>
-            <div class="dropdown-menu absolute hidden pt-1" aria-labelledby="employmentTypeDropdown">
-                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+            <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="employmentTypeDropdown">
+                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                    asp-action="@aspAction"
                    asp-route-sortBy="@sortBy"
                    asp-route-search="@search"
@@ -103,7 +112,7 @@
                 {
                     foreach (var et in employmentTypes)
                     {
-                        <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                            asp-action="@aspAction"
                            asp-route-sortBy="@sortBy"
                            asp-route-search="@search"
@@ -118,9 +127,9 @@
     </th>
 
     <!-- Status Type Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-black" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByStatusType))
                 {
                     @Html.DisplayNameFor(model => model.First().StatusType)
@@ -131,8 +140,8 @@
                 }
                 <i class="fa-solid fa-chevron-down"></i>
             </a>
-            <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+            <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
+                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                    asp-action="@aspAction"
                    asp-route-sortBy="@sortBy"
                    asp-route-search="@search"
@@ -144,7 +153,7 @@
                 {
                     foreach (var st in statusTypes)
                     {
-                        <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                            asp-action="@aspAction"
                            asp-route-sortBy="@sortBy"
                            asp-route-search="@search"
@@ -159,9 +168,9 @@
     </th>
 
     <!-- Work Setup Column (with dropdown) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
         <div class="dropdown relative">
-            <a class="cursor-pointer text-black" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            <a class="cursor-pointer text-gray-500" href="#" id="workSetupDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 @if (string.IsNullOrEmpty(filterByWorkSetup))
                 {
                     @Html.DisplayNameFor(model => model.First().SetupType)
@@ -172,8 +181,8 @@
                 }
                 <i class="fa-solid fa-chevron-down"></i>
             </a>
-            <div class="dropdown-menu absolute hidden pt-1 text-gray-700" aria-labelledby="workSetupDropdown">
-                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+            <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="workSetupDropdown">
+                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                    asp-action="@aspAction"
                    asp-route-sortBy="@sortBy"
                    asp-route-search="@search"
@@ -185,7 +194,7 @@
                 {
                     foreach (var ws in workSetups)
                     {
-                        <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
                            asp-action="@aspAction"
                            asp-route-sortBy="@sortBy"
                            asp-route-search="@search"
@@ -200,7 +209,7 @@
     </th>
 
     <!-- CreatedDate Column (sortable) -->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
         <a asp-action="@aspAction"
            asp-route-sortBy="@sortByCreatedDate"
            asp-route-search="@search"
@@ -214,5 +223,5 @@
         </a>
     </th>
     <!-- Actiion-->
-    <th class="px-6 py-3 text-left text-xs font-medium uppercase">Action</th>
+    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
 </tr>
