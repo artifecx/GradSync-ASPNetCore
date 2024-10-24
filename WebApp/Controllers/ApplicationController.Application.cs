@@ -24,6 +24,7 @@ namespace WebApp.Controllers
         /// </returns>
         [HttpPost]
         [Authorize(Policy = "Applicant")]
+        [Route("apply")]
         public async Task<IActionResult> SendApplication(string jobId)
         {
             return await HandleExceptionAsync(async () =>

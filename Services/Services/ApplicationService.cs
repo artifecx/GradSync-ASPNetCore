@@ -301,7 +301,7 @@ namespace Services.Services
         /// <param name="userId">The ID of the user to check for existing applications.</param>
         /// <param name="jobId">The ID of the job to check for existing applications.</param>
         /// <returns>A task representing the asynchronous operation, returning true if an application exists.</returns>
-        private async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
+        public async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
         {
             var applications = await GetOrCacheAllApplicationsByUserAsync(userId);
             return applications.Exists(a => a.JobId == jobId);

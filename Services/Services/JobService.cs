@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static Services.Exceptions.CompanyExceptions;
+using static Resources.Constants.UserRoles;
 using Microsoft.Extensions.Caching.Memory;
 using System.Xml;
 
@@ -368,10 +369,16 @@ namespace Services.Services
         public async Task<JobViewModel> GetJobByIdAsync(string id) 
         {
             var job = await _repository.GetJobByIdAsync(id, false);
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var currentUserRole = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
             if (job == null)
                 throw new JobException("Job not found.");
 
             var model = _mapper.Map<JobViewModel>(job);
+
+            if (currentUserRole == Role_Applicant)
+                model.HasApplied = job.Applications.Any(a => a.UserId == currentUserId);
 
             model.SalaryLower = GetLowerSalary(job.Salary);
             model.SalaryUpper = GetUpperSalary(job.Salary);

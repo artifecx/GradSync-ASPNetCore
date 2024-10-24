@@ -11,6 +11,7 @@ using Services.ServiceModels;
 using static Resources.Constants.Routes;
 using static Resources.Messages.ErrorMessages;
 using static Resources.Messages.SuccessMessages;
+using System.Security.Claims;
 
 namespace WebApp.Controllers
 {
@@ -87,6 +88,7 @@ namespace WebApp.Controllers
         /// <returns>
         /// A view displaying the application details or redirects if the application is not found or if the model state is invalid.
         /// </returns>
+        // In your ApplicationController
         [HttpGet]
         [Route("view")]
         [Authorize]
@@ -97,13 +99,18 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid && !string.IsNullOrEmpty(id))
                 {
                     var model = await _applicationService.GetApplicationByIdAsync(id);
-                    if(model == null)
+                    if (model == null)
                     {
                         TempData["ErrorMessage"] = Error_ApplicationNotFound;
                         return RedirectToAction(Application_GetAll);
                     }
-                    
+
                     ViewBag.UserId = UserId;
+
+                    // Check if the user has applied for the job aaaaaahhhh
+                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                    var hasApplied = await _applicationService.HasExistingApplicationAsync(userId, model.JobId);
+                    ViewBag.HasApplied = hasApplied;
 
                     return View("ViewApplication", model);
                 }

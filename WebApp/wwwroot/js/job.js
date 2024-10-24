@@ -9,6 +9,29 @@
     }
 });
 
+async function applyJobHandler(jobId) {
+    const actionUrl = $('#actionUrl').val();
+    console.log(jobId);
+    console.log(actionUrl);
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        data: { jobId: jobId },
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (xhr, status, error) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
 function submitCreateJob() {
     var form = $('#createJobForm');
 

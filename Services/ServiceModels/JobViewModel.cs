@@ -99,5 +99,7 @@ namespace Services.ServiceModels
         public List<Program> Programs { get; set; }
 
         public string PostedById { get; set; }
+
+        public bool HasApplied { get; set; } = false;
     }
 }

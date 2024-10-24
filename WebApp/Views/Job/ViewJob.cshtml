@@ -1,10 +1,12 @@
 ﻿@model Services.ServiceModels.JobViewModel
+@using System.Security.Claims
 @using Data.Models;
 @using Humanizer;
 @using System.Text.Json;
+@using Services.Services
 
 @{
-    ViewData["Title"] = $"{Model.Title} | GradSync";
+    ViewData["Title"] = Model.Title;
     var userId = ViewBag.UserId;
     string aspAction = string.Empty;
 
@@ -25,7 +27,7 @@
     <div class="mx-auto mt-10 flex max-w-7xl gap-6 rounded-lg bg-gray-100 px-6">
         <div class="w-full justify-between">
             <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
-                <div class="flex justify-between">         
+                <div class="flex justify-between">
                     <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
                         <i class="fas fa-arrow-left mr-2"></i> Back
                     </a>
@@ -38,22 +40,53 @@
                     <div class="flex justify-between space-x-4 p-2">
                         @if (User.IsInRole("Applicant"))
                         {
-                            <!-- Save -->
-                            <button onclick="saveJobHandler('@Model.JobId')"
-                                    class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
-                                <i class="fa-regular fa-bookmark"></i>
-                            </button>
+                            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                            var hasApplied = Model.HasApplied;
 
-                            <!-- Apply -->
-                            <button onclick="applyJobHandler('@Model.JobId')"
-                                    class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
-                                <i class="fa-regular fa-paper-plane pr-1"></i> Apply
-                            </button>
+                            // var hasApplied = ViewBag.HasApplied as bool? ?? true; 
+
+                            if (hasApplied)
+                            {
+                                <!-- Withdraw Application Button -->
+                                <button onclick="withdrawApplicationHandler('@Model.JobId')"
+                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                    <i class="fa-solid fa-door-open pr-1"></i> Withdraw Application
+                                </button>
+
+                                <button onclick="location.href='@Url.Action("GetApplication", "Application",
+                                        new {
+                                            id = ViewBag.ApplicationId,
+                                            sortBy = ViewBag.SortBy,
+                                            search = ViewBag.Search,
+                                            pageIndex = ViewBag.PageIndex,
+                                            filterByWorkSetup = ViewBag.FilterByWorkSetup,
+                                            filterByProgram = ViewBag.FilterByProgram,
+                                            filterByStatus = ViewBag.FilterByStatus
+                                        })'"
+                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                    <i class="fa-solid fa-info-circle pr-1"></i> See Details
+                                </button>
+
+                            }
+                            else
+                            {
+                                <!-- Save -->
+                                <button onclick="saveJobHandler('@Model.JobId')"
+                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                    <i class="fa-regular fa-bookmark"></i>
+                                </button>
+
+                                <!-- Apply Button -->
+                                <button onclick="applyJobHandler('@Model.JobId')"
+                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                    <i class="fa-regular fa-paper-plane pr-1"></i> Apply
+                                </button>
+                            }
                         }
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById))
                         {
-                            <!-- Edit -->
-                            <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]"
+                            <!-- Edit Button -->
+                            <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white"
                                     data-toggle="modal"
                                     data-target="#editJobModal">
                                 <i class="fas fa-edit pr-2"></i> Edit
@@ -64,33 +97,34 @@
 
                 <!-- Second Row: Company Name and Date Posted -->
                 <div class="w-full text-sm text-gray-700">
-                   <div class="">
-                      <span>
-                            @Model.PostedBy.User?.FirstName - @Model.Company.Name 
-                      </span>
+                    <div class="">
+                        <span>
+                            @Model.PostedBy.User?.FirstName - @Model.Company.Name
+                        </span>
 
-                       <!-- Date Created -->
-                        <div class="text-xs text-gray-500" title="@Model.UpdatedDate">Updated
+                        <!-- Date Created -->
+                        <div class="text-xs text-gray-500" title="@Model.UpdatedDate">
+                            Updated
                             @(Model.UpdatedDate == DateTime.MinValue ? "Date Not Available" : Model.UpdatedDate.ToUniversalTime().Humanize())
-                      </div>
-                   </div>
-                </div>          
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>     
+    </div>
 
     <!--MAIN CONTENT W/SIDEBAR-->
-     <div class="mx-auto mt-6 flex max-w-7xl gap-6 px-6">
-         <!-- Job Listings Section -->
-         <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-           <h2 class="mb-2 pl-4 text-2xl font-bold text-gray-500">Job Details</h2>
+    <div class="mx-auto mt-6 flex max-w-7xl gap-6 px-6">
+        <!-- Job Listings Section -->
+        <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="mb-2 pl-4 text-2xl font-bold text-gray-500">Job Details</h2>
 
-                 <!-- Main Content -->
+            <!-- Main Content -->
             <div class="gap-6 px-4 pb-4">
-                 <!-- Skills Required -->
-                 <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                <!-- Skills Required -->
+                <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <div class="rounded-xl border bg-white p-4">
-                          <h3 class="mb-4 text-xl font-bold">Skills Required</h3>
+                        <h3 class="mb-4 text-xl font-bold">Skills Required</h3>
                         @*<p>@string.Join(", ", (Model.Skills as List<Skill>).Select(skill => skill.Name))</p>*@
 
                         <!--Skill Placeholder Only-->
@@ -108,24 +142,25 @@
                             }
                         </div>
                     </div>
-                 </div>
+                </div>
 
-                 <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">   
+                <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <!-- About the Job -->
                     <div class="rounded-xl border bg-white p-4">
-                         <h3 class="mb-4 text-xl font-bold">About the Job</h3>
-                         <p class="whitespace-pre-wrap text-base text-gray-600">@Model.Description</p>
+                        <h3 class="mb-4 text-xl font-bold">About the Job</h3>
+                        <p class="whitespace-pre-wrap text-base text-gray-600">@Model.Description</p>
                     </div>
-                 </div>
+                </div>
             </div>
-         </div>
-            <!-- Infotab Sidebar -->
-            @await Html.PartialAsync("InfoTab")
         </div>
+        <!-- Infotab Sidebar -->
+        @await Html.PartialAsync("InfoTab")
     </div>
+</div>
 
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="actionUrl" value="@Url.Action("SendApplication", "Application")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
@@ -168,6 +203,7 @@
     </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
+
             var existingSkills = @Html.Raw(JsonSerializer.Serialize(Model.Skills.Select(s => new { value = s.Name, id = s.SkillId })));
             var existingPrograms = @Html.Raw(JsonSerializer.Serialize(Model.Programs.Select(d => new { value = d.Name, id = d.ProgramId })));
 
@@ -179,7 +215,7 @@
                 cancelClicked = true;
             });
             $('#editJobModal').on('hidden.bs.modal', function () {
-                if(cancelClicked){
+                if (cancelClicked) {
                     editJobForm.reset();
                     $(".text-red-500").text('');
                     $("#remainingTitleChars").text('100 characters remaining');
