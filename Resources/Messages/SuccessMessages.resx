@@ -135,7 +135,7 @@
   <data name="Success_UserPasswordReset" xml:space="preserve">
     <value>Password reset successfully!</value>
   </data>
-  <data name="Success_UserPreferencesUpdate" xml:space="preserve">
+  <data name="Success_UserProfileUpdate" xml:space="preserve">
     <value>Successfully updated your preferences!</value>
   </data>
   <data name="Success_UserPasswordUpdate" xml:space="preserve">

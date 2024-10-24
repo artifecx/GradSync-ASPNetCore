@@ -42,8 +42,8 @@
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
-    <Compile Update="Messages\UserPreferences.Designer.cs">
-      <DependentUpon>UserPreferences.resx</DependentUpon>
+    <Compile Update="Messages\UserProfile.Designer.cs">
+      <DependentUpon>UserProfile.resx</DependentUpon>
       <DesignTime>True</DesignTime>
       <AutoGen>True</AutoGen>
     </Compile>
@@ -118,8 +118,8 @@
       <LastGenOutput>SuccessMessages.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
-    <EmbeddedResource Update="Messages\UserPreferences.resx">
-      <LastGenOutput>UserPreferences.Designer.cs</LastGenOutput>
+    <EmbeddedResource Update="Messages\UserProfile.resx">
+      <LastGenOutput>UserProfile.Designer.cs</LastGenOutput>
       <Generator>PublicResXFileCodeGenerator</Generator>
     </EmbeddedResource>
     <EmbeddedResource Update="Messages\ErrorMessages.resx">

@@ -9,22 +9,22 @@ using System.Threading.Tasks;
 namespace Data.Repositories
 {
     /// <summary>
-    /// Repository class for handling operations related to user preferences.
+    /// Repository class for handling operations related to user profiles.
     /// </summary>
-    public class UserPreferencesRepository : BaseRepository, IUserPreferencesRepository
+    public class UserProfileRepository : BaseRepository, IUserProfileRepository
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserPreferencesRepository"/> class.
+        /// Initializes a new instance of the <see cref="UserProfileRepository"/> class.
         /// </summary>
         /// <param name="unitOfWork">The unit of work.</param>
-        public UserPreferencesRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
+        public UserProfileRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
         /// <summary>
-        /// Retrieves the user preferences for a specified user.
+        /// Retrieves the user profiles for a specified user.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
-        /// <returns>A dictionary containing the user preferences.</returns>
-        public Dictionary<string, string> GetUserPreferences(string userId)
+        /// <returns>A dictionary containing the user profiles.</returns>
+        public Dictionary<string, string> GetUserProfile(string userId)
         {
             var preferences = this.GetDbSet<User>()
                                   .Where(x => x.UserId == userId)
@@ -38,12 +38,12 @@ namespace Data.Repositories
         }
 
         /// <summary>
-        /// Updates the user preferences asynchronously.
+        /// Updates the user profiles asynchronously.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <param name="updatedPreferences">The updated preferences.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task UpdateUserPreferencesAsync(string userId, Dictionary<string, string> updatedPreferences)
+        public async Task UpdateUserProfileAsync(string userId, Dictionary<string, string> updatedPreferences)
         {
             var user = await this.GetDbSet<User>().FirstOrDefaultAsync(x => x.UserId == userId);
             if (user != null)
@@ -62,6 +62,6 @@ namespace Data.Repositories
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. 
         /// The task result contains a key-value pair representing the preference.</returns>
         public async Task<KeyValuePair<string, string>> GetUserPreferenceByKeyAsync(string userId, string key) =>
-            GetUserPreferences(userId).FirstOrDefault(x => x.Key == key);
+            GetUserProfile(userId).FirstOrDefault(x => x.Key == key);
     }
 }

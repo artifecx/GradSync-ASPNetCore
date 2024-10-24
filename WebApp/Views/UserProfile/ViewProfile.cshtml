@@ -1,7 +1,7 @@
-﻿@model Services.ServiceModels.UserPreferencesViewModel
+﻿@model Services.ServiceModels.UserProfileViewModel
 
 @{
-    ViewData["Title"] = "Settings | GradSync";
+    ViewData["Title"] = "Profile | GradSync";
 }
 
 <div class="flex min-h-screen items-center justify-center bg-[#F5F7F8]">
@@ -177,7 +177,7 @@
             const form = document.getElementById('preferences-form');
             const formData = new FormData(form);
 
-            fetch('@Url.Action("UpdateUserPreferences")', {
+            fetch('@Url.Action("UpdateUserProfile")', {
                 method: 'POST',
                 body: formData,
                 headers: {

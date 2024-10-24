@@ -36,7 +36,7 @@ namespace WebApp.Mvc
         /// <summary>Session</summary>
         protected ISession _session => _httpContextAccessor.HttpContext.Session;
 
-        protected IUserPreferencesService _userPreferences { get; set; }
+        protected IUserProfileService _userProfile { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the ControllerBase{TController} class.
@@ -51,14 +51,14 @@ namespace WebApp.Mvc
                                 ILoggerFactory loggerFactory,
                                 IConfiguration configuration,
                                 IMapper mapper = null,
-                                IUserPreferencesService userPreferences = null)
+                                IUserProfileService userProfile = null)
         {
             this._httpContextAccessor = httpContextAccessor;
             this._configuration = configuration;
             this._logger = loggerFactory.CreateLogger<TController>();
             this._configuration = configuration;
             this._mapper = mapper;
-            this._userPreferences = userPreferences;
+            this._userProfile = userProfile;
         }
 
         /// <summary>Mapper</summary>
