@@ -378,8 +378,11 @@ namespace Services.Services
             var model = _mapper.Map<JobViewModel>(job);
 
             if (currentUserRole == Role_Applicant)
+            {
                 model.HasApplied = job.Applications.Any(a => a.UserId == currentUserId);
-
+                model.ApplicationId = job.Applications.FirstOrDefault(a => a.UserId == currentUserId)?.ApplicationId;
+            }
+                
             model.SalaryLower = GetLowerSalary(job.Salary);
             model.SalaryUpper = GetUpperSalary(job.Salary);
             model.ScheduleDays = GetDaysSchedule(job.Schedule);
