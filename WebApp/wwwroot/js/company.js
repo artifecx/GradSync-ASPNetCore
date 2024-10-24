@@ -97,8 +97,9 @@ function enableEditMode() {
     companyDescriptionField.classList.remove('text-gray-500', 'bg-gray-100', 'cursor-not-allowed');
     companyDescriptionField.classList.add('text-gray-700', 'bg-white');
 
-    document.getElementById('editButtons').classList.remove('hidden');
-    document.getElementById('editIcon').classList.add('hidden');
+    document.getElementById('cancelButton').classList.remove('hidden');
+    document.getElementById('saveButton').classList.remove('hidden');
+    document.getElementById('editButton').classList.add('hidden');
 
     // Store original values
     window.originalCompanyName = companyNameField.value;
@@ -136,8 +137,9 @@ function cancelEdit() {
     companyDescriptionField.classList.add('text-gray-500', 'bg-gray-100', 'cursor-not-allowed');
     companyDescriptionField.classList.remove('text-gray-700', 'bg-white');
 
-    document.getElementById('editButtons').classList.add('hidden');
-    document.getElementById('editIcon').classList.remove('hidden');
+    document.getElementById('cancelButton').classList.add('hidden');
+    document.getElementById('saveButton').classList.add('hidden');
+    document.getElementById('editButton').classList.remove('hidden');
 
     $(".text-red-500").text('');
 

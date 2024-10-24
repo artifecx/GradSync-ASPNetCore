@@ -16,13 +16,13 @@
 <div class="min-h-screen bg-[#F5F6F8]">
     <div class="mx-auto mt-10 max-w-7xl rounded-lg bg-[#F5F6F8] px-6">
         <!-- Header Section -->
-        <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm mb-6">
+        <div class="mb-6 w-full rounded-lg bg-white p-6 px-12 shadow-sm">
             <div class="flex items-center justify-between">
                 <!-- Logo + Company Info -->
                 <div class="flex items-center space-x-6">
 
                     <!-- Logo Frame (Parent Container) -->
-                    <div class="relative h-24 w-24 rounded-full outline-[#D7B8B8] outline outline-4">
+                    <div class="outline-4 relative h-24 w-24 rounded-full outline outline-[#D7B8B8]">
                         <img id="companyLogo"
                              class="h-24 w-24 rounded-full object-cover"
                              src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
@@ -30,7 +30,7 @@
 
                         <!-- Upload Button Overlay -->
                         <button type="button" onclick="openModal()"
-                                class="absolute bottom-0 right-0 h-8 w-8 rounded-full bg-[#7A1515] text-white hover:bg-gray-600 flex items-center justify-center">
+                                class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#7A1515] text-white hover:bg-gray-600">
                             <i class="fas fa-camera"></i>
                         </button>
                     </div>
@@ -38,41 +38,40 @@
                     <!-- Company Information -->
                     <div class="space-y-1">
                         <h3 class="text-3xl font-bold text-[#7A1515]">@Model.Name</h3>
-                        <p class="font-medium text-sm text-gray-600">@Model.Address</p>
-                        <p class="font-medium text-xs text-gray-500">
+                        <p class="text-sm font-medium text-gray-600">@Model.Address</p>
+                        <p class="text-xs font-medium text-gray-500">
                             @Model.ContactEmail | @Model.ContactNumber
                         </p>
                     </div>
                 </div>
 
                 <!-- Edit Button -->
-                <div>
-                    <button type="button" onclick="enableEditMode()"
-                            class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                        <i class="fas fa-edit pr-1"></i> Edit Details
-                    </button>
-                </div>
+                
             </div>
         </div>
 
         <!-- Main Content -->
-        <div class="grid grid-cols-2 gap-6">
+        <div class="grid-cols-2 grid gap-6">
             <!-- Company Form Section-->
-            <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="rounded-lg bg-white p-6 shadow-sm">
                 <form id="editCompanyForm">
                     <div class="flex items-center justify-between space-x-4 pb-3">
                         <div class="space-y-0">
                             <div class="text-lg font-bold text-gray-600">Company Profile</div>
-                            <div class="font-medium text-xs text-gray-500">Update your company details here.</div>
+                            <div class="text-xs font-medium text-gray-500">Update your company details here.</div>
                         </div>
-                        <div id="editButtons" class="hidden">
-                            <button type="button" class="rounded bg-gray-500 px-2 py-2 font-semibold text-sm text-white hover:bg-gray-600"
+                        <div>
+                            <button type="button" id="cancelButton" class="hidden rounded bg-gray-500 px-2 py-2 text-sm font-semibold text-white hover:bg-gray-600"
                                     onclick="cancelEdit()">
                                 Cancel
                             </button>
-                            <button type="button" class="rounded bg-[#7A1515] px-2 py-2 font-semibold text-sm text-white hover:bg-[#A53D3D]"
+                            <button type="button" id="saveButton" class="hidden rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A53D3D]"
                                     onclick="submitChanges()">
                                 Save Changes
+                            </button>
+                            <button type="button" onclick="enableEditMode()" id="editButton"
+                                    class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                                <i class="fas fa-edit pr-1"></i> Update
                             </button>
                         </div>
                     </div>
@@ -82,7 +81,7 @@
                     <div class="mb-3">
                         <label asp-for="Name" class="mb-1 block text-sm font-bold text-[#934141]">Company Name</label>
                         <input asp-for="Name" id="companyName" value="@Model.Name"
-                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-sm text-gray-500"
+                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
                                readonly />
                         <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
                     </div>
@@ -91,14 +90,14 @@
                         <div class="w-1/2">
                             <label asp-for="ContactEmail" class="mb-1 block text-sm font-bold text-[#934141]">Email</label>
                             <input asp-for="ContactEmail" id="companyEmail" value="@Model.ContactEmail"
-                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-sm text-gray-500"
+                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
                                    readonly />
                             <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
                         </div>
                         <div class="w-1/2">
                             <label asp-for="ContactNumber" class="mb-1 block text-sm font-bold text-[#934141]">Contact Number</label>
                             <input asp-for="ContactNumber" id="companyNumber" value="@Model.ContactNumber"
-                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-sm text-gray-500"
+                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
                                    readonly />
                             <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
                         </div>
@@ -107,7 +106,7 @@
                     <div class="mb-3">
                         <label asp-for="Address" class="mb-1 block text-sm font-bold text-[#934141]">Address</label>
                         <input asp-for="Address" id="companyAddress" value="@Model.Address"
-                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-sm text-gray-500"
+                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
                                readonly />
                         <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
                     </div>
@@ -115,7 +114,7 @@
                     <div class="mb-3">
                         <label asp-for="Description" class="mb-2 block text-sm font-bold text-[#934141]">Description</label>
                         <textarea asp-for="Description" id="companyDescription"
-                                  class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 leading-tight text-sm text-gray-500"
+                                  class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
                                   readonly>@(string.IsNullOrEmpty(Model.Description) ? "No description." : Model.Description)</textarea>
                         <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
                     </div>
@@ -123,7 +122,7 @@
             </div>
 
             <!-- Recruiter Information -->
-            <div class="bg-white p-6 rounded-lg shadow-sm">
+            <div class="rounded-lg bg-white p-6 shadow-sm">
                 <div class="flex items-center justify-between">
 
                     <h3 class="text-lg font-bold text-gray-600">Recruiter Information</h3>
@@ -136,7 +135,7 @@
 
                 @if (Model.Recruiters != null && Model.Recruiters.Any())
                 {
-                    <div class="h-[50vh] overflow-auto rounded-lg bg-[#F5F7F8] mt-4">
+                    <div class="mt-4 h-[50vh] overflow-auto rounded-lg bg-[#F5F7F8]">
                         <table class="min-w-full table-auto rounded-lg bg-white">
                             <thead class="bg-gray-100">
                                 <tr>
@@ -144,7 +143,7 @@
                                         <a asp-action="@aspAction" 
                                            asp-route-sortBy="@sortByName" 
                                            asp-route-search="@search"
-                                           class="cursor-pointer text-gray-700 text-xs hover:text-[#A53D3D]">
+                                           class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
                                             Name
                                             @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fas fa-sort'></i>") :
                                                 (sortBy == "name_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort-up'></i>")))
@@ -154,7 +153,7 @@
                                         <a asp-action="@aspAction" 
                                            asp-route-sortBy="@sortByEmail" 
                                            asp-route-search="@search" 
-                                           class="cursor-pointer text-gray-700 text-xs hover:text-[#A53D3D]">
+                                           class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
                                             Email
                                             @(sortBy == "email" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
                                                 (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
@@ -182,7 +181,7 @@
                 }
                 else
                 {
-                    <p class="text-gray-600 mt-4">No recruiters assigned to this company.</p>
+                    <p class="mt-4 text-gray-600">No recruiters assigned to this company.</p>
                 }
             </div>
         </div>
