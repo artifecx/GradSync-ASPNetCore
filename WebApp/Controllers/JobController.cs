@@ -333,7 +333,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (ModelState.IsValid && string.Equals(model.PostedById, UserId))
+                if (ModelState.IsValid && (string.Equals(model.PostedById, UserId) || User.IsInRole("NLO")))
                 {
                     await _jobService.UpdateJobAsync(model);
                     TempData["SuccessMessage"] = "Successfully updated the job.";
