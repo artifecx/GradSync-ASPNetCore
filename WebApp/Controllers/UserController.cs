@@ -14,6 +14,8 @@ using static Resources.Messages.ErrorMessages;
 using static Services.Exceptions.UserExceptions;
 using System;
 using System.Linq;
+using System.Security.Claims;
+using Services.Services;
 
 namespace WebApp.Controllers
 {
@@ -21,10 +23,11 @@ namespace WebApp.Controllers
     /// Controller for handling user-related operations.
     /// </summary>
     [Route("users")]
-   [Authorize(Policy = "Admin")]
+    [Authorize(Policy = "Admin")]
     public class UserController : ControllerBase<UserController>
     {
         private readonly IUserService _userService;
+        private readonly IAvatarService _avatarService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserController"/> class.
@@ -43,11 +46,13 @@ namespace WebApp.Controllers
                 IConfiguration configuration,
                 IMapper mapper,
                 IUserService userService,
+                IAvatarService avatarService, // Add this line
                 TokenValidationParametersFactory tokenValidationParametersFactory,
                 TokenProviderOptionsFactory tokenProviderOptionsFactory
             ) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _userService = userService;
+            _avatarService = avatarService;
         }
 
         #region GET Methods 
@@ -115,19 +120,40 @@ namespace WebApp.Controllers
         [AllowAnonymous]
         public async Task<IActionResult> Update(UserViewModel model)
         {
-            return await HandleExceptionAsync(async () =>
+            if (ModelState.IsValid)
             {
-                if (ModelState.IsValid)
+                try
                 {
+                    // Log model state for debugging
+                    Console.WriteLine($"Updating user: {model.UserId}");
+                    Console.WriteLine($"AvatarFile: {model.AvatarFile?.FileName}");
+
+                    // Update user information
                     await _userService.UpdateUserAsync(model);
-                    TempData["SuccessMessage"] = string.Format(Success_UserActionSuccess, "updated");
+
+                    // Handle avatar upload
+                    if (model.AvatarFile != null && model.AvatarFile.Length > 0)
+                    {
+                        // Log the avatar upload process
+                        Console.WriteLine($"Uploading avatar for user: {model.UserId}");
+                        await _avatarService.UploadAvatarAsync(model.AvatarFile, model.UserId);
+                    }
+
+                    TempData["SuccessMessage"] = "User  updated successfully.";
                     return Json(new { success = true });
                 }
-                TempData["ErrorMessage"] = string.Format(Error_UserActionError, "updating");
-                return Json(new { success = false });
-            }, "Update");
-        }
+                catch (Exception ex)
+                {
+                    // Log the exception for debugging
+                    Console.WriteLine($"Error updating user: {ex.Message}");
+                    TempData["ErrorMessage"] = "An error occurred while updating the user.";
+                    return Json(new { success = false });
+                }
+            }
 
+            TempData["ErrorMessage"] = "Error updating user.";
+            return Json(new { success = false });
+        }
         /// <summary>
         /// Resets a user's password through the admin panel.
         /// </summary>
@@ -172,7 +198,8 @@ namespace WebApp.Controllers
                 TempData["ErrorMessage"] = TempData["ErrorMessage"] = string.Format(Error_UserActionError, "deleting");
                 return Json(new { success = false });
             }, "Delete");
-        } 
+        }
+
 
         #endregion POST Methods
     }

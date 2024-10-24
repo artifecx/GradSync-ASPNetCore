@@ -132,6 +132,8 @@ namespace Data.Repositories
                     .SetProperty(u => u.IsDeleted, true)
                     .SetProperty(u => u.AvatarId, (string)null));
         }
+
+
         #endregion
 
         #region Admin CRUD Methods
@@ -219,8 +221,6 @@ namespace Data.Repositories
         {
             return this.GetDbSet<Admin>().Any(a => a.UserId == adminId && a.IsSuper == true);
         }
-
-
 
     }
 }

@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Services\Class1.cs" />
     <Compile Remove="Services\IApplicationRepository.cs" />
   </ItemGroup>
 

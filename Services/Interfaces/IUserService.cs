@@ -18,5 +18,6 @@ namespace Services.Interfaces
         Task ResetUserPasswordAsync(string id);
         Task DeleteUserAsync(string userId);
         Task<List<Role>> GetRolesAsync();
+
     }
 }

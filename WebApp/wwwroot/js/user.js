@@ -110,4 +110,31 @@ function submitEditUser() {
     });
 }
 
+function submitUploadAvatar() {
+    var form = $('#uploadAvatarForm')[0];
+    var formData = new FormData(form); // Create FormData object
+
+    $.ajax({
+        url: 'upload',
+        type: 'POST',
+        data: formData,
+        contentType: false, // Important for file uploads
+        processData: false, // Important for file uploads
+        success: function (response) {
+            if (response.success) {
+                location.reload(); // or redirect as needed
+            } else {
+                toastr.error(response.error || "An error occurred.");
+            }
+        },
+        error: function (xhr) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
+
+
+
 

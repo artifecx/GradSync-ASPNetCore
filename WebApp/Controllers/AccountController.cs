@@ -273,7 +273,10 @@ namespace WebApp.Controllers
                 Email = user.Email,
                 UserId = user.UserId,
                 IsVerified = user.IsVerified,
-                AvatarId = user.AvatarId
+                AvatarId = user.AvatarId,
+                AvatarFileContent = user.Avatar?.FileContent,
+                AvatarFileType = user.Avatar?.FileType,
+
                 // Map other properties as needed
             };
 

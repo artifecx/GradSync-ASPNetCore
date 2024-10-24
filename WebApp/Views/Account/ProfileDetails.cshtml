@@ -1,19 +1,27 @@
 ﻿@model Services.ServiceModels.UserViewModel
 
-<div class="container mt-12">
+<div class="container mt-8">
     <h2 class="text-2xl font-bold text-[#7A1515]">Profile Details</h2>
+
     <form id="editUserForm" enctype="multipart/form-data" method="post" action="/User/Edit">
-        <!-- Add the action and method for form submission -->
         <!-- Hidden Fields -->
         <input type="hidden" id="editUserId" name="UserId" value="@Model.UserId" />
         <input type="hidden" id="editUserIsVerified" name="IsVerified" value="True" />
         <input type="hidden" id="editUserRole" name="RoleId" value="Applicant" />
 
+        <!-- Avatar Upload -->
+        <div class="form-group">
+            <label for="avatarFile">Upload Avatar</label>
+            <input type="file" id="avatarFile" name="AvatarFile" accept="image/*" onchange="previewAvatar(event)" />
+            <img id="avatarPreview" src="@(!string.IsNullOrEmpty(Model.AvatarUrl) ? Model.AvatarUrl : Url.Content("~/images/placeholder.png"))" alt="Avatar" style="display: block; max-width: 150px; margin-top: 10px;" />
+            <span class="text-danger" id="avatarError"></span>
+        </div>
+
         <!-- First Name -->
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="FirstName" class="control-label"></label> <span class="text-red-500">*</span>
-                <input asp-for="FirstName" class="form-control" id="editUserFirstName" name="FirstName" maxlength="100" />
+                <input asp-for="FirstName" class="form-control" id="editUser FirstName" name="FirstName" maxlength="100" />
                 <span asp-validation-for="FirstName" class="text-danger"></span>
             </div>
             <div class="form-group col-md-6">
@@ -27,7 +35,7 @@
         <div class="form-row">
             <div class="form-group col-md-6">
                 <label asp-for="LastName" class="control-label"></label> <span class="text-red-500">*</span>
-                <input asp-for="LastName" class="form-control" id="editUserLastName" name="LastName" maxlength="100" />
+                <input asp-for="LastName" class="form-control" id="editUser LastName" name="LastName" maxlength="100" />
                 <span asp-validation-for="LastName" class="text-danger"></span>
             </div>
             <div class="form-group col-md-6">
@@ -46,11 +54,29 @@
 
         <!-- Save Changes Button -->
         <div class="form-group text-right">
-            <button type="button" class="bg-[#7A1515] text-white font-medium px-3 py-2 rounded-md hover:bg-[#A53D3D]" onclick="submitEditUser()">Save changes</button>
+            <button type="button" class="bg-[#7A1515] text-white font-medium px-3 py-2 rounded-md hover:bg-[#A53D3D]" onclick="submitEditUser ()">Save changes</button>
         </div>
     </form>
 </div>
 
 @section Scripts {
     <script src="~/js/user.js"></script>
+    <script>
+        function previewAvatar(event) {
+            const avatarPreview = document.getElementById('avatarPreview'); // Get the image element for preview
+            const file = event.target.files[0]; // Get the first file from the file input
+
+            if (file) {
+                const reader = new FileReader(); // Create a FileReader object
+                reader.onload = function (e) {
+                    avatarPreview.src = e.target.result; // Set the image source to the uploaded file
+                    avatarPreview.style.display = 'block'; // Show the image
+                };
+                reader.readAsDataURL(file); // Read the file as a data URL
+            } else {
+                avatarPreview.src = ''; // Clear the image if no file is selected
+                avatarPreview.style.display = 'none'; // Hide the image
+            }
+        }
+    </script>
 }

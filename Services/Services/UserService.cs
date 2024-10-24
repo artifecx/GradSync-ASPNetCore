@@ -25,6 +25,7 @@ namespace Services.Services
     {
         private readonly IUserRepository _repository;
         private readonly IAccountService _accountService;
+        private readonly IAvatarService _avatarService; 
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
@@ -39,12 +40,14 @@ namespace Services.Services
             (
                 IUserRepository repository, 
                 IAccountService accountService,
+                IAvatarService avatarService,
                 IMapper mapper,
                 IHttpContextAccessor httpContextAccessor
             )
         {
             _repository = repository;
             _accountService = accountService;
+            _avatarService = _avatarService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -182,7 +185,7 @@ namespace Services.Services
             bool roleChanged = !string.Equals(model.RoleId, user.RoleId, StringComparison.Ordinal);
             bool hasChanges = firstNameChanged || middleNameChanged || lastNameChanged || suffixChanged || emailChanged || roleChanged;
 
-            if(!hasChanges)
+            if (!hasChanges)
                 throw new UserException(Error_NoChanges);
 
             model.IsVerified = user.IsVerified && !emailChanged; //TODO: send verification email when changed
@@ -193,7 +196,7 @@ namespace Services.Services
                 _mapper.Map(model, user);
                 await _repository.UpdateUserAsync(user);
 
-                switch(user.RoleId)
+                switch (user.RoleId)
                 {
                     case "Admin":
                     case "NLO":
@@ -207,9 +210,24 @@ namespace Services.Services
                         break;
                 }
             }
+            if (model.AvatarFile != null)
+            {
+                var avatarModel = new Avatar
+                {
+                    FileContent = await GetFileContentAsync(model.AvatarFile),
+                    FileType = model.AvatarFile.ContentType,
+                    UploadedDate = DateTime.Now
+                };
+
+                // Save the avatar and get its ID
+                await _avatarService.AddAvatarAsync(avatarModel);
+                user.AvatarId = avatarModel.AvatarId; // Update user's AvatarId
+            }
             _mapper.Map(model, user);
             await _repository.UpdateUserAsync(user);
         }
+
+
 
         /// <summary>
         /// Deletes an existing user asynchronously.
@@ -230,16 +248,25 @@ namespace Services.Services
         public async Task ResetUserPasswordAsync(string id) =>
             await _accountService.ResetUserPasswordAsync(id, "id");
 
-        /// <summary>
-        /// Sets a user <see cref="Role"/> asynchronously. 
-        /// Hard deletes the previous role and adds the new role.
-        /// </summary>
-        /// <param name="userId">The user identifier.</param>
-        /// <param name="currentRole">The user's current role.</param>
-        /// <param name="newRole">The user's new role.</param>
-        /// <returns>A <see cref="string"/> containing the new user role.</returns>
-        /// <exception cref="UserException">Thrown when going to an administrative role from a non-administrative role and vice versa</exception>
-        private async Task<string> SetUserRole(string userId, string currentRole, string newRole)
+        private async Task<byte[]> GetFileContentAsync(IFormFile file)
+        {
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                return memoryStream.ToArray();
+            }
+        }
+
+            /// <summary>
+            /// Sets a user <see cref="Role"/> asynchronously. 
+            /// Hard deletes the previous role and adds the new role.
+            /// </summary>
+            /// <param name="userId">The user identifier.</param>
+            /// <param name="currentRole">The user's current role.</param>
+            /// <param name="newRole">The user's new role.</param>
+            /// <returns>A <see cref="string"/> containing the new user role.</returns>
+            /// <exception cref="UserException">Thrown when going to an administrative role from a non-administrative role and vice versa</exception>
+            private async Task<string> SetUserRole(string userId, string currentRole, string newRole)
         {
             string[] administrativeRoles = { Role_Admin, Role_NLO };
             if ((administrativeRoles.Contains(currentRole) && !administrativeRoles.Contains(newRole)) ||

@@ -1,4 +1,5 @@
 ﻿using Data.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -58,6 +59,12 @@ namespace Services.ServiceModels
         /// </summary>
         [Display(Name = "AvatarId")]
         public string AvatarId { get; set; }
+        public byte[] AvatarFileContent { get; set; }
+        public string AvatarFileType { get; set; }
+        public IFormFile AvatarFile { get; set; }
+        public string AvatarUrl { get; set; }
+
+
 
 
         /// <summary>
