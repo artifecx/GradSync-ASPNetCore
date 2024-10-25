@@ -6,7 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Services.ServiceModels;
+using static Resources.Constants.UserRoles;
 using static Resources.Messages.ErrorMessages;
+using Data.Models;
 
 namespace Services.Services
 {
@@ -39,14 +41,26 @@ namespace Services.Services
         /// <param name="userId">The user identifier.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. 
         /// The task result contains the user profiles view model.</returns>
-        public async Task<UserProfileViewModel> GetUserProfileAsync(string userId)
+        public async Task<UserProfileViewModel> GetUserProfileAsync(string userId, string roleId)
         {
             var preferences = _repository.GetUserProfile(userId);
+            var user = new User();
+            if (roleId == Role_Applicant)
+                user = await _repository.GetApplicantProfileByUserId(userId);
+            else if(roleId == Role_Recruiter)
+                user = await _repository.GetRecruiterProfileByUserId(userId);
 
             var model = new UserProfileViewModel
             {
                 UserId = userId,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Suffix = user.Suffix,
+                Email = user.Email,
                 Preferences = preferences,
+                Applicant = user.Applicant,
+                Recruiter = user.Recruiter
             };
             return model;
         }

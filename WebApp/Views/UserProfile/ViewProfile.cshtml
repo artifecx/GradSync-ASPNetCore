@@ -2,30 +2,148 @@
 
 @{
     ViewData["Title"] = "Profile | GradSync";
+    var fullname = $"{Model.FirstName} {Model.MiddleName} {Model.LastName} {Model.Suffix}";
+    var email = Model.Email;
+    var isRecruiter = User.IsInRole("Recruiter");
+    var isApplicant = User.IsInRole("Applicant");
 }
 
 <div class="flex min-h-screen items-center justify-center bg-[#F5F7F8]">
-    <div class="h-[48vh] w-full max-w-7xl rounded-lg p-6">
-        <div class="grid-cols-1 grid h-full gap-6 lg:grid-cols-2">
-            <div class="flex-1 overflow-y-auto rounded-lg bg-white p-6 shadow">
-                <form id="preferences-form">
-                    <div class="mb-4 flex items-center justify-between">
-                        <h2 class="mb-4 text-2xl font-semibold">Preferences</h2>
-                        <div class="flex space-x-2">
-                            <button type="button" id="cancel-preferences-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
-                                Cancel
-                            </button>
-                            <button type="button" id="save-preferences-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                                Update
-                            </button>
+    <div class="h-[60vh] w-full max-w-7xl rounded-lg p-6">
+        <div class="flex h-full">
+            <!-- Sidebar for navigation -->
+            <div class="flex h-full w-1/4 flex-col justify-between overflow-hidden rounded-lg bg-white p-4 shadow">
+                <div>
+                    <div class="relative mb-6">
+                        <!-- Profile picture section -->
+                        <div class="group relative mx-auto h-24 w-24">
+                            <img id="profile-picture-preview" class="h-full w-full rounded-full object-cover shadow" src="https://via.placeholder.com/150" alt="Profile Picture" />
+                            <div id="edit-icon" class="opacity-0 group-hover:opacity-100 pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200">
+                                <i class="fas fa-pencil-alt rounded-full bg-white p-2 text-gray-500 shadow-md"></i>
+                            </div>
+                            <input type="file" id="profile-picture" name="ProfilePicture" class="opacity-0 absolute inset-0 h-full w-full cursor-pointer" accept="image/*" />
+                        </div>
+                        <h3 class="mt-4 text-center text-xl font-semibold">@fullname</h3>
+                        <p class="text-center text-gray-600">@email</p>
+
+                        <!-- Save and Clear Buttons -->
+                        <div id="save-clear-buttons" class="absolute right-0 top-0 flex hidden gap-2">
+                            <button id="save-profile-btn"><i class="fas fa-check rounded-full bg-white p-1 text-green-500 shadow-md"></i></button>
+                            <button id="clear-profile-btn"><i class="fas fa-times rounded-full bg-white p-1 text-red-500 shadow-md"></i></button>
                         </div>
                     </div>
 
-                    <!-- Debug view all preferences -->
-                    @*@await Html.PartialAsync("_DisplayAllPreferences", Model)*@
+                    <!-- Navigation Buttons -->
+                    <div class="flex flex-col space-y-2">
+                        <button class="tab-btn active-tab rounded-md bg-gray-100 p-2 text-left hover:bg-gray-200" data-target="profile-section">
+                            Profile
+                        </button>
+                        <button class="tab-btn rounded-md p-2 text-left hover:bg-gray-200" data-target="preferences-section">
+                            Preferences
+                        </button>
+                        <button class="tab-btn rounded-md p-2 text-left hover:bg-gray-200" data-target="password-section">
+                            Change Password
+                        </button>
+                    </div>
+                </div>
+                <div class="flex justify-center">
+                    <button class="text-red-500 hover:text-red-700">Delete Account</button>
+                </div>
+            </div>
 
-                    @if (!User.IsInRole("Admin"))
-                    {
+            <!-- Content Section -->
+            <div class="ml-6 w-3/4 rounded-lg bg-white p-6 shadow">
+                <!-- Profile Section (default) -->
+                <div id="profile-section" class="tab-content">
+                    <div class="flex justify-between">
+                        <h2 class="mb-4 text-2xl font-semibold">Profile</h2>
+                        <div>
+                            <button type="button" id="cancelButton" class="hidden rounded bg-gray-500 px-2 py-2 text-sm font-semibold text-white hover:bg-gray-600"
+                                    onclick="cancelEdit()">
+                                Cancel
+                            </button>
+                            <button type="button" id="saveButton" class="hidden rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A53D3D]"
+                                    onclick="submitChanges()">
+                                Save Changes
+                            </button>
+                            <button type="button" onclick="enableEditMode()" id="editButton"
+                                    class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                                <i class="fas fa-edit pr-1"></i> Update
+                            </button>
+                        </div>
+                    </div>
+                    <!-- User Details Section -->
+                    <div class="space-y-2">
+                        <div><strong>Name:</strong><input class="ml-2 disabled:bg-white" value="@fullname" disabled/></div>
+                        <div><strong>Email:</strong><input class="ml-2 disabled:bg-white" value="@email" disabled/></div>
+                        @if(isApplicant)
+                        {
+                            <div><strong>Address:</strong><input class="ml-2 disabled:bg-white" value="@Model.Applicant.Address" disabled/></div>
+                        }
+                    </div>
+                    <hr />
+                    <!-- Applicant/Recruiter Details Section -->
+                    <div class="space-y-2">
+                        <div class="mb-4 space-y-0">
+                            @if(isRecruiter)
+                            {
+                                <div class="text-lg font-bold text-gray-600">Company Profile</div>
+                                @Html.Raw("<div class='text-xs font-medium text-gray-500'>To update company details, go to company tab</div>")
+                            }
+                        </div>
+                        <!-- Recruiter Details Section -->
+                        @if (isRecruiter)
+                        {
+                            var company = Model.Recruiter.Company;
+                            <div><strong>Name:</strong><input class="ml-2 disabled:bg-white" value="@company.Name" disabled/></div>
+                            <div><strong>Address:</strong><input class="ml-2 disabled:bg-white" value="@company.Address" disabled/></div>
+                            <div><strong>Email:</strong><input class="ml-2 disabled:bg-white" value="@company.ContactEmail" disabled/></div>
+                            <div><strong>Number:</strong><input class="ml-2 disabled:bg-white" value="@company.ContactNumber" disabled/></div>
+                        }
+                        else
+                        {
+                            <div class="flex flex-wrap">
+                                <div class="w-1/2 space-y-2">
+                                    @{
+                                        var applicant = Model.Applicant;
+                                        var educationalDetails = applicant.EducationalDetail;
+                                    }
+                                    <div class="mb-4 text-lg font-bold text-gray-600">Educational Profile</div>
+                                    <div><strong>Id Number:</strong><input class="ml-2 disabled:bg-white" value="@educationalDetails.IdNumber" disabled/></div>
+                                    <div><strong>College:</strong><input class="ml-2 disabled:bg-white" value="@educationalDetails.College.Name" disabled/></div>
+                                    <div><strong>Department:</strong><input class="ml-2 disabled:bg-white" value="@educationalDetails.Department.Name" disabled/></div>
+                                    <div><strong>Program:</strong><input class="ml-2 disabled:bg-white" value="@educationalDetails.Program.Name" disabled/></div>
+                                    <div><strong>Year Level:</strong><input class="ml-2 disabled:bg-white" value="@educationalDetails.YearLevel.Name" disabled/></div>
+                                </div>
+                                <div class="w-1/2 space-y-2">
+                                    <div class="mb-4 text-lg font-bold text-gray-600">Skills</div>
+                                    <div class="flex-1 h-full">
+                                        <label class="block text-sm font-medium text-gray-700"></label>
+                                        <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="createJobSkillsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                        <div type="hidden" id="skillsHiddenInputs" name="Skills"></div>
+                                        <span class="text-sm text-red-500" id="skillsValidation"></span>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+
+                <!-- Preferences Section -->
+                <div id="preferences-section" class="tab-content hidden">
+                    <form id="preferences-form">
+                        <div class="mb-4 flex items-center justify-between">
+                            <h2 class="mb-4 text-2xl font-semibold">Preferences</h2>
+                            <div class="flex space-x-2">
+                                <button type="button" id="cancel-preferences-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
+                                    Cancel
+                                </button>
+                                <button type="button" id="save-preferences-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                                    Update
+                                </button>
+                            </div>
+                        </div>
+
                         <!-- Notification Preferences Section -->
                         <div class="mb-4">
                             <button type="button" class="toggle-preferences flex w-full items-center justify-between rounded-md bg-gray-100 px-4 py-2 focus:outline-none" data-target="#notification-preferences-content" data-icon="#notification-icon">
@@ -40,7 +158,7 @@
                             </div>
                         </div>
 
-                        <!-- Default Sort and Filters -->
+                        <!-- Filter and Sort Section -->
                         <div class="mb-4">
                             <button type="button" class="toggle-preferences flex w-full items-center justify-between rounded-md bg-gray-100 px-4 py-2 focus:outline-none" data-target="#filterandsort-preferences-content" data-icon="#filterandsort-icon">
                                 <span class="text-xl font-medium">Filter and Sort</span>
@@ -53,26 +171,24 @@
                                 @await Html.PartialAsync("_NotificationPreferences", Model)
                             </div>
                         </div>
-                    }
-                </form>
-            </div>
-
-            <!-- Update Password Section -->
-            <div class="rounded-lg bg-white p-6 shadow">
-                <div class="mb-4 flex items-center justify-between">
-                    <h2 class="mb-4 text-2xl font-semibold">Update Password</h2>
-                    <div class="flex space-x-2">
-                        <button type="button" id="cancel-password-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
-                            Cancel
-                        </button>
-                        <button type="button" id="save-password-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                            Update
-                        </button>
-                    </div>
+                    </form>
                 </div>
-                
-                <form id="password-form">
-                    <div class="mb-4">
+
+                <!-- Password Section -->
+                <div id="password-section" class="tab-content hidden">
+                    <div class="mb-4 flex items-center justify-between">
+                        <h2 class="mb-4 text-2xl font-semibold">Change Password</h2>
+                        <div class="flex space-x-2">
+                            <button type="button" id="cancel-password-btn" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]">
+                                Cancel
+                            </button>
+                            <button type="button" id="save-password-btn" class="hidden rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                                Update
+                            </button>
+                        </div>
+                    </div>
+                    <form id="password-form">
+                        <div class="mb-4">
                         <label for="oldPassword" class="mb-2 block text-gray-700">Old Password</label>
                         <input 
                             type="password" 
@@ -99,7 +215,8 @@
                             name="ConfirmNewPassword" />
                         <span id="confirm-password-validation-message" class="hidden text-sm text-red-600"></span>
                     </div>
-                </form>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -113,6 +230,54 @@
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
+    <script>
+        document.getElementById('profile-picture').addEventListener('change', function () {
+            const file = this.files[0];
+            const saveClearButtons = document.getElementById('save-clear-buttons');
+            const profilePicturePreview = document.getElementById('profile-picture-preview');
+    
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (e) {
+                    profilePicturePreview.setAttribute('src', e.target.result);
+                };
+                reader.readAsDataURL(file);
+                saveClearButtons.classList.remove('hidden');
+            }
+        });
+
+        document.getElementById('clear-profile-btn').addEventListener('click', function () {
+            document.getElementById('profile-picture-preview').setAttribute('src', 'https://via.placeholder.com/150');
+            document.getElementById('save-clear-buttons').classList.add('hidden');
+            document.getElementById('profile-picture').value = '';
+        });
+
+        document.getElementById('save-profile-btn').addEventListener('click', function () {
+            alert('Profile picture saved successfully!');
+            document.getElementById('save-clear-buttons').classList.add('hidden');
+        });
+    </script>
+    <script>
+        const tabs = document.querySelectorAll('.tab-btn');
+        const contents = document.querySelectorAll('.tab-content');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs
+                tabs.forEach(btn => btn.classList.remove('active-tab', 'bg-gray-100'));
+                // Hide all content
+                contents.forEach(content => content.classList.add('hidden'));
+
+                // Show the target content and add active class
+                const target = tab.getAttribute('data-target');
+                document.getElementById(target).classList.remove('hidden');
+                tab.classList.add('active-tab', 'bg-gray-100');
+            });
+        });
+
+        // Default active tab (Profile section)
+        document.querySelector('.tab-btn[data-target="profile-section"]').click();
+    </script>
     <script>
         function formChanged(formId) {
             const form = document.getElementById(formId);

@@ -53,7 +53,7 @@ namespace WebApp.Controllers
         [Route("")]
         public async Task<IActionResult> GetUserProfile()
         {
-            var preferences = await _userProfileService.GetUserProfileAsync(UserId);
+            var preferences = await _userProfileService.GetUserProfileAsync(UserId, UserRole);
             return View("ViewProfile", preferences);
         }
 

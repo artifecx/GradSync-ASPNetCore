@@ -9,7 +9,7 @@ namespace Services.Interfaces
 {
     public interface IUserProfileService
     {
-        Task<UserProfileViewModel> GetUserProfileAsync(string userId);
+        Task<UserProfileViewModel> GetUserProfileAsync(string userId, string roleId);
         Task UpdateUserProfileAsync(UserProfileViewModel model);
         Task UpdateUserPassword(UserProfileViewModel model);
         Task<KeyValuePair<string, string>> GetUserPreferenceByKeyAsync(string userId, string key);
