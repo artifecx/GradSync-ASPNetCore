@@ -85,6 +85,11 @@ namespace Services.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId)
         {
+            if (string.IsNullOrEmpty(applicationId))
+            {
+                throw new JobApplicationException("Application ID is null or empty.");
+            }
+
             var application = await GetOrCacheApplicationByIdAsync(applicationId);
 
             if (application == null)
@@ -94,6 +99,9 @@ namespace Services.Services
 
             application.ApplicationStatusTypeId = applicationStatusTypeId;
             application.UpdatedDate = DateTime.Now;
+            application.Job = null;
+            application.User = null;
+            application.ApplicationStatusType = null;
 
             using (var scope = _serviceProvider.CreateScope())
             {
