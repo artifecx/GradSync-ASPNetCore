@@ -6,6 +6,7 @@ using static Resources.Constants.Routes;
 using static Resources.Constants.Types;
 using static Resources.Messages.ErrorMessages;
 using static Resources.Messages.SuccessMessages;
+using System;
 
 namespace WebApp.Controllers
 {
@@ -54,6 +55,7 @@ namespace WebApp.Controllers
         /// </returns>
         [HttpPost]
         [Authorize(Policy = "Applicant")]
+        [Route("withdraw")]
         public async Task<IActionResult> WithdrawApplication(string applicationId)
         {
             return await HandleExceptionAsync(async () =>

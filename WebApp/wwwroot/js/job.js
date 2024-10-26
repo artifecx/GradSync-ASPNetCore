@@ -9,6 +9,37 @@
     }
 });
 
+async function withdrawApplicationHandler(applicationId) {
+    //const actionUrl = $('#withdrawButton').data('action-url');
+    const actionUrl = $('#actionUrl').val();
+
+    if (!applicationId) {
+        toastr.error('Application ID is missing.');
+        return;
+    }
+
+    const confirmed = confirm('Are you sure you want to withdraw this application?');
+    if (!confirmed) return;
+
+    $.ajax({
+        url: actionUrl,
+        type: 'POST',
+        data: { applicationId: applicationId },
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                var errorMessage = response.error || "An error occurred.";
+                toastr.error(errorMessage);
+            }
+        },
+        error: function (xhr, status, error) {
+            var errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+}
+
 async function applyJobHandler(jobId) {
     const actionUrl = $('#actionUrl').val();
     console.log(jobId);
