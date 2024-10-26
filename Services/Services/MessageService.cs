@@ -16,15 +16,13 @@ namespace Services.Services
     public class MessageService : IMessageService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IMemoryCache _memoryCache;
         private readonly IEventBus _eventBus;
         private static TimeSpan cacheExpirationMinutes = 
             TimeSpan.FromMinutes(Convert.ToInt32(Expiration_Messages));
 
-        public MessageService(IServiceProvider serviceProvider, IMemoryCache memoryCache, IEventBus eventBus)
+        public MessageService(IServiceProvider serviceProvider, IEventBus eventBus)
         {
             _serviceProvider = serviceProvider;
-            _memoryCache = memoryCache;
             _eventBus = eventBus;
         }
 
@@ -61,7 +59,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync($"RecentMessages-{threadId}", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync($"RecentMessages-{threadId}", _serviceProvider, async (innerScope) =>
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetRecentMessagesAsync(threadId);
@@ -74,7 +72,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync($"Thread-{threadId}", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync($"Thread-{threadId}", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IMessageRepository>();
                     return await repository.GetThreadByIdAsync(threadId);
@@ -87,7 +85,6 @@ namespace Services.Services
             var recentMessagesEvent = new DataListUpdatedEvent<Message>
             {
                 Key = messageKey,
-                Cache = _memoryCache,
                 ServiceProvider = _serviceProvider,
                 FetchUpdatedData = async (scope) =>
                 {
@@ -105,7 +102,6 @@ namespace Services.Services
             var threadEvent = new DataUpdatedEvent<MessageThread>
             {
                 Key = threadKey,
-                Cache = _memoryCache,
                 ServiceProvider = _serviceProvider,
                 FetchUpdatedData = async (scope) =>
                 {

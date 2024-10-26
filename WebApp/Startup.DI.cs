@@ -50,7 +50,7 @@ namespace WebApp
             this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
             this._services.TryAddSingleton<IEventBus, EventBus>();
-            this._services.AddScoped<ICachingService, CachingService>();
+            this._services.TryAddSingleton<ICachingService, CachingService>();
 
             // Repositories
             this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();

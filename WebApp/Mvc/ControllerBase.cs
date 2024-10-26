@@ -16,6 +16,8 @@ using Services.Interfaces;
 using static Services.Exceptions.JobApplicationExceptions;
 using static Services.Exceptions.JobExceptions;
 using System.Diagnostics;
+using Data.Models;
+using WebApp.Models;
 
 namespace WebApp.Mvc
 {
@@ -282,7 +284,7 @@ namespace WebApp.Mvc
             catch (UserNotVerifiedException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 TempData["ErrorMessageLogin"] = ex.Message;
-                return RedirectToAction(actionName);
+                return View(actionName, new LoginViewModel { Email = ex.Id });
             }
             catch (Exception ex) when (LogAndSetErrorMessage(ex, actionName))
             {

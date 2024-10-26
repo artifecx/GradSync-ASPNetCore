@@ -11,7 +11,6 @@ namespace Services.ServiceModels
     public class CacheEvent<T>
     {
         public string Key { get; set; }
-        public IMemoryCache Cache { get; set; }
         public IServiceProvider ServiceProvider { get; set; }
         public Func<IServiceScope, Task<T>> FetchUpdatedData { get; set; }
         public TimeSpan? ExpirationMinutes { get; set; }

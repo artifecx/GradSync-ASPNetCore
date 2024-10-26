@@ -118,7 +118,7 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="Success_UserRegistrationSuccess" xml:space="preserve">
-    <value>User already exists!</value>
+    <value>Successfully registered! Check your email for verification.</value>
   </data>
   <data name="Success_UserVerificationSuccess" xml:space="preserve">
     <value>User successfully verified!</value>

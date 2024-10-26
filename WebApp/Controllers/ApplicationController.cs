@@ -107,11 +107,6 @@ namespace WebApp.Controllers
 
                     ViewBag.UserId = UserId;
 
-                    // Check if the user has applied for the job aaaaaahhhh
-                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    var hasApplied = await _applicationService.HasExistingApplicationAsync(userId, model.JobId);
-                    ViewBag.HasApplied = hasApplied;
-
                     return View("ViewApplication", model);
                 }
                 TempData["ErrorMessage"] = string.Format(Error_ApplicationActionError, "retrieving");

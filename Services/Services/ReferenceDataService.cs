@@ -17,12 +17,10 @@ namespace Services.Services
     public class ReferenceDataService : IReferenceDataService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IMemoryCache _memoryCache;
 
-        public ReferenceDataService(IServiceProvider serviceProvider, IMemoryCache memoryCache)
+        public ReferenceDataService(IServiceProvider serviceProvider)
         {
             _serviceProvider = serviceProvider;
-            _memoryCache = memoryCache;
         }
 
         #region Get Methods        
@@ -31,7 +29,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("EmploymentTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("EmploymentTypes", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetEmploymentTypesAsync();
@@ -44,7 +42,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("StatusTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("StatusTypes", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetStatusTypesAsync();
@@ -57,7 +55,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("WorkSetups", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("WorkSetups", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetWorkSetupsAsync();
@@ -70,7 +68,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("Programs", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("Programs", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetProgramsAsync();
@@ -83,7 +81,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("Skills", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("Skills", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetSkillsAsync();
@@ -96,7 +94,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("YearLevels", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("YearLevels", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetYearLevelsAsync();
@@ -109,7 +107,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("AppStatusTypes", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("AppStatusTypes", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetApplicationStatusTypesAsync();
@@ -122,7 +120,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync("UserRoles", _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync("UserRoles", _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
                     return await repository.GetUserRolesAsync();

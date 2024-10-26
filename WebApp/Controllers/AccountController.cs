@@ -96,6 +96,7 @@ namespace WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
+        [EnableRateLimiting("LoginPolicy")]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             return await HandleExceptionAsync(async () =>
@@ -146,7 +147,7 @@ namespace WebApp.Controllers
         /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
         [AllowAnonymous]
-        [EnableRateLimiting("EmailUsePolicy")]
+        [EnableRateLimiting("RegistrationPolicy")]
         public async Task<IActionResult> Register(AccountServiceModel model, string FormLoadTime)
         {
             return await HandleExceptionAsync(async () =>
@@ -184,7 +185,7 @@ namespace WebApp.Controllers
         /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpPost]
         [AllowAnonymous]
-        [EnableRateLimiting("EmailUsePolicy")]
+        [EnableRateLimiting("ResetPasswordPolicy")]
         public async Task<IActionResult> ForgotPassword(string email)
         {
             return await HandleExceptionAsync(async () =>

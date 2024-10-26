@@ -23,6 +23,7 @@ using Microsoft.AspNetCore.Http;
 using System.Threading.RateLimiting;
 using System.Linq;
 using Azure;
+using System.Security.Claims;
 
 namespace WebApp
 {
@@ -143,20 +144,39 @@ namespace WebApp
         
             services.AddRateLimiter(options =>
             {
-                options.AddPolicy("EmailUsePolicy", context =>
+                options.AddPolicy("RegistrationPolicy", context =>
                     RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 1,
-                            Window = TimeSpan.FromMinutes(30),
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(1440), // 24 hours
                             QueueLimit = 0,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                         }));
-
+                options.AddPolicy("ResetPasswordPolicy", context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(1440), // 24 hours
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        }));
+                options.AddPolicy("LoginPolicy", context =>
+                    RateLimitPartition.GetFixedWindowLimiter(
+                        partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        factory: partition => new FixedWindowRateLimiterOptions
+                        {
+                            PermitLimit = 3,
+                            Window = TimeSpan.FromMinutes(15),
+                            QueueLimit = 0,
+                            QueueProcessingOrder = QueueProcessingOrder.OldestFirst
+                        }));
                 options.AddPolicy("GeneralApiPolicy", context =>
                     RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 100,
@@ -164,10 +184,9 @@ namespace WebApp
                             QueueLimit = 10,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                         }));
-
                 options.GlobalLimiter = PartitionedRateLimiter.Create<HttpContext, string>(context =>
                     RateLimitPartition.GetFixedWindowLimiter(
-                        partitionKey: context.User.Identity?.Name ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
+                        partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
                             PermitLimit = 1000,
@@ -175,7 +194,6 @@ namespace WebApp
                             QueueLimit = 50,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst
                         }));
-
                 options.OnRejected = async (context, cancellationToken) =>
                 {
                     var request = context.HttpContext.Request;

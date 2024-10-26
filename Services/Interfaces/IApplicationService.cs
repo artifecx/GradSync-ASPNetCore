@@ -10,6 +10,5 @@ namespace Services.Interfaces
         Task ArchiveApplicationAsync(string userId, string applicationId);
         Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters);
         Task<ApplicationViewModel> GetApplicationByIdAsync(string id);
-        Task<bool> HasExistingApplicationAsync(string userId, string jobId);
     }
 }

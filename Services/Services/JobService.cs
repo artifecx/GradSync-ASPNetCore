@@ -28,20 +28,17 @@ namespace Services.Services
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMemoryCache _memoryCache;
 
         public JobService(
             IJobRepository repository,
             ICompanyRepository companyRepository,
             IMapper mapper,
-            IMemoryCache memoryCache,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _companyRepository = companyRepository;
             _mapper = mapper;
-            _memoryCache = memoryCache;
             _httpContextAccessor = httpContextAccessor;
         }
 

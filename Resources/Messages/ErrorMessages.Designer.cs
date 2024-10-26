@@ -178,9 +178,7 @@ namespace Resources.Messages {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to Please check your registered email and spam folder for the verification link. If your link has expired, a new one will be automatically sent shortly.
-        ///
-        ///If you have not received anything, contact us at support@gradsync.org.
+        ///   Looks up a localized string similar to Check your email (and spam folder) for the verification link. If expired, a new link will be sent shortly. For help, contact support@gradsync.org..
         /// </summary>
         public static string Error_UserNotVerified {
             get {
