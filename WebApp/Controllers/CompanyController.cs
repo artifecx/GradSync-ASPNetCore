@@ -118,7 +118,9 @@ namespace WebApp.Controllers
                 return View(new CompanyViewModel());
             }, "RegisterCompany");
         }
+        #endregion GET Methods
 
+        #region POST Methods
         [HttpPost]
         [Authorize(Policy = "Recruiter")]
         [Route("/company/register")]
