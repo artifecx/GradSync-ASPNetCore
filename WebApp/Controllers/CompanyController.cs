@@ -61,18 +61,6 @@ namespace WebApp.Controllers
             }, "GetAllCompanies");
         }
 
-        private async Task InitializeValues(
-            string sortBy,
-            string search,
-            bool? verified,
-            bool? hasValidMOA)
-        {
-            ViewData["Search"] = search;
-            ViewData["SortBy"] = sortBy;
-            ViewData["Verified"] = verified;
-            ViewData["HasValidMOA"] = hasValidMOA;
-        }
-
         [HttpGet]
         [Authorize]
         [Route("view")]
