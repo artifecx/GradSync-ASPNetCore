@@ -56,7 +56,7 @@ namespace WebApp.Controllers
         [HttpGet]
         [Route("all")]
         [Authorize]
-        public async Task<IActionResult> GetAllApplications(ApplicationFilter filters)
+        public async Task<IActionResult> GetAllApplications(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {

@@ -63,16 +63,16 @@ namespace WebApp.Controllers
         /// The task result contains an <see cref="IActionResult"/>.</returns>
         [HttpGet]
         [Route("all")]
-        public async Task<IActionResult> GetAllUsers(string sortBy, string search, string role, bool? verified, int pageIndex = 1)
+        public async Task<IActionResult> GetAllUsers(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var users = await _userService.GetAllUsersAsync(sortBy, search, role, verified, pageIndex, 10);
+                var users = await _userService.GetAllUsersAsync(filters);
 
-                ViewData["Search"] = search;
-                ViewData["SortBy"] = sortBy;
-                ViewData["Role"] = role;
-                ViewData["Verified"] = verified;
+                ViewData["Search"] = filters.Search;
+                ViewData["SortBy"] = filters.SortBy;
+                ViewData["Role"] = filters.Role;
+                ViewData["Verified"] = filters.Verified;
                 ViewBag.Roles = await _referenceDataService.GetUserRolesAsync();
 
                 return View("Index", users);

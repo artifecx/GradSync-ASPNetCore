@@ -86,29 +86,35 @@ namespace Services.Services
         }
 
         #region Get Methods        
-        public async Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(
-            string sortBy, string search, bool? verified, bool? hasValidMOA, int pageIndex, int pageSize)
+        public async Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(FilterServiceModel filters)
         {
             var companies = _mapper.Map<List<CompanyViewModel>>(await _repository.GetAllCompaniesNoFilesAsync());
-            companies = await FilterAndSortCompanies(companies, sortBy, search, verified, hasValidMOA);
+            companies = await FilterAndSortCompanies(companies, filters);
 
+            var pageIndex = filters.PageIndex;
+            var pageSize = filters.PageSize;
             var count = companies.Count;
             var items = companies.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return new PaginatedList<CompanyViewModel>(items, count, pageIndex, pageSize);
         }
 
-        private static async Task<List<CompanyViewModel>> FilterAndSortCompanies(List<CompanyViewModel> companies, string sortBy, string search, bool? verified, bool? hasValidMOA)
+        private static async Task<List<CompanyViewModel>> FilterAndSortCompanies(List<CompanyViewModel> companies, FilterServiceModel filters)
         {
+            var sortBy = filters.SortBy;
+            var search = filters.Search;
+            var verified = filters.Verified;
+            var hasValidMOA = filters.HasValidMOA;
+
             if (!string.IsNullOrEmpty(search))
             {
                 companies = companies
-                            .Where(c => 
-                                c.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                                c.Address.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                                c.ContactNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                                c.ContactEmail.Contains(search, StringComparison.OrdinalIgnoreCase))
-                            .ToList();
+                    .Where(c => 
+                        c.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        c.Address.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        c.ContactNumber.Contains(search, StringComparison.OrdinalIgnoreCase) ||
+                        c.ContactEmail.Contains(search, StringComparison.OrdinalIgnoreCase))
+                    .ToList();
             }
 
             if (verified.HasValue)
@@ -143,11 +149,14 @@ namespace Services.Services
 
             companies = sortBy switch
             {
+                "name_asc" => companies.OrderBy(c => c.Name).ToList(),
                 "name_desc" => companies.OrderByDescending(c => c.Name).ToList(),
-                "jobs" => companies.OrderBy(c => c.Recruiters.Count(r => r.Jobs.Any(j => !j.IsArchived))).ToList(),
+                "jobs_asc" => companies.OrderBy(c => c.Recruiters.Count(r => r.Jobs.Any(j => !j.IsArchived))).ToList(),
                 "jobs_desc" => companies.OrderByDescending(c => c.Recruiters.Count(r => r.Jobs.Any(j => !j.IsArchived))).ToList(),
                 _ => companies.OrderBy(c => c.Name).ToList(),
             };
+
+            await Task.CompletedTask;
 
             return companies;
         }

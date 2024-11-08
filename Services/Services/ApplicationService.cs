@@ -59,10 +59,9 @@ namespace Services.Services
             if(await HasExistingApplicationAsync(userId, jobId))
                 throw new JobApplicationException(Error_ApplicationExists);
 
-            string applicationId = Guid.NewGuid().ToString();
             var application = new Application
             {
-                ApplicationId = applicationId,
+                ApplicationId = Guid.NewGuid().ToString(),
                 ApplicationStatusTypeId = AppStatus_Submitted,
                 UserId = userId,
                 JobId = jobId,
@@ -76,7 +75,7 @@ namespace Services.Services
                 await repository.AddApplicationAsync(application);
             }
 
-            await UpdateApplicationCacheAsync(userId, applicationId);
+            await UpdateApplicationCacheAsync(userId, application.ApplicationId);
         }
 
         /// <summary>
@@ -148,7 +147,7 @@ namespace Services.Services
         /// </summary>
         /// <param name="filters">The filter criteria for retrieving applications.</param>
         /// <returns>A task representing the asynchronous operation, containing a paginated list of application view models.</returns>
-        public async Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters)
+        public async Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(FilterServiceModel filters)
         {
             var pageIndex = filters.PageIndex;
             var pageSize = filters.PageSize;

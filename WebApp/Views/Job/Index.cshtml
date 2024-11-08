@@ -36,10 +36,10 @@
 
     bool verified = ViewBag.Verified as bool? ?? false;
 
-    bool hasFilters = !string.IsNullOrEmpty(search) &&
-        !string.IsNullOrEmpty(filterByCompany) &&
-        !string.IsNullOrEmpty(filterByEmploymentType) &&
-        !string.IsNullOrEmpty(filterByStatusType) &&
+    bool hasFilters = !string.IsNullOrEmpty(search) ||
+        !string.IsNullOrEmpty(filterByCompany) ||
+        !string.IsNullOrEmpty(filterByEmploymentType) ||
+        !string.IsNullOrEmpty(filterByStatusType) ||
         !string.IsNullOrEmpty(filterByWorkSetup);
 }
 

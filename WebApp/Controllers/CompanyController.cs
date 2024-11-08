@@ -36,9 +36,7 @@ namespace WebApp.Controllers
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
             IMapper mapper,
-            ICompanyService companyService,
-            TokenValidationParametersFactory tokenValidationParametersFactory,
-            TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper)
+            ICompanyService companyService) : base(httpContextAccessor, loggerFactory, configuration, mapper)
         {
             _companyService = companyService;
         }
@@ -47,18 +45,17 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Admin")]
         [Route("all")]
-        public async Task<IActionResult> GetAllCompanies(
-            string sortBy, 
-            string search,
-            bool? verified,
-            bool? hasValidMOA,
-            int pageIndex = 1)
+        public async Task<IActionResult> GetAllCompanies(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var companies = await _companyService.GetAllCompaniesAsync(sortBy, search, verified, hasValidMOA, pageIndex, 5);
+                if (!ModelState.IsValid) return View("Index", new PaginatedList<CompanyViewModel>(null, 0, 1, 0));
+                var companies = await _companyService.GetAllCompaniesAsync(filters);
 
-                await InitializeValues(sortBy, search, verified, hasValidMOA);
+                ViewData["Search"] = filters.Search;
+                ViewData["SortBy"] = filters.SortBy;
+                ViewData["Verified"] = filters.Verified;
+                ViewData["HasValidMOA"] = filters.HasValidMOA;
 
                 return View("Index", companies);
             }, "GetAllCompanies");
@@ -83,7 +80,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (string.IsNullOrEmpty(id))
+                if (!ModelState.IsValid || string.IsNullOrEmpty(id))
                 {
                     TempData["ErrorMessage"] = "Invalid company id!";
                     return RedirectToAction("GetAllCompanies");

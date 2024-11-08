@@ -57,10 +57,10 @@
                         <form method="get" asp-action="@aspAction"
                               class="flex items-center space-x-2">
                             @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Applicant, address, job title, company" })
-                            <input type="hidden" name="SortBy" value="@sortBy" />
-                            <input type="hidden" name="ProgramFilter" value="@filterByProgram" />
-                            <input type="hidden" name="WorkSetupFilter" value="@filterByWorkSetup" />
-                            <input type="hidden" name="StatusFilter" value="@filterByStatus" />
+                            <input type="hidden" name="sortBy" value="@sortBy" />
+                            <input type="hidden" name="programFilter" value="@filterByProgram" />
+                            <input type="hidden" name="workSetupFilter" value="@filterByWorkSetup" />
+                            <input type="hidden" name="statusFilter" value="@filterByStatus" />
                         </form>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
                                 <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Applicant)</th>
                                 <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
                                     <div class="dropdown relative">
-                                        <a class="cursor-pointer href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        <a class="cursor-pointer" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                                             @if (string.IsNullOrEmpty(filterByProgram))
                                             {
                                                 @Html.DisplayNameFor(model => model.First().Applicant.EducationalDetail.Program)

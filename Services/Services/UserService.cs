@@ -60,9 +60,15 @@ namespace Services.Services
         /// <param name="pageSize">Page size.</param>
         /// <returns>A <see cref="Task{T}"/> representing the asynchronous operation. 
         /// The task result contains a paginated list of <see cref="UserViewModel"/>.</returns>
-        public async Task<PaginatedList<UserViewModel>> GetAllUsersAsync
-            (string sortBy, string search, string role, bool? verified, int pageIndex, int pageSize)
+        public async Task<PaginatedList<UserViewModel>> GetAllUsersAsync(FilterServiceModel filters)
         {
+            var sortBy = filters.SortBy;
+            var search = filters.Search;
+            var role = filters.Role;
+            var verified = filters.Verified;
+            var pageIndex = filters.PageIndex;
+            var pageSize = filters.PageSize;
+
             var claimsPrincipal = _httpContextAccessor.HttpContext.User;
             var currentUserIsSuper = claimsPrincipal.FindFirst("IsSuperAdmin")?.Value;
             var currentUserId = claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
@@ -101,8 +107,9 @@ namespace Services.Services
             users = sortBy switch
             {
                 "name_desc" => users.OrderByDescending(t => t.LastName).ToList(),
+                "name_asc" => users.OrderBy(t => t.LastName).ToList(),
                 "email_desc" => users.OrderByDescending(t => t.Email).ToList(),
-                "email" => users.OrderBy(t => t.Email).ToList(),
+                "email_asc" => users.OrderBy(t => t.Email).ToList(),
                 _ => users.OrderBy(t => t.LastName).ToList(),
             };
 
