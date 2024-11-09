@@ -14,15 +14,8 @@ namespace Services.Interfaces
         Task ArchiveJobAsync(string id);
         Task UnarchiveJobAsync(JobServiceModel model);
         Task<List<JobViewModel>> GetAllJobsAsync();
-        Task<PaginatedList<JobViewModel>> GetAllJobsAsync(
-            string sortBy, string search, string filterByCompany,
-            List<string> filterByEmploymentType, string filterByStatusType,
-            List<string> filterByWorkSetup, int pageIndex, int pageSize,
-            string filterByDatePosted = null, string filterBySalary = null, string archived = null);
-        Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
-            string sortBy, string search, string filterByCompany,
-            List<string> filterByEmploymentType, string filterByStatusType,
-            List<string> filterByWorkSetup, int pageIndex, int pageSize, string archived = null);
+        Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null);
+        Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(FilterServiceModel filters, string archived = null);
         Task<JobViewModel> GetJobByIdAsync(string id);
     }
 }

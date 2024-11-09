@@ -15,23 +15,36 @@
     string sortByDefault = sortBy == "match" || string.IsNullOrEmpty(sortBy) ? "match" : null;
     string sortBySalary = sortBy == "salary_asc" ? "salary_desc" : "salary_asc";
     string sortByDate = sortBy == "created_asc" ? "created_desc" : "created_asc";
+
+    bool hasFilters = !string.IsNullOrEmpty(search) ||
+        !string.IsNullOrEmpty(filterByDatePosted) ||
+        filterByEmploymentType.Any() ||
+        !string.IsNullOrEmpty(filterBySalary) ||
+        filterByWorkSetup.Any();
 }
 
 <!-- Sidebar Filter -->
 <div class="h-screen w-80 rounded-lg border-gray-200 bg-white p-6 shadow-md">
+    
     <div class="mb-6 flex items-center justify-between">
         <div class="text-xl font-semibold text-gray-800">Filter Jobs</div>
-        <button type="reset" form="filterForm"
-                class="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-[#991b1b]">
-            Clear all
-        </button>
+        @if (hasFilters)
+        {
+            <form method="get" asp-action="GetAllJobsApplicant">
+                <button type="submit"
+                        class="text-sm font-medium text-gray-500 transition-colors duration-200 hover:text-[#991b1b]">
+                    Clear all
+                </button>
+            </form>
+        }
     </div>
+    
 
     <form id="filterForm" method="get" asp-action="GetAllJobsApplicant">
         <!-- Date Post Filter -->
         <div class="pb-3 pt-2 text-sm">
             <label for="filterByDatePosted" class="mb-2 block text-sm font-medium text-[#7A1515]">DATE POSTED</label>
-            <select name="filterByDatePosted" id="filterByDatePosted"
+            <select name="filterByDatePosted" id="filterByDatePosted" onchange="this.form.submit()"
                     class="w-full rounded-lg border border-gray-300 bg-gray-50 px-2 py-2 transition-all duration-200 focus:ring-[#991b1b] focus:border-[#991b1b]">
                 <option value="" selected=@(string.IsNullOrEmpty(filterByDatePosted) || string.Equals(filterByDatePosted, "match"))>Anytime</option>
                 <option value="today" selected=@(string.Equals(filterByDatePosted, "today"))>Today</option>
@@ -52,6 +65,7 @@
                                id="filterByEmploymentType_@jobType.EmploymentTypeId"
                                name="filterByEmploymentType"
                                value="@jobType.Name"
+                               onchange="this.form.submit()"
                                @(filterByEmploymentType.Contains(jobType.Name) ? "checked" : "")>
                         <label for="filterByEmploymentType_@jobType.EmploymentTypeId" class="pl-1 pt-2 capitalize text-gray-700">
                             @jobType.Name
@@ -65,7 +79,7 @@
         <div class="pb-3 pt-2 text-sm">
             <label for="filterBySalary" class="mb-2 block text-sm font-medium text-[#7A1515]">MONTHLY SALARY RANGE (₱)</label>
             <div class="relative">
-                <input type="range" id="filterBySalary_range" min="0" max="60000" step="100" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000)
+                <input onchange="this.form.submit()" type="range" id="filterBySalary_range" min="0" max="60000" step="100" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000)
                        class="h-2 w-full appearance-none rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7A1515]">
                 <div class="opacity-10 pointer-events-none absolute inset-0 rounded-lg"></div>
             </div>
@@ -74,7 +88,7 @@
                 <span>₱60,000+</span>
             </div>
             <div class="mt-2 flex justify-center text-sm text-gray-600">
-                <input type="number" id="filterBySalary" name="filterBySalary" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000) min="0" max="60000"
+                <input onchange="this.form.submit()" type="number" id="filterBySalary" name="filterBySalary" value=@(!string.IsNullOrEmpty(filterBySalary) ? filterBySalary : 60000) min="0" max="60000"
                        class="w-full max-w-xs rounded-lg border border-red-500 px-3 py-2 text-sm focus:ring-[#7A1515] focus:border-[#7A1515]" placeholder="Enter salary ₱">
             </div>
         </div>
@@ -91,6 +105,7 @@
                                id="filterByWorkSetup_@workMode.SetupTypeId"
                                name="filterByWorkSetup"
                                value="@workMode.Name"
+                               onchange="this.form.submit()"
                                @(filterByWorkSetup.Contains(workMode.Name) ? "checked" : "")>
                         <label for="filterByWorkSetup_@workMode.SetupTypeId" class="pl-1 pt-2 capitalize text-gray-700">
                             @workMode.Name
@@ -101,12 +116,12 @@
         </div>
 
         <!-- Apply Filter Button -->
-        <div>
+        @*<div>
             <button type="submit"
                     class="w-full rounded-lg bg-[#7A1515] px-3 py-2 text-sm font-semibold text-white transition-all duration-200 hover:bg-[#991b1b]">
                 Apply Filters
             </button>
-        </div>
+        </div>*@
 
         <input type="hidden" name="sortBy" value="@sortBy" />
         <input type="hidden" name="search" value="@search" />

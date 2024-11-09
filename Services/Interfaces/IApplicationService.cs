@@ -8,8 +8,7 @@ namespace Services.Interfaces
         Task SendApplicationAsync(string userId, string jobId);
         Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId);
         Task ArchiveApplicationAsync(string userId, string applicationId);
-        Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters);
+        Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(FilterServiceModel filters);
         Task<ApplicationViewModel> GetApplicationByIdAsync(string id);
-        Task<bool> HasExistingApplicationAsync(string userId, string jobId);
     }
 }

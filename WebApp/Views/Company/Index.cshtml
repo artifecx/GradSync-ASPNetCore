@@ -13,10 +13,12 @@
     bool? hasValidMOA = ViewData["HasValidMOA"] as bool?;
     int pageIndex = Model.PageIndex;
 
-    string sortByName = string.IsNullOrEmpty(sortBy) ? "name_desc" : null;
-    string sortByActiveListings = string.Equals(sortBy, "jobs") ? "jobs_desc" : "jobs";
+    string sortByName = sortBy == "name_asc" ? "name_desc" : "name_asc";
+    string sortByActiveListings = sortBy == "jobs_asc" ? "jobs_desc" : "jobs_asc";
 
-    bool hasFilters = !string.IsNullOrEmpty(search);
+    bool hasFilters = !string.IsNullOrEmpty(search) ||
+        verified.HasValue ||
+        hasValidMOA.HasValue;
 }
 
 <div class="min-h-[calc(96vh-60px)] flex bg-[#F5F7F8]">
@@ -90,7 +92,7 @@
                                    asp-route-hasValidMOA="@hasValidMOA"
                                    class="text-gray-500">
                                     @Html.DisplayNameFor(model => model.First().Name)
-                                    @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                                    @(sortBy == "name_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                                 </a>
                             </th>
                             <!-- Email -->
@@ -109,7 +111,7 @@
                                    asp-route-hasValidMOA="@hasValidMOA"
                                    class="text-gray-500">
                                     @Html.DisplayNameFor(model => model.First().ActiveJobListings)
-                                    @(string.Equals(sortBy, "jobs") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                                    @(string.Equals(sortBy, "jobs_asc") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
                                 </a>
                             </th>
                             <!-- Is Verified -->
@@ -231,7 +233,7 @@
                                             <span>&#10006;</span>
                                         }
                                     </td>
-                                    <td class="py-3 pl-3 text-xs text-gray-700 font-medium">
+                                    <td class="py-3 pl-3 text-xs font-medium text-gray-700">
                                         @if (item.HasValidMOA)
                                         {
                                             <span>&#10004;</span>

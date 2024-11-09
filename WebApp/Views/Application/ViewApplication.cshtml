@@ -27,8 +27,11 @@
                         @if (User.IsInRole("Applicant"))
                         {
                             <!-- Withdraw -->
-                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white">
-                                <i class="fa-solid fa-door-open pr-1"></i> Withdraw Application
+                            <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all text-white bg-[#7A1515] hover:bg-[#991b1b] hover:text-white"
+                                    id="withdrawButton"
+                                    data-action-url="@Url.Action("WithdrawApplication", "Application")"
+                                    onclick="withdrawApplicationHandler('@Model.ApplicationId')">
+                                Withdraw Application
                             </button>
                         }
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
@@ -97,6 +100,7 @@
 
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+<input type="hidden" id="actionUrl" value="@Url.Action("WithdrawApplication", "Application")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>

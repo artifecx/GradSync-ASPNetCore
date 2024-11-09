@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
             success: function (response) {
                 if (response.success) {
                     $('#registerUserModal').modal('hide');
-                    toastr.success('User registered successfully!');
+                    location.reload();
                 } else {
                     toastr.error(response.error || "An error occurred.");
                 }

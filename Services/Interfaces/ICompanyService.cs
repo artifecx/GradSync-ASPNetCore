@@ -11,8 +11,7 @@ namespace Services.Interfaces
 {
     public interface ICompanyService
     {
-        Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(
-            string sortBy, string search, bool? verified, bool? hasValidMOA, int pageIndex, int pageSize);
+        Task<PaginatedList<CompanyViewModel>> GetAllCompaniesAsync(FilterServiceModel filters);
         Task<CompanyViewModel> GetCompanyByIdAsync(string id);
         Task AddCompanyAsync(CompanyViewModel model);
         Task UpdateCompanyAsync(CompanyViewModel model);

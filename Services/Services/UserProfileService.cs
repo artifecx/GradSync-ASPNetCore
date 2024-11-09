@@ -6,26 +6,28 @@ using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Services.ServiceModels;
+using static Resources.Constants.UserRoles;
 using static Resources.Messages.ErrorMessages;
+using Data.Models;
 
 namespace Services.Services
 {
     /// <summary>
-    /// Service class for handling operations related to user preferences.
+    /// Service class for handling operations related to user profiles.
     /// </summary>
-    public class UserPreferencesService : IUserPreferencesService
+    public class UserProfileService : IUserProfileService
     {
-        private readonly IUserPreferencesRepository _repository;
+        private readonly IUserProfileRepository _repository;
         private readonly IUserRepository _userRepository;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserPreferencesService"/> class.
+        /// Initializes a new instance of the <see cref="UserProfileService"/> class.
         /// </summary>
-        /// <param name="repository">The user preferences repository.</param>
+        /// <param name="repository">The user profiles repository.</param>
         /// <param name="userRepository">The user repository.</param>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
-        public UserPreferencesService(
-            IUserPreferencesRepository repository,
+        public UserProfileService(
+            IUserProfileRepository repository,
             IUserRepository userRepository,
             IHttpContextAccessor httpContextAccessor)
         {
@@ -34,48 +36,60 @@ namespace Services.Services
         }
 
         /// <summary>
-        /// Gets the user preferences asynchronously.
+        /// Gets the user profiles asynchronously.
         /// </summary>
         /// <param name="userId">The user identifier.</param>
         /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. 
-        /// The task result contains the user preferences view model.</returns>
-        public async Task<UserPreferencesViewModel> GetUserPreferencesAsync(string userId)
+        /// The task result contains the user profiles view model.</returns>
+        public async Task<UserProfileViewModel> GetUserProfileAsync(string userId, string roleId)
         {
-            var preferences = _repository.GetUserPreferences(userId);
+            var preferences = _repository.GetUserProfile(userId);
+            var user = new User();
+            if (roleId == Role_Applicant)
+                user = await _repository.GetApplicantProfileByUserId(userId);
+            else if(roleId == Role_Recruiter)
+                user = await _repository.GetRecruiterProfileByUserId(userId);
 
-            var model = new UserPreferencesViewModel
+            var model = new UserProfileViewModel
             {
                 UserId = userId,
+                FirstName = user.FirstName,
+                MiddleName = user.MiddleName,
+                LastName = user.LastName,
+                Suffix = user.Suffix,
+                Email = user.Email,
                 Preferences = preferences,
+                Applicant = user.Applicant,
+                Recruiter = user.Recruiter
             };
             return model;
         }
 
         /// <summary>
-        /// Updates the user preferences asynchronously.
+        /// Updates the user profiles asynchronously.
         /// </summary>
-        /// <param name="model">The user preferences view model.</param>
+        /// <param name="model">The user profiles view model.</param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task UpdateUserPreferencesAsync(UserPreferencesViewModel model)
+        public async Task UpdateUserProfileAsync(UserProfileViewModel model)
         {
-            var existingPreferences = _repository.GetUserPreferences(model.UserId);
+            var existingPreferences = _repository.GetUserProfile(model.UserId);
             if (existingPreferences != null && model.Preferences != null)
             {
                 foreach (var preference in model.Preferences)
                 {
                     existingPreferences[preference.Key] = preference.Value;
                 }
-                await _repository.UpdateUserPreferencesAsync(model.UserId, existingPreferences);
+                await _repository.UpdateUserProfileAsync(model.UserId, existingPreferences);
             }
         }
 
         /// <summary>
         /// Updates the user password.
         /// </summary>
-        /// <param name="model">The user preferences view model.</param>
+        /// <param name="model">The user profiles view model.</param>
         /// <exception cref="InvalidOperationException">Thrown when the old password does not match, 
         /// the new password is the same as the old password, or an error occurs during the update process.</exception>
-        public async Task UpdateUserPassword(UserPreferencesViewModel model)
+        public async Task UpdateUserPassword(UserProfileViewModel model)
         {
             var user = await _userRepository.GetUserByIdAsync(model.UserId);
             if (user != null)

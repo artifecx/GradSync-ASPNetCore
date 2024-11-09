@@ -10,9 +10,9 @@ namespace Services.Interfaces
 {
     public interface ICachingService
     {
-        Task<List<T>> GetOrCacheAsync<T>(string cacheKey, IMemoryCache cache, IServiceProvider serviceProvider, 
+        Task<List<T>> GetOrCacheAsync<T>(string cacheKey, IServiceProvider serviceProvider, 
             Func<IServiceScope, Task<List<T>>> getDataFunc, TimeSpan? cacheExpiration = null);
-        Task<T> GetOrCacheAsync<T>(string cacheKey, IMemoryCache cache, IServiceProvider serviceProvider, 
+        Task<T> GetOrCacheAsync<T>(string cacheKey, IServiceProvider serviceProvider, 
             Func<IServiceScope, Task<T>> getDataFunc, TimeSpan? cacheExpiration = null);
     }
 }

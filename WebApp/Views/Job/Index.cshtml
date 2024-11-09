@@ -36,10 +36,10 @@
 
     bool verified = ViewBag.Verified as bool? ?? false;
 
-    bool hasFilters = !string.IsNullOrEmpty(search) &&
-        !string.IsNullOrEmpty(filterByCompany) &&
-        !string.IsNullOrEmpty(filterByEmploymentType) &&
-        !string.IsNullOrEmpty(filterByStatusType) &&
+    bool hasFilters = !string.IsNullOrEmpty(search) ||
+        !string.IsNullOrEmpty(filterByCompany) ||
+        !string.IsNullOrEmpty(filterByEmploymentType) ||
+        !string.IsNullOrEmpty(filterByStatusType) ||
         !string.IsNullOrEmpty(filterByWorkSetup);
 }
 
@@ -89,7 +89,7 @@ else
                                 <input type="hidden" name="sortBy" value="@sortBy" />
                             </form>
 
-                            @if (User.IsInRole("NLO"))
+                            @if (User.IsInRole("Recruiter"))
                             {
                                 <div class="ml-3">
                                     <button type="button"

@@ -16,6 +16,8 @@ using Services.Interfaces;
 using static Services.Exceptions.JobApplicationExceptions;
 using static Services.Exceptions.JobExceptions;
 using System.Diagnostics;
+using Data.Models;
+using WebApp.Models;
 
 namespace WebApp.Mvc
 {
@@ -36,7 +38,7 @@ namespace WebApp.Mvc
         /// <summary>Session</summary>
         protected ISession _session => _httpContextAccessor.HttpContext.Session;
 
-        protected IUserPreferencesService _userPreferences { get; set; }
+        protected IUserProfileService _userProfile { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the ControllerBase{TController} class.
@@ -51,14 +53,14 @@ namespace WebApp.Mvc
                                 ILoggerFactory loggerFactory,
                                 IConfiguration configuration,
                                 IMapper mapper = null,
-                                IUserPreferencesService userPreferences = null)
+                                IUserProfileService userProfile = null)
         {
             this._httpContextAccessor = httpContextAccessor;
             this._configuration = configuration;
             this._logger = loggerFactory.CreateLogger<TController>();
             this._configuration = configuration;
             this._mapper = mapper;
-            this._userPreferences = userPreferences;
+            this._userProfile = userProfile;
         }
 
         /// <summary>Mapper</summary>
@@ -282,7 +284,7 @@ namespace WebApp.Mvc
             catch (UserNotVerifiedException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 TempData["ErrorMessageLogin"] = ex.Message;
-                return RedirectToAction(actionName);
+                return View(actionName, new LoginViewModel { Email = ex.Id });
             }
             catch (Exception ex) when (LogAndSetErrorMessage(ex, actionName))
             {

@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Services.Interfaces
 {
-    public interface IUserPreferencesService
+    public interface IUserProfileService
     {
-        Task<UserPreferencesViewModel> GetUserPreferencesAsync(string userId);
-        Task UpdateUserPreferencesAsync(UserPreferencesViewModel model);
-        Task UpdateUserPassword(UserPreferencesViewModel model);
+        Task<UserProfileViewModel> GetUserProfileAsync(string userId, string roleId);
+        Task UpdateUserProfileAsync(UserProfileViewModel model);
+        Task UpdateUserPassword(UserProfileViewModel model);
         Task<KeyValuePair<string, string>> GetUserPreferenceByKeyAsync(string userId, string key);
     }
 }

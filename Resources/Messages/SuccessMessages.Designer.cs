@@ -117,14 +117,14 @@ namespace Resources.Messages {
         /// <summary>
         ///   Looks up a localized string similar to Successfully updated your preferences!.
         /// </summary>
-        public static string Success_UserPreferencesUpdate {
+        public static string Success_UserProfileUpdate {
             get {
-                return ResourceManager.GetString("Success_UserPreferencesUpdate", resourceCulture);
+                return ResourceManager.GetString("Success_UserProfileUpdate", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to User already exists!.
+        ///   Looks up a localized string similar to Successfully registered! Check your email for verification..
         /// </summary>
         public static string Success_UserRegistrationSuccess {
             get {

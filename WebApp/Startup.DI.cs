@@ -46,18 +46,18 @@ namespace WebApp
             this._services.AddScoped<IJobService, JobService>();
             this._services.AddScoped<ICompanyService, CompanyService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
-            this._services.AddScoped<IUserPreferencesService, UserPreferencesService>();
+            this._services.AddScoped<IUserProfileService, UserProfileService>();
             this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
             this._services.TryAddSingleton<IEventBus, EventBus>();
-            this._services.AddScoped<ICachingService, CachingService>();
+            this._services.TryAddSingleton<ICachingService, CachingService>();
 
             // Repositories
             this._services.AddScoped<IReferenceDataRepository, ReferenceDataRepository>();
             this._services.AddScoped<IUserRepository, UserRepository>();
             this._services.AddScoped<IJobRepository, JobRepository>();
             this._services.AddScoped<ICompanyRepository, CompanyRepository>();
-            this._services.AddScoped<IUserPreferencesRepository, UserPreferencesRepository>();
+            this._services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             this._services.AddScoped<IApplicationRepository, ApplicationRepository>();
             this._services.AddScoped<IMessageRepository, MessageRepository>();
 

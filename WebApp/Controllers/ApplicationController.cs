@@ -56,7 +56,7 @@ namespace WebApp.Controllers
         [HttpGet]
         [Route("all")]
         [Authorize]
-        public async Task<IActionResult> GetAllApplications(ApplicationFilter filters)
+        public async Task<IActionResult> GetAllApplications(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
@@ -106,11 +106,6 @@ namespace WebApp.Controllers
                     }
 
                     ViewBag.UserId = UserId;
-
-                    // Check if the user has applied for the job aaaaaahhhh
-                    var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                    var hasApplied = await _applicationService.HasExistingApplicationAsync(userId, model.JobId);
-                    ViewBag.HasApplied = hasApplied;
 
                     return View("ViewApplication", model);
                 }

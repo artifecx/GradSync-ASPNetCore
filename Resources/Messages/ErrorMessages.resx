@@ -121,9 +121,7 @@
     <value>User already exists!</value>
   </data>
   <data name="Error_UserNotVerified" xml:space="preserve">
-    <value>Please check your registered email and spam folder for the verification link. If your link has expired, a new one will be automatically sent shortly.
-
-If you have not received anything, contact us at support@gradsync.org</value>
+    <value>Check your email (and spam folder) for the verification link. If expired, a new link will be sent shortly. For help, contact support@gradsync.org.</value>
   </data>
   <data name="Error_UserRegistrationDefault" xml:space="preserve">
     <value>An has error occurred while registering user.</value>

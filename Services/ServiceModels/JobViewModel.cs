@@ -101,5 +101,7 @@ namespace Services.ServiceModels
         public string PostedById { get; set; }
 
         public bool HasApplied { get; set; } = false;
+        public string ApplicationId { get; set; } = null;
+
     }
 }

@@ -16,6 +16,7 @@ using static Resources.Constants.UserRoles;
 using static Resources.Constants.Types;
 using static Resources.Messages.ErrorMessages;
 using static Services.Exceptions.JobApplicationExceptions;
+using Microsoft.Extensions.Logging;
 
 namespace Services.Services
 {
@@ -25,7 +26,6 @@ namespace Services.Services
     public class ApplicationService : IApplicationService
     {
         private readonly IServiceProvider _serviceProvider;
-        private readonly IMemoryCache _memoryCache;
         private readonly IEventBus _eventBus;
         private readonly IMapper _mapper;
         private static TimeSpan cacheExpirationMinutes = TimeSpan.FromMinutes(Convert.ToInt32(Expiration_Applications));
@@ -37,10 +37,13 @@ namespace Services.Services
         /// <param name="memoryCache">In-memory cache for storing application data.</param>
         /// <param name="eventBus">Event bus for publishing events related to application data.</param>
         /// <param name="mapper">Object mapper for converting between data and service models.</param>
-        public ApplicationService(IServiceProvider serviceProvider, IMemoryCache memoryCache, IEventBus eventBus, IMapper mapper)
+        public ApplicationService
+            (IServiceProvider serviceProvider, 
+            IEventBus eventBus, 
+            IMapper mapper,
+            ILogger<ApplicationService> logger)
         {
             _serviceProvider = serviceProvider;
-            _memoryCache = memoryCache;
             _eventBus = eventBus;
             _mapper = mapper;
         }
@@ -56,10 +59,9 @@ namespace Services.Services
             if(await HasExistingApplicationAsync(userId, jobId))
                 throw new JobApplicationException(Error_ApplicationExists);
 
-            string applicationId = Guid.NewGuid().ToString();
             var application = new Application
             {
-                ApplicationId = applicationId,
+                ApplicationId = Guid.NewGuid().ToString(),
                 ApplicationStatusTypeId = AppStatus_Submitted,
                 UserId = userId,
                 JobId = jobId,
@@ -73,7 +75,7 @@ namespace Services.Services
                 await repository.AddApplicationAsync(application);
             }
 
-            await UpdateApplicationCacheAsync(userId, applicationId);
+            await UpdateApplicationCacheAsync(userId, application.ApplicationId);
         }
 
         /// <summary>
@@ -85,6 +87,11 @@ namespace Services.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId)
         {
+            if (string.IsNullOrEmpty(applicationId))
+            {
+                throw new JobApplicationException("Application ID is null or empty.");
+            }
+
             var application = await GetOrCacheApplicationByIdAsync(applicationId);
 
             if (application == null)
@@ -94,6 +101,9 @@ namespace Services.Services
 
             application.ApplicationStatusTypeId = applicationStatusTypeId;
             application.UpdatedDate = DateTime.Now;
+            application.Job = null;
+            application.User = null;
+            application.ApplicationStatusType = null;
 
             using (var scope = _serviceProvider.CreateScope())
             {
@@ -137,7 +147,7 @@ namespace Services.Services
         /// </summary>
         /// <param name="filters">The filter criteria for retrieving applications.</param>
         /// <returns>A task representing the asynchronous operation, containing a paginated list of application view models.</returns>
-        public async Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(ApplicationFilter filters)
+        public async Task<PaginatedList<ApplicationViewModel>> GetAllApplicationsAsync(FilterServiceModel filters)
         {
             var pageIndex = filters.PageIndex;
             var pageSize = filters.PageSize;
@@ -231,7 +241,7 @@ namespace Services.Services
             using (var scope = _serviceProvider.CreateScope())
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
-                return await cachingService.GetOrCacheAsync(Key_ApplicationsAll, _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync(Key_ApplicationsAll, _serviceProvider, async (innerScope) =>
                 {
                     var repository = innerScope.ServiceProvider.GetRequiredService<IApplicationRepository>();
                     return await repository.GetAllApplicationsAsync(true);
@@ -250,7 +260,7 @@ namespace Services.Services
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
                 string applicationUserKey = string.Format(Key_ApplicationsByUserId, userId);
-                return await cachingService.GetOrCacheAsync(applicationUserKey, _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync(applicationUserKey, _serviceProvider, async (innerScope) =>
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
                     return await repository.GetAllApplicationsByUserAsync(userId);
@@ -269,7 +279,7 @@ namespace Services.Services
             {
                 var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
                 string applicationKey = string.Format(Key_ApplicationById, id);
-                return await cachingService.GetOrCacheAsync(applicationKey, _memoryCache, _serviceProvider, async (innerScope) =>
+                return await cachingService.GetOrCacheAsync(applicationKey, _serviceProvider, async (innerScope) =>
                 {
                     var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
                     return await repository.GetApplicationByIdAsync(id);
@@ -301,7 +311,7 @@ namespace Services.Services
         /// <param name="userId">The ID of the user to check for existing applications.</param>
         /// <param name="jobId">The ID of the job to check for existing applications.</param>
         /// <returns>A task representing the asynchronous operation, returning true if an application exists.</returns>
-        public async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
+        private async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
         {
             var applications = await GetOrCacheAllApplicationsByUserAsync(userId);
             return applications.Exists(a => a.JobId == jobId);
@@ -317,7 +327,6 @@ namespace Services.Services
             var threadEvent = new DataListUpdatedEvent<Application>
             {
                 Key = key,
-                Cache = _memoryCache,
                 ServiceProvider = _serviceProvider,
                 FetchUpdatedData = async (scope) =>
                 {
@@ -342,7 +351,6 @@ namespace Services.Services
             var threadEvent = new DataListUpdatedEvent<Application>
             {
                 Key = key,
-                Cache = _memoryCache,
                 ServiceProvider = _serviceProvider,
                 FetchUpdatedData = async (scope) =>
                 {
@@ -367,7 +375,6 @@ namespace Services.Services
             var threadEvent = new DataUpdatedEvent<Application>
             {
                 Key = key,
-                Cache = _memoryCache,
                 ServiceProvider = _serviceProvider,
                 FetchUpdatedData = async (scope) =>
                 {

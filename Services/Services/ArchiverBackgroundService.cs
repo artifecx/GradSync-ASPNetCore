@@ -16,7 +16,9 @@ namespace Services.Services
         private readonly ILogger<ArchiverBackgroundService> _logger;
         private readonly IServiceProvider _serviceProvider;
 
-        public ArchiverBackgroundService(ILogger<ArchiverBackgroundService> logger, IServiceProvider serviceProvider)
+        public ArchiverBackgroundService
+            (ILogger<ArchiverBackgroundService> logger, 
+            IServiceProvider serviceProvider)
         {
             _logger = logger;
             _serviceProvider = serviceProvider;

@@ -28,20 +28,17 @@ namespace Services.Services
         private readonly ICompanyRepository _companyRepository;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IMemoryCache _memoryCache;
 
         public JobService(
             IJobRepository repository,
             ICompanyRepository companyRepository,
             IMapper mapper,
-            IMemoryCache memoryCache,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _companyRepository = companyRepository;
             _mapper = mapper;
-            _memoryCache = memoryCache;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -228,19 +225,15 @@ namespace Services.Services
         }
 
         #region Get Methods        
-        public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(
-            string sortBy, string search, string filterByCompany,
-            List<string> filterByEmploymentType, string filterByStatusType,
-            List<string> filterByWorkSetup, int pageIndex, int pageSize, 
-            string filterByDatePosted = null, string filterBySalary = null, string archived = null)
+        public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {
             var jobs = string.Equals(archived, "archived") ?
                 _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync()) :
                 _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
-            jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
-                filterByEmploymentType, filterByStatusType, filterByWorkSetup,
-                filterByDatePosted, filterBySalary, archived);
+            jobs = await FilterAndSortJobs(jobs, filters, archived);
 
+            var pageIndex = filters.PageIndex;
+            var pageSize = filters.PageSize;
             var count = jobs.Count;
             var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
@@ -250,34 +243,36 @@ namespace Services.Services
         public async Task<List<JobViewModel>> GetAllJobsAsync() =>
             _mapper.Map <List<JobViewModel>>(await _repository.GetAllJobsAsync());
 
-        public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(
-            string sortBy, string search, string filterByCompany,
-            List<string> filterByEmploymentType, string filterByStatusType,
-            List<string> filterByWorkSetup, int pageIndex, int pageSize, string archived = null)
+        public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(FilterServiceModel filters, string archived = null)
         {
             var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var jobs = string.Equals(archived, "archived") ? 
                 _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterArchivedJobsAsync(userId)) :
                 _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
-            jobs = await FilterAndSortJobs(jobs, sortBy, search, filterByCompany, 
-                filterByEmploymentType, filterByStatusType, filterByWorkSetup, archived);
+            jobs = await FilterAndSortJobs(jobs, filters, archived);
 
+            var pageIndex = filters.PageIndex;
+            var pageSize = filters.PageSize;
             var count = jobs.Count;
             var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
 
             return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
         }
 
-        private async Task<List<JobViewModel>> FilterAndSortJobs(
-            List<JobViewModel> jobs, string sortBy, string search, 
-            string filterByCompany, List<string> filterByEmploymentType, 
-            string filterByStatusType, List<string> filterByWorkSetup, 
-            string filterByDatePosted = null, string filterBySalary = null,
-            string archived = null)
+        private async Task<List<JobViewModel>> FilterAndSortJobs(List<JobViewModel> jobs, FilterServiceModel filters, string archived = null)
         {
+            var search = filters.Search;
+            var filterByDatePosted = filters.FilterByDatePosted;
+            var filterByCompany = filters.FilterByCompany;
+            var filterByEmploymentType = filters.FilterByEmploymentType;
+            var filterByStatusType = filters.FilterByStatusType;
+            var filterByWorkSetup = filters.FilterByWorkSetup;
+            var filterBySalary = filters.FilterBySalary;
+            var sortBy = filters.SortBy;
+
             if (!string.IsNullOrEmpty(search))
             {
-                if (!string.IsNullOrEmpty(archived))
+                if (string.IsNullOrEmpty(archived))
                 {
                     jobs = jobs
                         .Where(job =>
@@ -378,8 +373,11 @@ namespace Services.Services
             var model = _mapper.Map<JobViewModel>(job);
 
             if (currentUserRole == Role_Applicant)
+            {
                 model.HasApplied = job.Applications.Any(a => a.UserId == currentUserId);
-
+                model.ApplicationId = job.Applications.FirstOrDefault(a => a.UserId == currentUserId)?.ApplicationId;
+            }
+                
             model.SalaryLower = GetLowerSalary(job.Salary);
             model.SalaryUpper = GetUpperSalary(job.Salary);
             model.ScheduleDays = GetDaysSchedule(job.Schedule);

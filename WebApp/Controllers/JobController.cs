@@ -57,28 +57,14 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Admin")]
         [Route("admin/all")]
-        public async Task<IActionResult> GetAllJobsAdmin(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            string filterByEmploymentType,
-            string filterByStatusType,
-            string filterByWorkSetup,
-            int pageIndex = 1)
+        public async Task<IActionResult> GetAllJobsAdmin(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var filterByEmploymentTypeList = new List<string>();
-                if (!string.IsNullOrEmpty(filterByEmploymentType))
-                    filterByEmploymentTypeList.Add(filterByEmploymentType);
-                var filterByWorkSetupList = new List<string>();
-                if (!string.IsNullOrEmpty(filterByWorkSetup))
-                    filterByWorkSetupList.Add(filterByWorkSetup);
+                var jobs = await _jobService.GetAllJobsAsync(filters);
 
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentTypeList, filterByStatusType, filterByWorkSetupList, pageIndex, 10);
-
-                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
-                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
+                await InitializeValues(filters);
+                await InitializeValues(filters.FilterByEmploymentType.FirstOrDefault(), filters.FilterByWorkSetup.FirstOrDefault());
 
                 ViewBag.Companies = await _companyService.GetCompaniesWithListingsAsync();
 
@@ -89,14 +75,7 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Recruiter")]
         [Route("recruiter/all")]
-        public async Task<IActionResult> GetAllJobsRecruiter(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            string filterByEmploymentType,
-            string filterByStatusType,
-            string filterByWorkSetup,
-            int pageIndex = 1)
+        public async Task<IActionResult> GetAllJobsRecruiter(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
@@ -105,17 +84,10 @@ namespace WebApp.Controllers
 
                 ViewBag.Verified = company.IsVerified;
 
-                var filterByEmploymentTypeList = new List<string>();
-                if (!string.IsNullOrEmpty(filterByEmploymentType))
-                    filterByEmploymentTypeList.Add(filterByEmploymentType);
-                var filterByWorkSetupList = new List<string>();
-                if (!string.IsNullOrEmpty(filterByWorkSetup))
-                    filterByWorkSetupList.Add(filterByWorkSetup);
+                var jobs = await _jobService.GetRecruiterJobsAsync(filters);
 
-                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, filterByCompany, filterByEmploymentTypeList, filterByStatusType, filterByWorkSetupList, pageIndex, 10);
-
-                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType);
-                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
+                await InitializeValues(filters);
+                await InitializeValues(filters.FilterByEmploymentType.FirstOrDefault(), filters.FilterByWorkSetup.FirstOrDefault());
 
                 return View("Index", jobs);
             }, "GetAllJobsRecruiter");
@@ -124,21 +96,14 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Recruiter")]
         [Route("recruiter/archived")]
-        public async Task<IActionResult> GetArchivedJobsRecruiter(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            string filterByEmploymentType,
-            string filterByStatusType,
-            string filterByWorkSetup,
-            int pageIndex = 1)
+        public async Task<IActionResult> GetArchivedJobsRecruiter(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (sortBy.IsNullOrEmpty()) sortBy = "updated_desc";
-                var jobs = await _jobService.GetRecruiterJobsAsync(sortBy, search, null, new List<string>(), null, new List<string>(), pageIndex, 10, "archived");
+                if (filters.SortBy.IsNullOrEmpty()) filters.SortBy = "updated_desc";
+                var jobs = await _jobService.GetRecruiterJobsAsync(filters, "archived");
 
-                await InitializeValues(sortBy, search, null, null);
+                await InitializeValues(filters);
 
                 return View("IndexArchived", jobs);
             }, "GetAllJobsRecruiter");
@@ -147,21 +112,14 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Admin")]
         [Route("/archived")]
-        public async Task<IActionResult> GetArchivedJobs(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            string filterByEmploymentType,
-            string filterByStatusType,
-            string filterByWorkSetup,
-            int pageIndex = 1)
+        public async Task<IActionResult> GetArchivedJobs(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                if (sortBy.IsNullOrEmpty()) sortBy = "updated_desc";
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, null, new List<string>(), null, new List<string>(), pageIndex, 10, null, null, "archived");
+                if (filters.SortBy.IsNullOrEmpty()) filters.SortBy = "updated_desc";
+                var jobs = await _jobService.GetAllJobsAsync(filters, "archived");
 
-                await InitializeValues(sortBy, search, null, null);
+                await InitializeValues(filters);
 
                 return View("IndexArchived", jobs);
             }, "GetAllJobsRecruiter");
@@ -188,43 +146,27 @@ namespace WebApp.Controllers
         [HttpGet]
         [Authorize(Policy = "Applicant")]
         [Route("all")]
-        public async Task<IActionResult> GetAllJobsApplicant(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            List<string> filterByEmploymentType,
-            string filterByStatusType,
-            List<string> filterByWorkSetup,
-            int pageIndex = 1,
-            string filterByDatePosted = null,
-            string filterBySalary = null)
+        public async Task<IActionResult> GetAllJobsApplicant(FilterServiceModel filters)
         {
             return await HandleExceptionAsync(async () =>
             {
-                var jobs = await _jobService.GetAllJobsAsync(sortBy, search, filterByCompany, filterByEmploymentType,
-                    filterByStatusType, filterByWorkSetup, pageIndex, 10, filterByDatePosted, filterBySalary);
+                var jobs = await _jobService.GetAllJobsAsync(filters);
 
-                await InitializeValues(sortBy, search, filterByCompany, filterByStatusType, filterByDatePosted, filterBySalary);
-                await InitializeValues(filterByEmploymentType, filterByWorkSetup);
+                await InitializeValues(filters);
+                await InitializeValues(filters.FilterByEmploymentType, filters.FilterByWorkSetup);
 
                 return View("IndexApplicant", jobs);
             }, "GetAllJobsApplicant");
         }
 
-        private async Task InitializeValues(
-            string sortBy,
-            string search,
-            string filterByCompany,
-            string filterByStatusType,
-            string filterByDatePosted = null,
-            string filterBySalary = null)
+        private async Task InitializeValues(FilterServiceModel filters)
         {
-            ViewData["SortBy"] = sortBy;
-            ViewData["Search"] = search;
-            ViewData["FilterByCompany"] = filterByCompany;
-            ViewData["FilterByStatusType"] = filterByStatusType;
-            ViewData["FilterByDatePosted"] = filterByDatePosted;
-            ViewData["FilterBySalary"] = filterBySalary;
+            ViewData["SortBy"] = filters.SortBy;
+            ViewData["Search"] = filters.Search;
+            ViewData["FilterByCompany"] = filters.FilterByCompany;
+            ViewData["FilterByStatusType"] = filters.FilterByStatusType;
+            ViewData["FilterByDatePosted"] = filters.FilterByDatePosted;
+            ViewData["FilterBySalary"] = filters.FilterBySalary;
 
             await PopulateViewBagsAsync();
         }

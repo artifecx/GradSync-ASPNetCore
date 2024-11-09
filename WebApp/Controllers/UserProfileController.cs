@@ -15,85 +15,85 @@ using static Resources.Messages.SuccessMessages;
 namespace WebApp.Controllers
 {
     /// <summary>
-    /// Controller for handling user preferences.
+    /// Controller for handling user profiles.
     /// </summary>
     [Authorize]
-    [Route("preferences")]
-    public class UserPreferencesController : ControllerBase<UserPreferencesController>
+    [Route("profile")]
+    public class UserProfileController : ControllerBase<UserProfileController>
     {
-        private readonly IUserPreferencesService _userPreferencesService;
+        private readonly IUserProfileService _userProfileService;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="UserPreferencesController"/> class.
+        /// Initializes a new instance of the <see cref="UserProfileController"/> class.
         /// </summary>
         /// <param name="httpContextAccessor">The HTTP context accessor.</param>
         /// <param name="loggerFactory">The logger factory.</param>
         /// <param name="configuration">The configuration.</param>
         /// <param name="mapper">The mapper.</param>
-        /// <param name="userPreferencesService">The user preferences service.</param>
+        /// <param name="userProfileService">The user profiles service.</param>
         /// <param name="tokenValidationParametersFactory">The token validation parameters factory.</param>
         /// <param name="tokenProviderOptionsFactory">The token provider options factory.</param>
-        public UserPreferencesController(
+        public UserProfileController(
             IHttpContextAccessor httpContextAccessor,
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
             IMapper mapper,
-            IUserPreferencesService userPreferencesService,
+            IUserProfileService userProfileService,
             TokenValidationParametersFactory tokenValidationParametersFactory,
-            TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper, userPreferencesService)
+            TokenProviderOptionsFactory tokenProviderOptionsFactory) : base(httpContextAccessor, loggerFactory, configuration, mapper, userProfileService)
         {
-            this._userPreferencesService = userPreferencesService;
+            this._userProfileService = userProfileService;
         }
 
         /// <summary>
-        /// Gets the user preferences.
+        /// Gets the user profiles.
         /// </summary>
-        /// <returns>The user preferences view.</returns>
+        /// <returns>The user profiles view.</returns>
         [HttpGet]
         [Route("")]
-        public async Task<IActionResult> GetUserPreferences()
+        public async Task<IActionResult> GetUserProfile()
         {
-            var preferences = await _userPreferencesService.GetUserPreferencesAsync(UserId);
-            return View("ViewPreferences", preferences);
+            var preferences = await _userProfileService.GetUserProfileAsync(UserId, UserRole);
+            return View("ViewProfile", preferences);
         }
 
         /// <summary>
-        /// Updates the user preferences.
+        /// Updates the user profiles.
         /// </summary>
-        /// <param name="model">The user preferences view model.</param>
+        /// <param name="model">The user profiles view model.</param>
         /// <returns>A JSON result indicating success or failure.</returns>
         [HttpPost]
-        [Route("UpdateUserPreferences")]
-        public async Task<IActionResult> UpdateUserPreferences(UserPreferencesViewModel model)
+        [Route("UpdateUserProfile")]
+        public async Task<IActionResult> UpdateUserProfile(UserProfileViewModel model)
         {
             return await HandleExceptionAsync(async () =>
             {
                 if (model.UserId != null)
                 {
-                    await _userPreferencesService.UpdateUserPreferencesAsync(model);
-                    TempData["SuccessMessage"] = Success_UserPreferencesUpdate;
+                    await _userProfileService.UpdateUserProfileAsync(model);
+                    TempData["SuccessMessage"] = Success_UserProfileUpdate;
                     return Json(new { success = true });
                 }
                 TempData["ErrorMessage"] = Error_UserPreferenceUpdateDefault;
                 return Json(new { success = false });
-            }, "UpdateUserPreferences");
+            }, "UpdateUserProfile");
         }
 
         /// <summary>
         /// Updates the user password.
         /// </summary>
-        /// <param name="model">The user preferences view model.</param>
+        /// <param name="model">The user profiles view model.</param>
         /// <returns>A JSON result indicating success or failure.</returns>
         [HttpPost]
         [Route("UpdatePassword")]
-        public async Task<IActionResult> UpdatePassword(UserPreferencesViewModel model)
+        public async Task<IActionResult> UpdatePassword(UserProfileViewModel model)
         {
             return await HandleExceptionAsync(async () =>
             {
                 if (!string.IsNullOrEmpty(model.NewPassword) && !string.IsNullOrEmpty(model.OldPassword))
                 {
                     model.UserId = UserId;
-                    await _userPreferencesService.UpdateUserPassword(model);
+                    await _userProfileService.UpdateUserPassword(model);
                     TempData["SuccessMessage"] = Success_UserPasswordUpdate;
                     return Json(new { success = true });
                 }

@@ -50,25 +50,18 @@
                             if (hasApplied)
                             {
                                 <!-- Withdraw Application Button -->
-                                <button onclick="withdrawApplicationHandler('@Model.JobId')"
-                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
-                                    <i class="fa-solid fa-door-open pr-1"></i> Withdraw Application
+                                <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all text-white bg-[#7A1515] hover:bg-[#991b1b] hover:text-white"
+                                        id="withdrawButton"
+                                        data-action-url="@Url.Action("WithdrawApplication", "Application")"
+                                        onclick="withdrawApplicationHandler('@Model.ApplicationId')">
+                                    Withdraw Application
                                 </button>
 
                                 <button onclick="location.href='@Url.Action("GetApplication", "Application",
-                                        new {
-                                            id = ViewBag.ApplicationId,
-                                            sortBy = ViewBag.SortBy,
-                                            search = ViewBag.Search,
-                                            pageIndex = ViewBag.PageIndex,
-                                            filterByWorkSetup = ViewBag.FilterByWorkSetup,
-                                            filterByProgram = ViewBag.FilterByProgram,
-                                            filterByStatus = ViewBag.FilterByStatus
-                                        })'"
+                                        new { id = Model.ApplicationId })'"
                                         class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
                                     <i class="fa-solid fa-info-circle pr-1"></i> See Details
                                 </button>
-
                             }
                             else
                             {
@@ -163,6 +156,7 @@
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 <input type="hidden" id="actionUrl" value="@Url.Action("SendApplication", "Application")" />
+<input type="hidden" id="actionUrl" value="@Url.Action("WithdrawApplication", "Application")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>

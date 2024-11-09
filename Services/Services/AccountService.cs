@@ -14,6 +14,7 @@ using static Resources.Messages.ErrorMessages;
 using static Resources.Messages.SuccessMessages;
 using static Services.Exceptions.UserExceptions;
 using System.Security.Claims;
+using Microsoft.Extensions.Logging;
 
 namespace Services.Services
 {
@@ -35,12 +36,11 @@ namespace Services.Services
         /// <param name="httpContextAccessor">The HTTP context accessor.</param> 
         /// <param name="emailService">The email service.</param>
         public AccountService
-            (
-                IUserRepository repository, 
-                IMapper mapper, 
-                IHttpContextAccessor httpContextAccessor, 
-                IEmailService emailService
-            )
+            (IUserRepository repository, 
+            IMapper mapper, 
+            IHttpContextAccessor httpContextAccessor, 
+            IEmailService emailService,
+            ILogger<AccountService> logger)
         {
             _mapper = mapper;
             _repository = repository;
@@ -74,7 +74,7 @@ namespace Services.Services
                         _repository.UpdateUserAsync(user).Wait();
                         SendVerificationEmail(newToken, user.FirstName, user.Email);
                     }
-                    throw new UserNotVerifiedException(Error_UserNotVerified);
+                    throw new UserNotVerifiedException(Error_UserNotVerified, user.Email);
                 }
 
                 user.LastLoginDate = DateTime.Now;
