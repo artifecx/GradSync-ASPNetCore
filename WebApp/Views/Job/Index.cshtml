@@ -188,134 +188,17 @@ else
     <script src="~/js/delete.js"></script>
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/archive.js"></script>
-    <script src="~/js/job.js"></script>
+    <script src="~/js/jobs.js"></script>
     <script>
-        document.addEventListener('DOMContentLoaded', function () {
-            let cancelClicked = false;
-
-            const cancelButtons = ["closeCreateJobModal", "cancelCreateJob"];
-            cancelButtons.forEach(id => {
-                const button = document.getElementById(id);
-                if (button) {
-                    button.addEventListener("click", () => {
-                        cancelClicked = true;
-                    });
-                }
-            });
-
-            $('#createJobModal').on('hidden.bs.modal', function () {
-                if (cancelClicked) {
-                    createJobForm.reset();
-                    $(".text-red-500").text('');
-                    $("#remainingTitleChars").text('100 characters remaining');
-                    $("#remainingDescriptionChars").text('800 characters remaining');
-                    $("#skillWeights").text('30% - 70%');
-                }
-                cancelClicked = false;
-            });
-
-            function initializeTagify(inputSelector, hiddenInputsSelector, whitelist, namePrefix, validationSelector) {
-                const inputElement = document.querySelector(inputSelector);
-                const hiddenInputsContainer = document.getElementById(hiddenInputsSelector);
-                const validationElement = $(validationSelector);
-
-                if (!inputElement || !hiddenInputsContainer) return;
-
-                const tagify = new Tagify(inputElement, {
-                    whitelist: whitelist,
-                    enforceWhitelist: true,
-                    searchKeys: ['value'],
-                    pattern: null,
-                    dropdown: {
-                        classname: "color-blue",
-                        enabled: 0,
-                        maxItems: 10
-                    },
-                });
-
-                tagify.DOM.scope.classList.add(
-                    'block',
-                    'w-full',
-                    'rounded-lg',
-                    'border',
-                    'border-gray-300',
-                    'p-2',
-                    'focus:ring-red-800',
-                    'focus:border-red-800',
-                    'overflow-y-auto',
-                    'max-h-16'
-                );
-
-                tagify.on('change', function () {
-                    const selectedValues = tagify.value;
-                    hiddenInputsContainer.innerHTML = '';
-
-                    selectedValues.forEach((item, index) => {
-                        const hiddenInput = document.createElement('input');
-                        hiddenInput.type = 'hidden';
-                        hiddenInput.name = `${namePrefix}[${index}].${namePrefix.endsWith('SkillsT') || namePrefix.endsWith('SkillsC') || namePrefix.endsWith('SkillsS') ? 'SkillId' : 'ProgramId'}`;
-                        hiddenInput.value = item.id;
-                        hiddenInputsContainer.appendChild(hiddenInput);
-                    });
-                    if (inputSelector.slice(1) !== 'createJobSkillsCInput') {
-                        if (!selectedValues.length)
-                        {
-                            $(validationSelector).text('This field is required.');
-                            updateValidation(namePrefix, true);
-                        }
-                        else
-                        {
-                            $(validationSelector).text('');
-                            updateValidation(namePrefix, false);
-                        }
-                    }
-                });
-            }
-
-            function initializeAllTagify() {
-                const tagifyConfigs = [
-                    {
-                        inputSelector: '#createJobSkillsTInput',
-                        hiddenInputsSelector: 'skillsTHiddenInputs',
-                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsTechnical.Select(s => new { value = s.Name, id = s.SkillId }))),
-                        namePrefix: 'SkillsT',
-                        validationSelector: '#skillsTValidation'
-                    },
-                    {
-                        inputSelector: '#createJobSkillsCInput',
-                        hiddenInputsSelector: 'skillsCHiddenInputs',
-                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsCertification.Select(s => new { value = s.Name, id = s.SkillId }))),
-                        namePrefix: 'SkillsC',
-                        validationSelector: '#skillsCValidation'
-                    },
-                    {
-                        inputSelector: '#createJobSkillsSInput',
-                        hiddenInputsSelector: 'skillsSHiddenInputs',
-                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsSoft.Select(s => new { value = s.Name, id = s.SkillId }))),
-                        namePrefix: 'SkillsS',
-                        validationSelector: '#skillsSValidation'
-                    },
-                    {
-                        inputSelector: '#createJobProgramsInput',
-                        hiddenInputsSelector: 'programsHiddenInputs',
-                        whitelist: @Html.Raw(JsonSerializer.Serialize(Programs.Select(d => new { value = d.Name, id = d.ProgramId }))),
-                        namePrefix: 'Programs',
-                        validationSelector: '#programsValidation'
-                    }
-                ];
-
-                tagifyConfigs.forEach(config => {
-                    initializeTagify(
-                        config.inputSelector,
-                        config.hiddenInputsSelector,
-                        config.whitelist,
-                        config.namePrefix,
-                        config.validationSelector
-                    );
-                });
-            }
-
-            initializeAllTagify();
-        });
+        window.appData = {
+            skillsS: @Html.Raw(JsonSerializer.Serialize(SkillsSoft
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsT: @Html.Raw(JsonSerializer.Serialize(SkillsTechnical
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsC: @Html.Raw(JsonSerializer.Serialize(SkillsCertification
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            programs: @Html.Raw(JsonSerializer.Serialize(Programs
+                .Select(d => new { value = d.Name, id = d.ProgramId })))
+        };
     </script>
 }

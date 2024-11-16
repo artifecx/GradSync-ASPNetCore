@@ -7,22 +7,22 @@
 
 @{
     ViewData["Title"] = Model.Title;
+    await Html.RenderPartialAsync("_EditJobModal", Model);
+
     var userId = ViewBag.UserId;
     string aspAction = string.Empty;
 
     bool isAdmin = User.IsInRole("Admin") || User.IsInRole("NLO");
+    bool isRecruiter = User.IsInRole("Recruiter");
 
-    if (isAdmin)
-        aspAction = "GetAllJobsAdmin";
-    else if (User.IsInRole("Recruiter"))
-        aspAction = "GetAllJobsRecruiter";
-    else
-        aspAction = "GetAllJobsApplicant";
-
-    await Html.RenderPartialAsync("_EditJobModal", Model);
+    if (isAdmin) aspAction = "GetAllJobsAdmin";
+    else if (isRecruiter) aspAction = "GetAllJobsRecruiter";
+    else aspAction = "GetAllJobsApplicant";
 
     var Programs = ViewBag.Programs as List<Program>;
-    var Skills = ViewBag.Skills as List<Skill>;
+    var SkillsSoft = ViewBag.SkillsSoft as List<Skill>;
+    var SkillsTechnical = ViewBag.SkillsTechnical as List<Skill>;
+    var SkillsCertification = ViewBag.SkillsCertification as List<Skill>;
 }
 
 <div class="mt-8 min-h-screen bg-gray-100 text-black">
@@ -45,12 +45,10 @@
                             var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
                             var hasApplied = Model.HasApplied;
 
-                            // var hasApplied = ViewBag.HasApplied as bool? ?? true; 
-
                             if (hasApplied)
                             {
                                 <!-- Withdraw Application Button -->
-                                <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all text-white bg-[#7A1515] hover:bg-[#991b1b] hover:text-white"
+                                <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b] hover:text-white"
                                         id="withdrawButton"
                                         data-action-url="@Url.Action("WithdrawApplication", "Application")"
                                         onclick="withdrawApplicationHandler('@Model.ApplicationId')">
@@ -59,7 +57,7 @@
 
                                 <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                         new { id = Model.ApplicationId })'"
-                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
                                     <i class="fa-solid fa-info-circle pr-1"></i> See Details
                                 </button>
                             }
@@ -67,13 +65,13 @@
                             {
                                 <!-- Save -->
                                 <button onclick="saveJobHandler('@Model.JobId')"
-                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
                                     <i class="fa-regular fa-bookmark"></i>
                                 </button>
 
                                 <!-- Apply Button -->
                                 <button onclick="applyJobHandler('@Model.JobId')"
-                                        class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white">
+                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
                                     <i class="fa-regular fa-paper-plane pr-1"></i> Apply
                                 </button>
                             }
@@ -81,7 +79,7 @@
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
                         {
                             <!-- Edit Button -->
-                            <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all bg-[#7A1515] hover:bg-[#991b1b] text-white"
+                            <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]"
                                     data-toggle="modal"
                                     data-target="#editJobModal">
                                 <i class="fas fa-edit pr-2"></i> Edit
@@ -153,162 +151,36 @@
     </div>
 </div>
 
-<!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 <input type="hidden" id="actionUrl" value="@Url.Action("SendApplication", "Application")" />
-<input type="hidden" id="actionUrl" value="@Url.Action("WithdrawApplication", "Application")" />
+<input type="hidden" id="withdrawUrl" value="@Url.Action("WithdrawApplication", "Application")" />
+<input type="hidden" id="baseUrl" value="@Url.Action($"{aspAction}", "Job")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/job.js"></script>
     <script>
-        const urlParams = new URLSearchParams(window.location.search);
-        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-        sessionStorage.setItem('filterByEmploymentType', JSON.stringify(urlParams.getAll('filterByEmploymentType')) || '[]');
-        sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
-        sessionStorage.setItem('filterByWorkSetup', JSON.stringify(urlParams.getAll('filterByWorkSetup')) || '[]');
-        sessionStorage.setItem('search', urlParams.get('search') || '');
-        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
-        sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '');
-        sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '');
-
-        const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
-        const newUrl = window.location.origin + window.location.pathname + idParam;
-        window.history.replaceState({}, document.title, newUrl);
-
-        document.querySelector('#back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            const baseUrl = '@Url.Action($"{aspAction}", "Job")';
-            const params = new URLSearchParams();
-            const filterByEmploymentType = JSON.parse(sessionStorage.getItem('filterByEmploymentType') || '[]');
-            const filterByWorkSetup = JSON.parse(sessionStorage.getItem('filterByWorkSetup') || '[]');
-            filterByEmploymentType.forEach(employmentType => {
-                params.append('filterByEmploymentType', employmentType);
-            });
-            filterByWorkSetup.forEach(workSetup => {
-                params.append('filterByWorkSetup', workSetup);
-            });
-            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-            params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
-            params.set('search', sessionStorage.getItem('search') || '');
-            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '');
-            params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '');
-            window.location.href = `${baseUrl}?${params.toString()}`;
-        });
-    </script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function () {
-
-            var existingSkills = @Html.Raw(JsonSerializer.Serialize(Model.Skills.Select(s => new { value = s.Name, id = s.SkillId })));
-            var existingPrograms = @Html.Raw(JsonSerializer.Serialize(Model.Programs.Select(d => new { value = d.Name, id = d.ProgramId })));
-
-            var cancelClicked = false;
-            document.getElementById("closeEditJobModal").addEventListener("click", function () {
-                cancelClicked = true;
-            });
-            document.getElementById("cancelEditJob").addEventListener("click", function () {
-                cancelClicked = true;
-            });
-            $('#editJobModal').on('hidden.bs.modal', function () {
-                if (cancelClicked) {
-                    editJobForm.reset();
-                    $(".text-red-500").text('');
-                    $("#remainingTitleChars").text('100 characters remaining');
-                    $("#remainingDescriptionChars").text('800 characters remaining');
-                    tagifySkills.addTags(existingSkills);
-                    tagifyPrograms.addTags(existingPrograms);
-                }
-                cancelClicked = false;
-            });
-
-            var skillsInput = document.querySelector('#editJobSkillsInput');
-            var skillsHiddenInputs = document.getElementById('skillsHiddenInputs');
-
-            var skillsList = @Html.Raw(JsonSerializer.Serialize(Skills.Select(s => new { value = s.Name, id = s.SkillId })));
-            var tagifySkills = new Tagify(skillsInput, {
-                whitelist: skillsList,
-                enforceWhitelist: true,
-                searchKeys: ['value'],
-                pattern: null,
-                dropdown: {
-                    classname: "color-blue",
-                    enabled: 0,
-                    maxItems: 5,
-                    position: 'top'
-                },
-            });
-
-            tagifySkills.DOM.scope.classList.add(
-                'block',
-                'w-full',
-                'rounded-lg',
-                'border',
-                'border-gray-300',
-                'p-2',
-                'focus:ring-blue-500',
-                'focus:border-blue-500',
-                'overflow-y-auto',
-                'max-h-16'
-            );
-
-            tagifySkills.addTags(existingSkills);
-
-            tagifySkills.on('change', function () {
-                var selectedValues = tagifySkills.value;
-                skillsHiddenInputs.innerHTML = '';
-                selectedValues.forEach(function (item, index) {
-                    var hiddenInputId = document.createElement('input');
-                    hiddenInputId.type = 'hidden';
-                    hiddenInputId.name = 'Skills[' + index + '].SkillId';
-                    hiddenInputId.value = item.id;
-                    skillsHiddenInputs.appendChild(hiddenInputId);
-                });
-            });
-
-            var programsInput = document.querySelector('#editJobProgramsInput');
-            var programsHiddenInputs = document.getElementById('programsHiddenInputs');
-            var programsList = @Html.Raw(JsonSerializer.Serialize(Programs.Select(d => new { value = d.Name, id = d.ProgramId })));
-            var tagifyPrograms = new Tagify(programsInput, {
-                whitelist: programsList,
-                enforceWhitelist: true,
-                searchKeys: ['value'],
-                pattern: null,
-                dropdown: {
-                    classname: "color-blue",
-                    enabled: 0,
-                    maxItems: 5,
-                    position: 'top'
-                },
-            });
-
-            tagifyPrograms.DOM.scope.classList.add(
-                'block',
-                'w-full',
-                'rounded-lg',
-                'border',
-                'border-gray-300',
-                'p-2',
-                'focus:ring-blue-500',
-                'focus:border-blue-500',
-                'overflow-y-auto',
-                'max-h-16'
-            );
-
-            tagifyPrograms.addTags(existingPrograms);
-
-            tagifyPrograms.on('change', function () {
-                var selectedValues = tagifyPrograms.value;
-                programsHiddenInputs.innerHTML = '';
-                selectedValues.forEach(function (item, index) {
-                    var hiddenInputId = document.createElement('input');
-                    hiddenInputId.type = 'hidden';
-                    hiddenInputId.name = 'Programs[' + index + '].ProgramId';
-                    hiddenInputId.value = item.id;
-                    programsHiddenInputs.appendChild(hiddenInputId);
-                });
-            });
-        });
+        window.appData = {
+            existingSkillsS: @Html.Raw(JsonSerializer.Serialize(Model.Skills
+                .Where(s => s.Type == "Common Skill")
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            existingSkillsT: @Html.Raw(JsonSerializer.Serialize(Model.Skills
+                .Where(s => s.Type == "Specialized Skill")
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            existingSkillsC: @Html.Raw(JsonSerializer.Serialize(Model.Skills
+                .Where(s => s.Type == "Certification")
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            existingPrograms: @Html.Raw(JsonSerializer.Serialize(Model.Programs
+                .Select(d => new { value = d.Name, id = d.ProgramId }))),
+            skillsS: @Html.Raw(JsonSerializer.Serialize(SkillsSoft
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsT: @Html.Raw(JsonSerializer.Serialize(SkillsTechnical
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsC: @Html.Raw(JsonSerializer.Serialize(SkillsCertification
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            programs: @Html.Raw(JsonSerializer.Serialize(Programs
+                .Select(d => new { value = d.Name, id = d.ProgramId })))
+        };
     </script>
 }
 
