@@ -17,7 +17,7 @@
                 </button>
             </div>
 
-            <div class="modal-body max-h-[calc(96vh-200px)] flex">
+            <div class="modal-body min-h-[calc(96vh-250px)] max-h-[calc(96vh-250px)] flex">
                 <!-- Sidebar Navigation -->
                 <div class="w-1/4 rounded-lg bg-white p-4 shadow">
                     <h3 class="mb-4 text-lg font-semibold">Sections</h3>
@@ -48,18 +48,20 @@
                 <div class="ml-6 w-3/4 flex-grow overflow-y-auto rounded-lg bg-white p-6 shadow">
                     <form id="createJobForm">
                         @Html.AntiForgeryToken()
-                        <div class="space-y-6">
+                        <div>
                             <!-- Job Details Section -->
                             <div id="job-details-section" class="tab-content-create">
                                 <h3 class="text-xl font-semibold">Job Details</h3>
-                                <div class="mt-4 space-y-6 overflow-y-auto">
+                                <div class="mt-4 space-y-6">
                                     <div class="flex space-x-6">
                                         <!-- Job Title -->
                                         <div class="flex-1">
                                             <label asp-for="Title" class="block text-sm font-medium text-gray-700">Job Title</label>
                                             <input placeholder="Junior Software Developer" asp-for="Title" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobTitle" name="Title" maxlength="100" />
-                                            <span asp-validation-for="Title" class="text-sm text-red-500"></span>
-                                            <span id="remainingTitleChars" class="text-xs text-gray-500">100 characters remaining</span>
+                                            <div class="flex flex-col">
+                                                <span asp-validation-for="Title" class="mt-1 text-sm text-red-500"></span>
+                                                <span id="remainingTitleChars" class="mt-1 text-xs text-gray-500">100 characters remaining</span>
+                                            </div>
                                         </div>
 
                                         <!-- Slots Available -->
@@ -346,9 +348,9 @@
 
             <div class="modal-footer">
                 <span class="hidden pr-2 text-xs font-medium italic text-red-600" id="summaryValidation">complete all sections before submitting (*)</span>
-                <button type="button" class="rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelCreateJob" data-dismiss="modal">Cancel</button>
-                <button type="button" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="backCreateJob">Previous</button>
-                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D] disabled:bg-gray-400" id="nextCreateJob">Next</button>
+                <button type="button" class="min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelCreateJob" data-dismiss="modal">Cancel</button>
+                <button type="button" class="hidden min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="backCreateJob">Previous</button>
+                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D] disabled:bg-gray-400" id="nextCreateJob">Next</button>
             </div>
         </div>
     </div>
