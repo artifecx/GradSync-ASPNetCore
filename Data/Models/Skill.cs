@@ -9,6 +9,8 @@ public partial class Skill
 
     public string Name { get; set; }
 
+    public string Type { get; set; }
+
     public virtual ICollection<ApplicantSkill> ApplicantSkills { get; set; } = new List<ApplicantSkill>();
 
     public virtual ICollection<JobSkill> JobSkills { get; set; } = new List<JobSkill>();

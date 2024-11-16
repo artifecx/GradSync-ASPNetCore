@@ -11,11 +11,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory.Database;
 using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
-using Microsoft.Extensions.Caching.Memory;
-using System.Xml;
 
 namespace Services.Services
 {
@@ -57,12 +54,20 @@ namespace Services.Services
             job.CompanyId = recruiter.CompanyId;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
-            job.JobSkills = model.Skills.Select(skill => new JobSkill
+            job.JobSkills = new[]
+            {
+                new { Skills = model.SkillsT ?? Enumerable.Empty<Skill>(), Type = "Technical" },
+                new { Skills = model.SkillsS ?? Enumerable.Empty<Skill>(), Type = "Cultural" },
+                new { Skills = model.SkillsC ?? Enumerable.Empty<Skill>(), Type = "Certification" }
+            }
+            .SelectMany(group => group.Skills.Select(skill => new JobSkill
             {
                 JobSkillId = Guid.NewGuid().ToString(),
                 JobId = job.JobId,
-                SkillId = skill.SkillId
-            }).ToList();
+                SkillId = skill.SkillId,
+                Type = group.Type
+            }))
+            .ToList();
             job.JobPrograms = model.Programs.Select(program => new JobProgram
             {
                 JobProgramId = Guid.NewGuid().ToString(),
@@ -127,36 +132,63 @@ namespace Services.Services
 
         private bool SetJobSkills(Job job, JobViewModel model)
         {
-            var currentJobSkills = job.JobSkills.Select(js => js.SkillId).ToList();
-            var newSkills = model.Skills.Select(s => s.SkillId).ToList();
+            var newJobSkills = CreateJobSkills(model.SkillsT, "Technical", job.JobId)
+                .Concat(CreateJobSkills(model.SkillsC, "Certification", job.JobId))
+                .Concat(CreateJobSkills(model.SkillsS, "Cultural", job.JobId))
+                .ToList();
 
-            var skillsToRemove = currentJobSkills.Except(newSkills).ToList();
-            if (skillsToRemove.Any())
+            var currentJobSkills = job.JobSkills.ToList();
+
+            var newJobSkillKeys = new HashSet<(string SkillId, string Type)>(
+                newJobSkills.Select(js => (js.SkillId, js.Type))
+            );
+            var currentJobSkillKeys = new HashSet<(string SkillId, string Type)>(
+                currentJobSkills.Select(js => (js.SkillId, js.Type))
+            );
+
+            var skillsToRemove = currentJobSkills
+                .Where(js => !newJobSkillKeys.Contains((js.SkillId, js.Type)))
+                .ToList();
+
+            var skillsToAdd = newJobSkills
+                .Where(js => !currentJobSkillKeys.Contains((js.SkillId, js.Type)))
+                .ToList();
+
+            foreach (var jobSkill in skillsToRemove)
             {
-                foreach (var skillId in skillsToRemove)
-                {
-                    var jobSkill = job.JobSkills.FirstOrDefault(js => js.SkillId == skillId);
-                    if (jobSkill != null)
-                    {
-                        job.JobSkills.Remove(jobSkill);
-                    }
-                }
+                job.JobSkills.Remove(jobSkill);
             }
-            var skillsToAdd = newSkills.Except(currentJobSkills).ToList();
-            if (skillsToAdd.Any())
+
+            foreach (var jobSkill in skillsToAdd)
             {
-                foreach (var skillId in skillsToAdd)
+                job.JobSkills.Add(new JobSkill
                 {
-                    var jobSkill = new JobSkill
-                    {
-                        JobSkillId = Guid.NewGuid().ToString(),
-                        JobId = job.JobId,
-                        SkillId = skillId
-                    };
-                    job.JobSkills.Add(jobSkill);
-                }
+                    JobSkillId = Guid.NewGuid().ToString(),
+                    JobId = job.JobId,
+                    SkillId = jobSkill.SkillId,
+                    Type = jobSkill.Type
+                });
             }
+
             return skillsToAdd.Any() || skillsToRemove.Any();
+        }
+
+        /// <summary>
+        /// Helper method to create JobSkill instances from a list of skills and a specified type.
+        /// </summary>
+        /// <param name="skills">The collection of skills.</param>
+        /// <param name="type">The type of the skills (e.g., Technical, Certification, Cultural).</param>
+        /// <param name="jobId">The ID of the job.</param>
+        /// <returns>An enumerable of JobSkill instances.</returns>
+        private IEnumerable<JobSkill> CreateJobSkills(IEnumerable<Skill> skills, string type, string jobId)
+        {
+            return skills.Select(skill => new JobSkill
+            {
+                JobSkillId = Guid.NewGuid().ToString(),
+                JobId = jobId,
+                SkillId = skill.SkillId,
+                Type = type
+            });
         }
 
         private bool SetJobPrograms(Job job, JobViewModel model)

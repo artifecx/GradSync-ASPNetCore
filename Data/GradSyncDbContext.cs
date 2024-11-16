@@ -119,10 +119,15 @@ public partial class GradSyncDbContext : DbContext
 
         modelBuilder.Entity<ApplicantSkill>(entity =>
         {
-            entity.HasKey(e => e.ApplicantSkillsId);
+            entity.ToTable("ApplicantSkill");
 
-            entity.Property(e => e.ApplicantSkillsId).HasMaxLength(255);
+            entity.HasIndex(e => e.Type, "IX_ApplicantSkill_Type");
+
+            entity.Property(e => e.ApplicantSkillId).HasMaxLength(255);
             entity.Property(e => e.SkillId)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.Type)
                 .IsRequired()
                 .HasMaxLength(255);
             entity.Property(e => e.UserId)
@@ -131,11 +136,11 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasOne(d => d.Skill).WithMany(p => p.ApplicantSkills)
                 .HasForeignKey(d => d.SkillId)
-                .HasConstraintName("FK_ApplicantSkills_Skill");
+                .HasConstraintName("FK_ApplicantSkill_Skill");
 
             entity.HasOne(d => d.User).WithMany(p => p.ApplicantSkills)
                 .HasForeignKey(d => d.UserId)
-                .HasConstraintName("FK_ApplicantSkills_Applicant");
+                .HasConstraintName("FK_ApplicantSkill_Applicant");
         });
 
         modelBuilder.Entity<Application>(entity =>
@@ -512,11 +517,16 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("JobSkill");
 
+            entity.HasIndex(e => e.Type, "IX_JobSkill_Type");
+
             entity.Property(e => e.JobSkillId).HasMaxLength(255);
             entity.Property(e => e.JobId)
                 .IsRequired()
                 .HasMaxLength(255);
             entity.Property(e => e.SkillId)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.Type)
                 .IsRequired()
                 .HasMaxLength(255);
 
@@ -745,8 +755,13 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.Name, "IX_Skill_Name");
 
+            entity.HasIndex(e => e.Type, "IX_Skill_Type");
+
             entity.Property(e => e.SkillId).HasMaxLength(255);
             entity.Property(e => e.Name)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.Type)
                 .IsRequired()
                 .HasMaxLength(255);
         });

@@ -34,10 +34,33 @@ namespace Data.Repositories
                 .Where(p => !p.IsDeleted)
                 .Include(p => p.Department)
                 .ThenInclude(d => d.College)
+                .OrderBy(s => s.Name)
                 .AsNoTracking()
                 .ToListAsync();
 
         public async Task<List<Skill>> GetSkillsAsync() =>
-            await this.GetDbSet<Skill>().AsNoTracking().ToListAsync();
+            await this.GetDbSet<Skill>()
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
+        public async Task<List<Skill>> GetSoftSkillsAsync() =>
+            await this.GetDbSet<Skill>()
+                .Where(s => s.Type == "Common Skill")
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
+        public async Task<List<Skill>> GetTechnicalSkillsAsync() =>
+            await this.GetDbSet<Skill>()
+                .Where(s => s.Type == "Specialized Skill")
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
+        public async Task<List<Skill>> GetCertificationSkillsAsync() =>
+            await this.GetDbSet<Skill>()
+                .Where(s => s.Type == "Certification")
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
     }
 }

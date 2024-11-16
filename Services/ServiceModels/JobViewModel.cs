@@ -90,12 +90,24 @@ namespace Services.ServiceModels
         [Display(Name = "Employment Type")]
         public string EmploymentTypeId { get; set; }
 
-        [Required]
-        [Display(Name = "Skills Requirement")]
         public List<Skill> Skills { get; set; }
 
         [Required]
-        [Display(Name = "Recommended Programs")]
+        [Display(Name = "Cultural & Soft Skills (Required)")]
+        public List<Skill> SkillsS { get; set; }
+
+        [Required]
+        [Display(Name = "Technical Skills (Required)")]
+        public List<Skill> SkillsT { get; set; }
+
+        [Display(Name = "Certifications (Optional)")]
+        public List<Skill> SkillsC { get; set; }
+
+        [Display(Name = "Skill Weights")]
+        public double SkillWeights { get; set; }
+
+        [Required]
+        [Display(Name = "Recommended Programs (Required)")]
         public List<Program> Programs { get; set; }
 
         public string PostedById { get; set; }
