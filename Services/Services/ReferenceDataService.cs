@@ -89,6 +89,45 @@ namespace Services.Services
             }
         }
 
+        public async Task<List<Skill>> GetSoftSkillsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("SkillsSoft", _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetSoftSkillsAsync();
+                });
+            }
+        }
+
+        public async Task<List<Skill>> GetTechnicalSkillsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("SkillsTechnical", _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetTechnicalSkillsAsync();
+                });
+            }
+        }
+
+        public async Task<List<Skill>> GetCertificationSkillsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("SkillsCertification", _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetCertificationSkillsAsync();
+                });
+            }
+        }
+
         public async Task<List<YearLevel>> GetYearLevelsAsync()
         {
             using (var scope = _serviceProvider.CreateScope())

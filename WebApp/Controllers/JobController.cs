@@ -191,7 +191,9 @@ namespace WebApp.Controllers
             ViewBag.YearLevels = (await _referenceDataService.GetYearLevelsAsync())
                 .OrderByDescending(y => y.Year).ToList();
             ViewBag.Programs = await _referenceDataService.GetProgramsAsync();
-            ViewBag.Skills = await _referenceDataService.GetSkillsAsync();
+            ViewBag.SkillsSoft = await _referenceDataService.GetSoftSkillsAsync();
+            ViewBag.SkillsTechnical = await _referenceDataService.GetTechnicalSkillsAsync();
+            ViewBag.SkillsCertification = await _referenceDataService.GetCertificationSkillsAsync();
         }
 
         /// <summary>

@@ -14,6 +14,9 @@ namespace Services.Interfaces
         Task<List<Program>> GetProgramsAsync();
         Task<List<YearLevel>> GetYearLevelsAsync();
         Task<List<Skill>> GetSkillsAsync();
+        Task<List<Skill>> GetSoftSkillsAsync();
+        Task<List<Skill>> GetTechnicalSkillsAsync();
+        Task<List<Skill>> GetCertificationSkillsAsync();
         Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync();
         Task<List<Role>> GetUserRolesAsync();
     }
