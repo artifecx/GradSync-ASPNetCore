@@ -32,7 +32,9 @@
     }
 
     var Programs = ViewBag.Programs as List<Program>;
-    var Skills = ViewBag.Skills as List<Skill>;
+    var SkillsSoft = ViewBag.SkillsSoft as List<Skill>;
+    var SkillsTechnical = ViewBag.SkillsTechnical as List<Skill>;
+    var SkillsCertification = ViewBag.SkillsCertification as List<Skill>;
 
     bool verified = ViewBag.Verified as bool? ?? false;
 
@@ -189,111 +191,131 @@ else
     <script src="~/js/job.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            var cancelClicked = false;
-            document.getElementById("closeCreateJobModal").addEventListener("click", function () {
-                cancelClicked = true;
+            let cancelClicked = false;
+
+            const cancelButtons = ["closeCreateJobModal", "cancelCreateJob"];
+            cancelButtons.forEach(id => {
+                const button = document.getElementById(id);
+                if (button) {
+                    button.addEventListener("click", () => {
+                        cancelClicked = true;
+                    });
+                }
             });
-            document.getElementById("cancelCreateJob").addEventListener("click", function () {
-                cancelClicked = true;
-            });
+
             $('#createJobModal').on('hidden.bs.modal', function () {
-                if(cancelClicked){
+                if (cancelClicked) {
                     createJobForm.reset();
                     $(".text-red-500").text('');
                     $("#remainingTitleChars").text('100 characters remaining');
                     $("#remainingDescriptionChars").text('800 characters remaining');
+                    $("#skillWeights").text('30% - 70%');
                 }
                 cancelClicked = false;
             });
 
-            var skillsInput = document.querySelector('#createJobSkillsInput');
-            var skillsHiddenInputs = document.getElementById('skillsHiddenInputs');
+            function initializeTagify(inputSelector, hiddenInputsSelector, whitelist, namePrefix, validationSelector) {
+                const inputElement = document.querySelector(inputSelector);
+                const hiddenInputsContainer = document.getElementById(hiddenInputsSelector);
+                const validationElement = $(validationSelector);
 
-            var skillsList = @Html.Raw(JsonSerializer.Serialize(Skills.Select(s => new { value = s.Name, id = s.SkillId })));
+                if (!inputElement || !hiddenInputsContainer) return;
 
-            var tagifySkills = new Tagify(skillsInput, {
-                whitelist: skillsList,
-                enforceWhitelist: true,
-                searchKeys: ['value'],
-                pattern: null,
-                dropdown: {
-                    classname: "color-blue",
-                    enabled: 0,
-                    maxItems: 5,
-                    position: 'top'
-                },
-            });
-
-            tagifySkills.DOM.scope.classList.add(
-                'block',
-                'w-full',
-                'rounded-lg',
-                'border',
-                'border-gray-300',
-                'p-2',
-                'focus:ring-blue-500',
-                'focus:border-blue-500',
-                'overflow-y-auto',
-                'max-h-16'
-            );
-
-            tagifySkills.on('change', function () {
-                var selectedValues = tagifySkills.value;
-                skillsHiddenInputs.innerHTML = '';
-                selectedValues.forEach(function (item, index) {
-                    var hiddenInputId = document.createElement('input');
-                    hiddenInputId.type = 'hidden';
-                    hiddenInputId.name = 'Skills[' + index + '].SkillId';
-                    hiddenInputId.value = item.id;
-                    skillsHiddenInputs.appendChild(hiddenInputId);
-
-                    $("#skillsValidation").text('');
+                const tagify = new Tagify(inputElement, {
+                    whitelist: whitelist,
+                    enforceWhitelist: true,
+                    searchKeys: ['value'],
+                    pattern: null,
+                    dropdown: {
+                        classname: "color-blue",
+                        enabled: 0,
+                        maxItems: 10
+                    },
                 });
-            });
 
-            var programsInput = document.querySelector('#createJobProgramsInput');
-            var programsHiddenInputs = document.getElementById('programsHiddenInputs');
-            var programsList = @Html.Raw(JsonSerializer.Serialize(Programs.Select(d => new { value = d.Name, id = d.ProgramId })));
+                tagify.DOM.scope.classList.add(
+                    'block',
+                    'w-full',
+                    'rounded-lg',
+                    'border',
+                    'border-gray-300',
+                    'p-2',
+                    'focus:ring-red-800',
+                    'focus:border-red-800',
+                    'overflow-y-auto',
+                    'max-h-16'
+                );
 
-            var tagifyPrograms = new Tagify(programsInput, {
-                whitelist: programsList,
-                enforceWhitelist: true,
-                searchKeys: ['value'],
-                pattern: null,
-                dropdown: {
-                    classname: "color-blue",
-                    enabled: 0,
-                    maxItems: 5,
-                    position: 'top'
-                },
-            });
+                tagify.on('change', function () {
+                    const selectedValues = tagify.value;
+                    hiddenInputsContainer.innerHTML = '';
 
-            tagifyPrograms.DOM.scope.classList.add(
-                'block',
-                'w-full',
-                'rounded-lg',
-                'border',
-                'border-gray-300',
-                'p-2',
-                'focus:ring-blue-500',
-                'focus:border-blue-500',
-                'overflow-y-auto',
-                'max-h-16'
-            );
-
-            tagifyPrograms.on('change', function () {
-                var selectedValues = tagifyPrograms.value;
-                programsHiddenInputs.innerHTML = '';
-                selectedValues.forEach(function (item, index) {
-                    var hiddenInputId = document.createElement('input');
-                    hiddenInputId.type = 'hidden';
-                    hiddenInputId.name = 'Programs[' + index + '].ProgramId';
-                    hiddenInputId.value = item.id;
-                    programsHiddenInputs.appendChild(hiddenInputId);
-
-                    $("#programsValidation").text('');
+                    selectedValues.forEach((item, index) => {
+                        const hiddenInput = document.createElement('input');
+                        hiddenInput.type = 'hidden';
+                        hiddenInput.name = `${namePrefix}[${index}].${namePrefix.endsWith('SkillsT') || namePrefix.endsWith('SkillsC') || namePrefix.endsWith('SkillsS') ? 'SkillId' : 'ProgramId'}`;
+                        hiddenInput.value = item.id;
+                        hiddenInputsContainer.appendChild(hiddenInput);
+                    });
+                    if (inputSelector.slice(1) !== 'createJobSkillsCInput') {
+                        if (!selectedValues.length)
+                        {
+                            $(validationSelector).text('This field is required.');
+                            updateValidation(namePrefix, true);
+                        }
+                        else
+                        {
+                            $(validationSelector).text('');
+                            updateValidation(namePrefix, false);
+                        }
+                    }
                 });
-            });
+            }
+
+            function initializeAllTagify() {
+                const tagifyConfigs = [
+                    {
+                        inputSelector: '#createJobSkillsTInput',
+                        hiddenInputsSelector: 'skillsTHiddenInputs',
+                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsTechnical.Select(s => new { value = s.Name, id = s.SkillId }))),
+                        namePrefix: 'SkillsT',
+                        validationSelector: '#skillsTValidation'
+                    },
+                    {
+                        inputSelector: '#createJobSkillsCInput',
+                        hiddenInputsSelector: 'skillsCHiddenInputs',
+                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsCertification.Select(s => new { value = s.Name, id = s.SkillId }))),
+                        namePrefix: 'SkillsC',
+                        validationSelector: '#skillsCValidation'
+                    },
+                    {
+                        inputSelector: '#createJobSkillsSInput',
+                        hiddenInputsSelector: 'skillsSHiddenInputs',
+                        whitelist: @Html.Raw(JsonSerializer.Serialize(SkillsSoft.Select(s => new { value = s.Name, id = s.SkillId }))),
+                        namePrefix: 'SkillsS',
+                        validationSelector: '#skillsSValidation'
+                    },
+                    {
+                        inputSelector: '#createJobProgramsInput',
+                        hiddenInputsSelector: 'programsHiddenInputs',
+                        whitelist: @Html.Raw(JsonSerializer.Serialize(Programs.Select(d => new { value = d.Name, id = d.ProgramId }))),
+                        namePrefix: 'Programs',
+                        validationSelector: '#programsValidation'
+                    }
+                ];
+
+                tagifyConfigs.forEach(config => {
+                    initializeTagify(
+                        config.inputSelector,
+                        config.hiddenInputsSelector,
+                        config.whitelist,
+                        config.namePrefix,
+                        config.validationSelector
+                    );
+                });
+            }
+
+            initializeAllTagify();
         });
     </script>
 }

@@ -5,10 +5,11 @@
     var EmploymentTypes = ViewBag.EmploymentTypes as List<EmploymentType>;
     var SetupTypes = ViewBag.WorkSetups as List<SetupType>;
     var YearLevels = ViewBag.YearLevels as List<YearLevel>;
+    int negative = -1;
 }
 
 <div class="modal fade" id="createJobModal" tabindex="-1" role="dialog" aria-labelledby="createJobModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-2xl font-bold text-[#7A1515]" id="createJobModalLabel">Create Job</h5>
@@ -17,153 +18,322 @@
                 </button>
             </div>
 
-            <div class="modal-body max-h-[calc(96vh-200px)] flex-grow overflow-y-auto">
-                <form id="createJobForm" class="rounded-lg p-2">
-                    @Html.AntiForgeryToken()
-                    <div class="space-y-6">
-                        <!-- First Row: Job Title | Slots Available -->
-                        <div class="flex space-x-6">
-                            <!-- Job Title -->
-                            <div class="flex-1">
-                                <label asp-for="Title" class="block text-sm font-medium text-gray-700">Job Title</label>
-                                <input placeholder="Junior Software Developer" asp-for="Title" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobTitle" name="Title" maxlength="100" />
-                                <span asp-validation-for="Title" class="text-sm text-red-500"></span>
-                                <span id="remainingTitleChars" class="text-xs text-gray-500">100 characters remaining</span>
-                            </div>
+            <div class="modal-body max-h-[calc(96vh-200px)] flex">
+                <!-- Sidebar Navigation -->
+                <div class="w-1/4 rounded-lg bg-white p-4 shadow">
+                    <h3 class="mb-4 text-lg font-semibold">Navigation</h3>
+                    <div class="flex flex-col space-y-2">
+                        <button class="tab-btn-create active-tab rounded-md bg-gray-100 p-2 text-left hover:bg-gray-200" data-target="job-details-section">Job Details</button>
+                        <button class="tab-btn-create rounded-md p-2 text-left hover:bg-gray-200" data-target="skills-section">Skills</button>
+                        <button class="tab-btn-create rounded-md p-2 text-left hover:bg-gray-200" data-target="job-details2-section">Schedule and Salary</button>
+                        <button class="tab-btn-create rounded-md p-2 text-left hover:bg-gray-200" data-target="additional-section">Additional Info</button>
+                        <button class="tab-btn-create rounded-md p-2 text-left hover:bg-gray-200" data-target="summary-section">Summary</button>
+                    </div>
+                </div>
 
-                            <!-- Slots Available -->
-                            <div class="flex-1">
-                                <label asp-for="AvailableSlots" class="block text-sm font-medium text-gray-700"></label>
-                                <input asp-for="AvailableSlots" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="30" id="createJobSlotsAvailable" name="AvailableSlots" />
-                                <span asp-validation-for="AvailableSlots" class="text-sm text-red-500"></span>
-                            </div>
-                        </div>
+                <div class="ml-6 w-3/4 flex-grow overflow-y-auto rounded-lg bg-white p-6 shadow">
+                    <form id="createJobForm">
+                        @Html.AntiForgeryToken()
+                        <div class="space-y-6">
+                            <!-- Job Details Section -->
+                            <div id="job-details-section" class="tab-content-create">
+                                <h3 class="text-xl font-semibold">Job Details</h3>
+                                <div class="mt-4 space-y-6 overflow-y-auto">
+                                    <div class="flex space-x-6">
+                                        <!-- Job Title -->
+                                        <div class="flex-1">
+                                            <label asp-for="Title" class="block text-sm font-medium text-gray-700">Job Title</label>
+                                            <input placeholder="Junior Software Developer" asp-for="Title" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobTitle" name="Title" maxlength="100" />
+                                            <span asp-validation-for="Title" class="text-sm text-red-500"></span>
+                                            <span id="remainingTitleChars" class="text-xs text-gray-500">100 characters remaining</span>
+                                        </div>
 
-                        <!-- Second Row: Description -->
-                        <div>
-                            <label asp-for="Description" class="block text-sm font-semibold text-gray-700">Description</label>
-                            <textarea placeholder="Job description, benefits, etc. (make this field as descriptive as possible)" 
-                                asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobDescription" name="Description" maxlength="800"></textarea>
-                            <span asp-validation-for="Description" class="text-sm text-red-500"></span>
-                            <span id="remainingDescriptionChars" class="text-xs text-gray-500">800 characters remaining</span>
-                        </div>
+                                        <!-- Slots Available -->
+                                        <div class="flex-1">
+                                            <label asp-for="AvailableSlots" class="block text-sm font-medium text-gray-700"></label>
+                                            <input asp-for="AvailableSlots" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="30" id="createJobSlotsAvailable" name="AvailableSlots" />
+                                            <span asp-validation-for="AvailableSlots" class="text-sm text-red-500"></span>
+                                        </div>
 
-                        <!-- Third Row: Location | Setup Type -->
-                        <div class="flex space-x-6">
-                            <!-- Location -->
-                            <div class="flex-1">
-                                <label asp-for="Location" class="block text-sm font-medium text-gray-700">Location</label>
-                                <input placeholder="Cebu City, Cebu" asp-for="Location" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobLocation" name="Location" />
-                                <span asp-validation-for="Location" class="text-sm text-red-500"></span>
-                            </div>
-
-                            <!-- Setup Type -->
-                            <div class="flex-1">
-                                <label asp-for="SetupTypeId" class="block text-sm font-medium text-gray-700">Setup Type</label>
-                                <select asp-for="SetupTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobSetupTypeId" name="SetupTypeId">
-                                    <option value="">-- Select Setup Type --</option>
-                                    @foreach (var setup in SetupTypes)
-                                    {
-                                        <option value="@setup.SetupTypeId" title="@setup.Description">@setup.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="SetupTypeId" class="text-sm text-red-500"></span>
-                            </div>
-                        </div>
-
-                        <!-- Fourth Row: Schedule | Salary -->
-                        <div class="flex space-x-6">
-                            <!-- Schedule -->
-                            <div class="flex-1">
-                                <label class="block text-sm font-medium text-gray-700">Schedule (Weekly)</label>
-                                <div class="flex space-x-4">
-                                    <div class="flex-1">
-                                        <label asp-for="ScheduleDays" class="block text-xs font-medium text-gray-700"></label>
-                                        <input asp-for="ScheduleDays" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="5" id="createJobScheduleDays" name="ScheduleDays" />
-                                        <span asp-validation-for="ScheduleDays" class="text-sm text-red-500"></span>
+                                        <!-- Location -->
+                                        <div class="flex-1">
+                                            <label asp-for="Location" class="block text-sm font-medium text-gray-700">Location</label>
+                                            <input placeholder="Cebu City, Cebu" asp-for="Location" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobLocation" name="Location" />
+                                            <span asp-validation-for="Location" class="text-sm text-red-500"></span>
+                                        </div>
                                     </div>
-                                    <div class="flex-1">
-                                        <label asp-for="ScheduleHours" class="block text-xs font-medium text-gray-700"></label>
-                                        <input asp-for="ScheduleHours" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="40" id="createJobScheduleHours" name="ScheduleHours" />
-                                        <span asp-validation-for="ScheduleHours" class="text-sm text-red-500"></span>
+                                    <!-- Description -->
+                                    <div>
+                                        <label asp-for="Description" class="block text-sm font-semibold text-gray-700">Description</label>
+                                        <textarea placeholder="Key responsibilities, qualifications, benefits, work environment or culture, etc."
+                                                  asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobDescription" name="Description" maxlength="800"></textarea>
+                                        <span asp-validation-for="Description" class="text-sm text-red-500"></span>
+                                        <span id="remainingDescriptionChars" class="text-xs text-gray-500">800 characters remaining</span>
                                     </div>
-                                </div>
-                                <span class="text-xs text-[#7A1515]" id="createJobScheduleInfo">Input 0 for either days or hours if flexible.</span>
-                            </div>
-
-                            <!-- Salary -->
-                            <div class="flex-1">
-                                <label asp-for="Salary" class="block text-sm font-medium text-gray-700"></label>
-                                <div class="flex space-x-4">
-                                    <div class="flex-1">
-                                        <label asp-for="SalaryLower" class="block text-xs font-medium text-gray-700"></label>
-                                        <input asp-for="SalaryLower" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="30000" id="createJobSalaryLower" name="SalaryLower" />
-                                        <span asp-validation-for="SalaryLower" class="text-sm text-red-500"></span>
-                                    </div>
-                                    <div class="flex-1">
-                                        <label asp-for="SalaryUpper" class="block text-xs font-medium text-gray-700"></label>
-                                        <input asp-for="SalaryUpper" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="45000" id="createJobSalaryUpper" name="SalaryUpper" />
-                                        <span asp-validation-for="SalaryUpper" class="text-sm text-red-500"></span>
+                                    <hr />
+                                    <div>
+                                        <label for="jobDetailsSectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                        <ul class="space-y-2 text-xs text-[#7A1515]">
+                                            <li>
+                                                - Provide a <strong>concise and comprehensive</strong> title and description to ensure accurate match percentages.
+                                            </li>
+                                            <li>
+                                                - <strong>DO NOT</strong> include a company profile in the job description, it should only contain information directly relevant to the job position.
+                                            </li>
+                                            <li>
+                                                - Skills &amp; Schedule have separate input fields. Including them in the description is <strong>unnecessary</strong>.
+                                            </li>
+                                            <li>
+                                                - The job will automatically be marked as <strong>'Closed'</strong> and unlisted once the number of accepted applications reaches the available slots.
+                                            </li>
+                                            <li>
+                                                - All fields can be updated after the job is posted.
+                                            </li>
+                                        </ul>
                                     </div>
                                 </div>
-                                <span class="text-xs text-[#7A1515]" id="createJobSalaryInfo">Input 0 for both lower and upper if unpaid.</span>
+                            </div>
+
+                            <!-- Skills Section -->
+                            <div id="skills-section" class="tab-content-create hidden">
+                                <h3 class="text-xl font-semibold">Requirements</h3>
+                                <div class="mt-4 space-y-6">
+                                    <div class="flex space-x-6">
+                                        <!-- Cultural Skills -->
+                                        <div class="flex-1">
+                                            <label asp-for="SkillsS" class="block text-sm font-medium text-gray-700"></label>
+                                            <input placeholder="Open Mindset, Communication, Leadership" type="text" id="createJobSkillsSInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                            <div type="hidden" id="skillsSHiddenInputs" name="SkillsS"></div>
+                                            <span asp-validation-for="SkillsS" class="text-sm text-red-500" id="skillsSValidation"></span>
+                                        </div>
+                                        <!-- Technical Skills -->
+                                        <div class="flex-1">
+                                            <label asp-for="SkillsT" class="block text-sm font-medium text-gray-700"></label>
+                                            <input placeholder="C# (Programming Language), ASP.NET" type="text" id="createJobSkillsTInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                            <div type="hidden" id="skillsTHiddenInputs" name="SkillsT"></div>
+                                            <span asp-validation-for="SkillsT" class="text-sm text-red-500" id="skillsTValidation"></span>
+                                        </div>
+                                        <!-- Certification Skills -->
+                                        <div class="flex-1">
+                                            <label asp-for="SkillsC" class="block text-sm font-medium text-gray-700"></label>
+                                            <input placeholder="Microsoft Azure Certification, CompTIA CASP+ CE" type="text" id="createJobSkillsCInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                            <div type="hidden" id="skillsCHiddenInputs" name="SkillsC"></div>
+                                            <span asp-validation-for="SkillsC" class="text-sm text-red-500" id="skillsCValidation"></span>
+                                        </div>
+                                    </div>
+                                    <!-- Skill Weights -->
+                                    <div class="flex-1">
+                                        <label asp-for="SkillWeights" class="block text-sm font-medium text-gray-700"></label>
+                                        <div class="relative">
+                                            <input asp-for="SkillWeights" type="range" id="skillWeights_range" min="0" max="1" step="0.1" value="0.7"
+                                                   class="h-2 w-full appearance-none rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7A1515]">
+                                            <div class="opacity-10 pointer-events-none absolute inset-0 rounded-lg"></div>
+                                        </div>
+                                        <div class="mb-2 flex items-center justify-between text-xs text-gray-500">
+                                            <span>Cultural</span>
+                                            <span id="skillWeights" name="skillWeights">30% - 70%</span>
+                                            <span>Technical</span>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div>
+                                        <label for="skillsSectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                        <ul class="space-y-2 text-xs text-[#7A1515]">
+                                            <li>
+                                                - The skill weights <strong>directly influences</strong> each applicant's <em>final match percentage</em>.
+                                            </li>
+                                            <li>
+                                                - Decide whether to prioritize cultural alignment or technical expertise in your ideal candidate.
+                                            </li>
+                                            <li>
+                                                - Setting the scale to 100% on one side will <strong>completely ignore</strong> skills shared with applicants from the opposite category.
+                                            </li>
+                                            <li>
+                                                - Certifications are evaluated alongside technical skills when assessing candidates.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Schedule and Salary Section -->
+                            <div id="job-details2-section" class="tab-content-create">
+                                <h3 class="text-xl font-semibold">Schedule and Salary</h3>
+                                <div class="mt-4 space-y-6 overflow-y-auto">
+                                    <div class="flex space-x-6">
+                                        <!-- Schedule -->
+                                        <div class="flex-1">
+                                            <label class="block text-sm font-medium text-gray-700">Schedule (Weekly)</label>
+                                            <div class="flex space-x-4">
+                                                <div class="flex-1">
+                                                    <label asp-for="ScheduleDays" class="block text-xs font-medium text-gray-700"></label>
+                                                    <input asp-for="ScheduleDays" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="5" id="createJobScheduleDays" name="ScheduleDays" />
+                                                    <span asp-validation-for="ScheduleDays" class="text-sm text-red-500"></span>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <label asp-for="ScheduleHours" class="block text-xs font-medium text-gray-700"></label>
+                                                    <input asp-for="ScheduleHours" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="40" id="createJobScheduleHours" name="ScheduleHours" />
+                                                    <span asp-validation-for="ScheduleHours" class="text-sm text-red-500"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <!-- Salary -->
+                                        <div class="flex-1">
+                                            <label asp-for="Salary" class="block text-sm font-medium text-gray-700"></label>
+                                            <div class="flex space-x-4">
+                                                <div class="flex-1">
+                                                    <label asp-for="SalaryLower" class="block text-xs font-medium text-gray-700"></label>
+                                                    <input asp-for="SalaryLower" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="30000" id="createJobSalaryLower" name="SalaryLower" />
+                                                    <span asp-validation-for="SalaryLower" class="text-sm text-red-500"></span>
+                                                </div>
+                                                <div class="flex-1">
+                                                    <label asp-for="SalaryUpper" class="block text-xs font-medium text-gray-700"></label>
+                                                    <input asp-for="SalaryUpper" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" placeholder="45000" id="createJobSalaryUpper" name="SalaryUpper" />
+                                                    <span asp-validation-for="SalaryUpper" class="text-sm text-red-500"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <hr />
+                                    <div>
+                                        <label for="jobDetails2SectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                        <ul class="space-y-2 text-xs text-[#7A1515]">
+                                            <li>
+                                                - The schedule defines the weekly required hours and days for a candidate, e.g., 40 hours spread across 5 days.
+                                            </li>
+                                            <li>
+                                                - Input <em>0</em> in the schedule fields if you want the hours or days to remain <strong>flexible</strong>.
+                                            </li>
+                                            <li>
+                                                - To designate a job as <em>unpaid</em>, set <strong>both</strong> the lower and upper bounds to <em>0</em>.
+                                            </li>
+                                            <li>
+                                                - For a <em>fixed salary</em>, set <strong>both</strong> the lower and upper bounds to the <em>same value</em>.
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Additional Info Section -->
+                            <div id="additional-section" class="tab-content-create hidden">
+                                <h3 class="text-xl font-semibold">Additional Information</h3>
+                                <div class="mt-4 space-y-6">
+                                    <div class="flex space-x-6">
+                                        <!-- Setup Type -->
+                                        <div class="flex-1">
+                                            <label asp-for="SetupTypeId" class="block text-sm font-medium text-gray-700">Setup Type</label>
+                                            <select asp-for="SetupTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobSetupTypeId" name="SetupTypeId">
+                                                <option value="">-- Select Setup Type --</option>
+                                                @foreach (var setup in SetupTypes)
+                                                {
+                                                    <option value="@setup.SetupTypeId" title="@setup.Description">@setup.Name</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="SetupTypeId" id="createJobSetupTypeIdValidation" class="text-sm text-red-500"></span>
+                                        </div>
+                                        <!-- Employment Type -->
+                                        <div class="flex-1">
+                                            <label asp-for="EmploymentTypeId" class="block text-sm font-medium text-gray-700"></label>
+                                            <select asp-for="EmploymentTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobEmploymentTypeId" name="EmploymentTypeId">
+                                                <option value="">-- Select Employment Type --</option>
+                                                @foreach (var type in EmploymentTypes)
+                                                {
+                                                    <option value="@type.EmploymentTypeId" title="@type.Description">@type.Name</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="EmploymentTypeId" id="createJobEmploymentTypeIdValidation" class="text-sm text-red-500"></span>
+                                        </div>
+                                        <!-- Year Level -->
+                                        <div class="flex-1">
+                                            <label asp-for="YearLevelId" class="block text-sm font-medium text-gray-700"></label>
+                                            <select asp-for="YearLevelId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobYearLevelId" name="YearLevelId">
+                                                <option value="">-- Select Year Level --</option>
+                                                @foreach (var yearLevel in YearLevels)
+                                                {
+                                                    <option value="@yearLevel.YearLevelId">@yearLevel.Name</option>
+                                                }
+                                            </select>
+                                            <span asp-validation-for="YearLevelId" id="createJobYearLevelIdValidation" class="text-sm text-red-500"></span>
+                                        </div>
+                                    </div>
+                                    <!-- Programs -->
+                                    <div class="flex-1">
+                                        <label asp-for="Programs" class="block text-sm font-medium text-gray-700"></label>
+                                        <input placeholder="BS Computer Science, BS Information Technology" type="text" id="createJobProgramsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                        <div type="hidden" id="programsHiddenInputs" name="Programs"></div>
+                                        <span asp-validation-for="Programs" class="text-sm text-red-500" id="programsValidation"></span>
+                                    </div>
+                                    <hr />
+                                    <div>
+                                        <label for="additionalSectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                        <ul class="space-y-2 text-xs text-[#7A1515]">
+                                            <li>
+                                                - The <strong>Year Level Requirement</strong> ensures that applicants who do not meet the specified criteria <em>cannot view or apply</em> for this job.
+                                            </li>
+                                            <li>
+                                                - The <strong>Year Level dropdown</strong> is structured to reflect <em>eligibility</em>, allowing applicants from the selected level and above to view or apply.
+                                            </li>
+                                            <li>
+                                                - Likewise, the <strong>Recommended Programs</strong> field will <em>limit access</em> to applicants from the designated programs or their postgrad equivalent.
+                                            </li>
+
+                                        </ul>
+                                    </div>
+                                </div>
                             </div>
                         </div>
-
-                        <!-- Fifth Row: Employment Type | Year Level -->
-                        <div class="flex space-x-6">
-                            <!-- Employment Type -->
-                            <div class="flex-1">
-                                <label asp-for="EmploymentTypeId" class="block text-sm font-medium text-gray-700"></label>
-                                <select asp-for="EmploymentTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobEmploymentTypeId" name="EmploymentTypeId">
-                                    <option value="">-- Select Employment Type --</option>
-                                    @foreach (var type in EmploymentTypes)
-                                    {
-                                        <option value="@type.EmploymentTypeId" title="@type.Description">@type.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="EmploymentTypeId" class="text-sm text-red-500"></span>
+                    </form>
+                    <!-- Summary Section -->
+                    <div id="summary-section" class="tab-content-create hidden">
+                        <h3 class="text-xl font-semibold text-gray-700">Summary</h3>
+                        <div class="mt-4 space-y-4">
+                            <!-- Job Details Summary -->
+                            <div class="space-y-2">
+                                <span class="text-lg font-semibold">Job Details</span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Title:</strong> <span id="summaryTitle">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Available Slots:</strong> <span id="summaryAvailableSlots">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Location:</strong> <span id="summaryLocation">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Description:</strong> <input id="summaryDescription" class="bg-white disabled:" disabled></span>
+                            </div>
+                            <hr />
+                            <!-- Skills Summary -->
+                            <div class="space-y-2">
+                                <span class="text-lg font-semibold">Requirements</span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Cultural Skills:</strong> <span id="summarySkillsS">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Technical Skills:</strong> <span id="summarySkillsT">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Certification Skills:</strong> <span id="summarySkillsC">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Skill Weights:</strong> <span id="summarySkillWeights">-</span></span>
                             </div>
 
-                            <!-- Year Level -->
-                            <div class="flex-1">
-                                <label asp-for="YearLevelId" class="block text-sm font-medium text-gray-700"></label>
-                                <select asp-for="YearLevelId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="createJobYearLevelId" name="YearLevelId">
-                                    <option value="">-- Select Year Level --</option>
-                                    @foreach (var yearLevel in YearLevels)
-                                    {
-                                        <option value="@yearLevel.YearLevelId">@yearLevel.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="YearLevelId" class="text-sm text-red-500"></span>
-                            </div>
-                        </div>
+                            <hr />
 
-                        <!-- Sixth Row: Skills | Programs -->
-                        <div class="flex space-x-6">
-                            <!-- Skills -->
-                            <div class="flex-1">
-                                <label asp-for="Skills" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="createJobSkillsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
-                                <div type="hidden" id="skillsHiddenInputs" name="Skills"></div>
-                                <span asp-validation-for="Skills" class="text-sm text-red-500" id="skillsValidation"></span>
+                            <!-- Schedule and Salary Summary -->
+                            <div class="space-y-2">
+                                <span class="text-lg font-semibold">Schedule and Salary</span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Schedule:</strong> <span id="summaryScheduleDays">-</span> Days, <span id="summaryScheduleHours">-</span> Hours</span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Salary:</strong> <span id="summarySalary">-</span></span>
                             </div>
 
-                            <!-- Programs -->
-                            <div class="flex-1">
-                                <label asp-for="Programs" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="BS Computer Science, BS Information Technology" type="text" id="createJobProgramsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
-                                <div type="hidden" id="programsHiddenInputs" name="Programs"></div>
-                                <span asp-validation-for="Programs" class="text-sm text-red-500" id="programsValidation"></span>
+                            <hr />
+
+                            <!-- Additional Information Summary -->
+                            <div class="space-y-2">
+                                <span class="text-lg font-semibold">Additional Information</span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Setup Type:</strong> <span id="summarySetupType">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Employment Type:</strong> <span id="summaryEmploymentType">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Year Level:</strong> <span id="summaryYearLevel">-</span></span>
+                                <span class="block text-sm font-medium text-gray-700"><strong>Programs:</strong> <span id="summaryPrograms">-</span></span>
                             </div>
                         </div>
                     </div>
-                </form>
+                </div>
             </div>
 
             <div class="modal-footer">
                 <button type="button" class="rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelCreateJob" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]" onclick="submitCreateJob()">Create</button>
+                <button type="button" class="hidden rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="backCreateJob">Previous</button>
+                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]" id="nextCreateJob">Next</button>
             </div>
         </div>
     </div>
