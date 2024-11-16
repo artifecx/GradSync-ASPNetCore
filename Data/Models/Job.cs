@@ -39,6 +39,8 @@ public partial class Job
 
     public string EmbeddingJson { get; set; }
 
+    public decimal? SkillWeights { get; set; }
+
     public virtual ICollection<Application> Applications { get; set; } = new List<Application>();
 
     public virtual Company Company { get; set; }
