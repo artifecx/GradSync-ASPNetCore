@@ -8,7 +8,7 @@
 }
 
 <div class="modal fade" id="editJobModal" tabindex="-1" role="dialog" aria-labelledby="editJobModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title text-2xl font-bold text-[#7A1515]" id="editJobModalLabel">Edit Job</h5>
@@ -21,7 +21,7 @@
                 <form id="editJobForm" class="rounded-lg p-2">
                     @Html.AntiForgeryToken()
                     <div class="space-y-6">
-                        <!-- First Row: Job Title | Slots Available -->
+                        <!-- First Row: Job Title | Slots Available | Location-->
                         <div class="flex space-x-6">
                             <!-- Job Title -->
                             <div class="flex-1">
@@ -37,6 +37,13 @@
                                 <input asp-for="AvailableSlots" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" type="number" value="@Model.AvailableSlots" placeholder="30" id="editJobSlotsAvailable" name="AvailableSlots" />
                                 <span asp-validation-for="AvailableSlots" class="text-sm text-red-500"></span>
                             </div>
+
+                            <!-- Location -->
+                            <div class="flex-1">
+                                <label asp-for="Location" class="block text-sm font-medium text-gray-700">Location</label>
+                                <input placeholder="Cebu City, Cebu" asp-for="Location" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobLocation" name="Location" value="@Model.Location" />
+                                <span asp-validation-for="Location" class="text-sm text-red-500"></span>
+                            </div>
                         </div>
 
                         <!-- Second Row: Description -->
@@ -48,26 +55,56 @@
                             <span id="remainingDescriptionChars" class="text-xs text-gray-500">800 characters remaining</span>
                         </div>
 
-                        <!-- Third Row: Location | Setup Type -->
+                        <!-- Third Row: Soft Skills | Technical Skills | Certification Skills -->
                         <div class="flex space-x-6">
-                            <!-- Location -->
+                            <!-- Soft Skills -->
                             <div class="flex-1">
-                                <label asp-for="Location" class="block text-sm font-medium text-gray-700">Location</label>
-                                <input placeholder="Cebu City, Cebu" asp-for="Location" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobLocation" name="Location" value="@Model.Location" />
-                                <span asp-validation-for="Location" class="text-sm text-red-500"></span>
+                                <label asp-for="SkillsS" class="block text-sm font-medium text-gray-700"></label>
+                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsSInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <div type="hidden" id="skillsSHiddenInputs" name="Skills"></div>
+                                <span asp-validation-for="SkillsS" class="text-sm text-red-500" id="skillsSValidation"></span>
                             </div>
 
-                            <!-- Setup Type -->
+                            <!-- Technical Skills -->
                             <div class="flex-1">
-                                <label asp-for="SetupTypeId" class="block text-sm font-medium text-gray-700">Setup Type</label>
-                                <select asp-for="SetupTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobSetupTypeId" name="SetupTypeId">
-                                    <option value="">-- Select Setup Type --</option>
-                                    @foreach (var setup in SetupTypes)
-                                    {
-                                        <option value="@setup.SetupTypeId" selected=@(Model.SetupTypeId == setup.SetupTypeId) title="@setup.Description">@setup.Name</option>
-                                    }
-                                </select>
-                                <span asp-validation-for="SetupTypeId" class="text-sm text-red-500"></span>
+                                <label asp-for="SkillsT" class="block text-sm font-medium text-gray-700"></label>
+                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsTInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <div type="hidden" id="skillsTHiddenInputs" name="SkillsT"></div>
+                                <span asp-validation-for="SkillsT" class="text-sm text-red-500" id="skillsTValidation"></span>
+                            </div>
+
+                            <!-- Certification Skills -->
+                            <div class="flex-1">
+                                <label asp-for="SkillsC" class="block text-sm font-medium text-gray-700"></label>
+                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsCInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <div type="hidden" id="skillsCHiddenInputs" name="SkillsC"></div>
+                                <span asp-validation-for="SkillsC" class="text-sm text-red-500" id="skillsCValidation"></span>
+                            </div>
+                        </div>
+
+                        <!-- Third Row: Programs | Skill Weights -->
+                        <div class="flex space-x-6">
+                            <!-- Programs -->
+                            <div class="flex-1">
+                                <label asp-for="Programs" class="block text-sm font-medium text-gray-700"></label>
+                                <input placeholder="Computer Science, Information Technology" type="text" id="editJobProgramsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <div type="hidden" id="programsHiddenInputs" name="Programs"></div>
+                                <span asp-validation-for="Programs" class="text-sm text-red-500" id="programsValidation"></span>
+                            </div>
+
+                            <!-- Skill Weights -->
+                            <div class="flex-1">
+                                <label asp-for="SkillWeights" class="block text-sm font-medium text-gray-700"></label>
+                                <div class="relative">
+                                    <input asp-for="SkillWeights" type="range" id="skillWeights_range" min="0" max="1" step="0.1" value="@Model.SkillWeights"
+                                           class="h-2 w-full appearance-none rounded-lg bg-gray-200 focus:outline-none focus:ring-2 focus:ring-[#7A1515]">
+                                    <div class="opacity-10 pointer-events-none absolute inset-0 rounded-lg"></div>
+                                </div>
+                                <div class="mb-2 flex items-center justify-between text-xs text-gray-500">
+                                    <span>Cultural</span>
+                                    <span id="skillWeights" name="skillWeights">30% - 70%</span>
+                                    <span>Technical</span>
+                                </div>
                             </div>
                         </div>
 
@@ -110,8 +147,21 @@
                             </div>
                         </div>
 
-                        <!-- Fifth Row: Employment Type | Year Level -->
+                        <!-- Fifth Row: Setup Type | Employment Type | Year Level -->
                         <div class="flex space-x-6">
+                            <!-- Setup Type -->
+                            <div class="flex-1">
+                                <label asp-for="SetupTypeId" class="block text-sm font-medium text-gray-700">Setup Type</label>
+                                <select asp-for="SetupTypeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobSetupTypeId" name="SetupTypeId">
+                                    <option value="">-- Select Setup Type --</option>
+                                    @foreach (var setup in SetupTypes)
+                                    {
+                                        <option value="@setup.SetupTypeId" selected=@(Model.SetupTypeId == setup.SetupTypeId) title="@setup.Description">@setup.Name</option>
+                                    }
+                                </select>
+                                <span asp-validation-for="SetupTypeId" class="text-sm text-red-500"></span>
+                            </div>
+
                             <!-- Employment Type -->
                             <div class="flex-1">
                                 <label asp-for="EmploymentTypeId" class="block text-sm font-medium text-gray-700"></label>
@@ -136,25 +186,6 @@
                                     }
                                 </select>
                                 <span asp-validation-for="YearLevelId" class="text-sm text-red-500"></span>
-                            </div>
-                        </div>
-
-                        <!-- Sixth Row: Skills | Programs -->
-                        <div class="flex space-x-6">
-                            <!-- Skills -->
-                            <div class="flex-1">
-                                <label asp-for="Skills" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
-                                <div type="hidden" id="skillsHiddenInputs" name="Skills"></div>
-                                <span asp-validation-for="Skills" class="text-sm text-red-500" id="skillsValidation"></span>
-                            </div>
-
-                            <!-- Programs -->
-                            <div class="flex-1">
-                                <label asp-for="Programs" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="Computer Science, Information Technology" type="text" id="editJobProgramsInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
-                                <div type="hidden" id="programsHiddenInputs" name="Programs"></div>
-                                <span asp-validation-for="Programs" class="text-sm text-red-500" id="programsValidation"></span>
                             </div>
                         </div>
                     </div>

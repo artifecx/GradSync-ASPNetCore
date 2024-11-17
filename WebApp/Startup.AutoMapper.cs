@@ -54,7 +54,8 @@ namespace WebApp
                     .ReverseMap()
                     .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.PostedBy.Company))
                     .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.JobSkills.Select(s => s.Skill)))
-                    .ForMember(dest => dest.Programs, opt => opt.MapFrom(src => src.JobPrograms.Select(s => s.Program)));
+                    .ForMember(dest => dest.Programs, opt => opt.MapFrom(src => src.JobPrograms.Select(s => s.Program)))
+                    .ForMember(dest => dest.SkillWeights, opt => opt.MapFrom(src => src.SkillWeights));
                 CreateMap<CompanyViewModel, Company>()
                     .ForMember(dest => dest.CompanyId, opt => opt.Ignore())
                     .ForMember(dest => dest.CompanyLogoId, opt => opt.Ignore())

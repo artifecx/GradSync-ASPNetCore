@@ -188,8 +188,7 @@ namespace WebApp.Controllers
             ViewBag.EmploymentTypes = await _referenceDataService.GetEmploymentTypesAsync();
             ViewBag.StatusTypes = await _referenceDataService.GetStatusTypesAsync();
             ViewBag.WorkSetups = await _referenceDataService.GetWorkSetupsAsync();
-            ViewBag.YearLevels = (await _referenceDataService.GetYearLevelsAsync())
-                .OrderByDescending(y => y.Year).ToList();
+            ViewBag.YearLevels = await _referenceDataService.GetYearLevelsAsync();
             ViewBag.Programs = await _referenceDataService.GetProgramsAsync();
             ViewBag.SkillsSoft = await _referenceDataService.GetSoftSkillsAsync();
             ViewBag.SkillsTechnical = await _referenceDataService.GetTechnicalSkillsAsync();

@@ -49,7 +49,7 @@ namespace Services.Services
 
             job.JobId = Guid.NewGuid().ToString();
             job.CreatedDate = job.UpdatedDate = DateTime.Now;
-            job.StatusTypeId = "Open";
+            job.StatusTypeId = "Pending";
             job.PostedById = recruiter.UserId;
             job.CompanyId = recruiter.CompanyId;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
@@ -74,6 +74,7 @@ namespace Services.Services
                 JobId = job.JobId,
                 ProgramId = program.ProgramId
             }).ToList();
+            job.SkillWeights = ((decimal)model.SkillWeights);
 
             await _repository.AddJobAsync(job);
         }
@@ -121,6 +122,7 @@ namespace Services.Services
             bool jobProgramChanged = SetJobPrograms(job, model);
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
+            job.SkillWeights = ((decimal)model.SkillWeights);
 
             if (!_repository.HasChanges(job) && !jobSkillsChanged && !jobProgramChanged)
                 throw new CompanyException("No changes detected.");
@@ -132,9 +134,12 @@ namespace Services.Services
 
         private bool SetJobSkills(Job job, JobViewModel model)
         {
-            var newJobSkills = CreateJobSkills(model.SkillsT, "Technical", job.JobId)
-                .Concat(CreateJobSkills(model.SkillsC, "Certification", job.JobId))
-                .Concat(CreateJobSkills(model.SkillsS, "Cultural", job.JobId))
+            var jobSkillC = model.SkillsC != null && model.SkillsC.Any() 
+                ? CreateJobSkills(model.SkillsC, "Certification", job.JobId) 
+                : new List<JobSkill>().AsEnumerable();
+            var newJobSkills = CreateJobSkills(model.SkillsS, "Cultural", job.JobId)
+                .Concat(CreateJobSkills(model.SkillsT, "Technical", job.JobId))
+                .Concat(jobSkillC)
                 .ToList();
 
             var currentJobSkills = job.JobSkills.ToList();

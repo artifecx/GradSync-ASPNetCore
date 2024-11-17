@@ -424,6 +424,7 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.SetupTypeId)
                 .IsRequired()
                 .HasMaxLength(255);
+            entity.Property(e => e.SkillWeights).HasColumnType("decimal(2, 1)");
             entity.Property(e => e.StatusTypeId)
                 .IsRequired()
                 .HasMaxLength(255);
