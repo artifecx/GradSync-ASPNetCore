@@ -21,7 +21,10 @@ namespace Data.Repositories
             await this.GetDbSet<SetupType>().AsNoTracking().ToListAsync();
 
         public async Task<List<YearLevel>> GetYearLevelsAsync() =>
-            await this.GetDbSet<YearLevel>().AsNoTracking().ToListAsync();
+            await this.GetDbSet<YearLevel>()
+                .OrderByDescending(y => y.Year)
+                .AsNoTracking()
+                .ToListAsync();
 
         public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
             await this.GetDbSet<ApplicationStatusType>().AsNoTracking().ToListAsync();

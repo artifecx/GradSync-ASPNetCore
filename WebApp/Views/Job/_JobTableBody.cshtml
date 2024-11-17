@@ -34,7 +34,7 @@ else
     {
         <tr class="hover:bg-gray-100">
             <td class="py-3 pl-3 text-sm text-gray-700">
-                <div class="text-xs font-medium text-[#7A1515]">
+                <div class="text-xs font-semibold text-[#7A1515]">
                     <button onclick="location.href='@Url.Action("GetJob", "Job",
                         new { 
                             id = item.JobId,
@@ -87,6 +87,16 @@ else
                                     })'"
                                     class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
                                 <i class="fas fa-info-circle mr-2"></i> Job Details
+                            </button>
+
+                            <!-- Update Status -->
+                            <button data-toggle="modal"
+                                    data-target="#updateJobStatusModal"
+                                    data-jobid="@item.JobId"
+                                    data-statusId="@item.StatusTypeId"
+                                    class="update-job-status text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                    disabled="@(User.IsInRole("Recruiter") && (item.StatusTypeId == "Pending" || item.StatusTypeId == "BlackListed"))">
+                                <i class="fa-solid fa-rotate mr-2"></i> Update Status
                             </button>
 
                             <!-- Edit Job -->

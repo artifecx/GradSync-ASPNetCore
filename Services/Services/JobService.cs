@@ -49,7 +49,7 @@ namespace Services.Services
 
             job.JobId = Guid.NewGuid().ToString();
             job.CreatedDate = job.UpdatedDate = DateTime.Now;
-            job.StatusTypeId = "Open";
+            job.StatusTypeId = "Pending";
             job.PostedById = recruiter.UserId;
             job.CompanyId = recruiter.CompanyId;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);

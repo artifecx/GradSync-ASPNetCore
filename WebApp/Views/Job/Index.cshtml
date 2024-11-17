@@ -6,6 +6,7 @@
 @{
     ViewData["Title"] = "Job Management | GradSync";
     await Html.RenderPartialAsync("_CreateJobModal", new Services.ServiceModels.JobViewModel());
+    await Html.RenderPartialAsync("_UpdateStatusModal");
     await Html.RenderPartialAsync("_DeleteModal");
 
     string filterByCompany = ViewData["FilterByCompany"] as string;

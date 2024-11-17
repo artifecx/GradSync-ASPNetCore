@@ -24,6 +24,24 @@
     });
 
     /// ------------------------------------
+    /// Listener: Update Job Status
+    /// ------------------------------------
+    document.querySelectorAll('.update-job-status').forEach(button => {
+        button.addEventListener('click', () => {
+            const jobId = button.getAttribute('data-jobid');
+            const statusId = button.getAttribute('data-statusId');
+
+            const selectElement = document.getElementById('updateJobStatus');
+            const hiddenInput = document.getElementById('updateJobStatusJobId');
+
+            hiddenInput.value = jobId;
+            if (selectElement) {
+                selectElement.value = statusId;
+            }
+        });
+    });
+
+    /// ------------------------------------
     /// Listener: Close Create Job Modal
     /// ------------------------------------
     let cancelClicked = false;
