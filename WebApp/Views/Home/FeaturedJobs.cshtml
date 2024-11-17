@@ -61,9 +61,15 @@ else
                             <div class="mt-2 flex flex-wrap gap-2">
                                 @if (job.Skills != null && job.Skills.Any())
                                 {
-                                    @foreach (var skill in job.Skills)
+                                    var displayedSkills = job.Skills.Take(3);
+                                    foreach (var skill in displayedSkills)
                                     {
                                         <span class="rounded-full border px-2 py-1 text-gray-500 text-xs">@skill.Name</span>
+                                    }
+
+                                    @if (job.Skills.Count() > 3)
+                                    {
+                                        <span class="rounded-full border px-2 py-1 text-gray-500 text-xs">...</span>
                                     }
                                 }
                                 else

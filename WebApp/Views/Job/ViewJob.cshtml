@@ -118,15 +118,15 @@
                 <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <div class="rounded-xl border bg-white p-4">
                         <h3 class="mb-4 text-xl font-bold">Skills Required</h3>
-                        @*<p>@string.Join(", ", (Model.Skills as List<Skill>).Select(skill => skill.Name))</p>*@
-
-                        <!--Skill Placeholder Only-->
+                        <!--Skills-->
                         <div class="mb-1 flex flex-wrap space-x-3">
                             @if (Model.Skills.Any())
                             {
                                 @foreach (var skill in Model.Skills)
                                 {
+                                    <div class="mb-1 flex flex-wrap py-1">
                                     <span class="outline-offset-1 rounded-full px-2 py-1 text-xs font-semibold outline outline-[#7A1515]">@skill.Name.ToUpper()</span>
+                                    </div>
                                 }
                             }
                             else
