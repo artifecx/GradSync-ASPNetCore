@@ -114,9 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
             searchKeys: ['value'],
             pattern: null,
             dropdown: {
-                classname: "color-blue",
                 enabled: 0,
-                maxItems: 10
+                maxItems: 20,
+                sortby: 'startsWith'
             },
         });
 

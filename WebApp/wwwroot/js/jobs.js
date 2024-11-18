@@ -405,10 +405,10 @@
             searchKeys: ['value'],
             pattern: null,
             dropdown: {
-                classname: "color-blue",
                 enabled: 0,
-                maxItems: 10
-            },
+                maxItems: 20,
+                sortby: 'startsWith',
+            }
         });
 
         tagify.DOM.scope.classList.add(
@@ -423,7 +423,7 @@
             'overflow-y-auto',
             'max-h-16'
         );
-
+        
         tagify.on('change', function () {
             const selectedValues = tagify.value;
             hiddenInputsContainer.innerHTML = '';
