@@ -1,5 +1,4 @@
 ﻿using Services.Interfaces;
-using Services.ServiceModels;
 using WebApp.Mvc;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
@@ -7,8 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
-using System.Security.Claims;
 using System.Threading.Tasks;
+using WebApp.Authentication;
 
 namespace WebApp.Controllers
 {
@@ -16,10 +15,14 @@ namespace WebApp.Controllers
     /// Home Controller
     /// </summary>
     [Route("home")]
-    public class HomeController : ControllerBase<HomeController>
+    public partial class HomeController : ControllerBase<HomeController>
     {
         private readonly IDashboardService _dashboardService;
         private readonly IJobService _jobService;
+        private readonly IOnboardingService _welcomeService;
+        private readonly IReferenceDataService _referenceDataService;
+        private readonly SignInManager _signInManager;
+
         /// <summary>
         /// Constructor
         /// </summary>
@@ -32,6 +35,9 @@ namespace WebApp.Controllers
         public HomeController(
             IDashboardService dashboardService,
             IJobService jobService,
+            IOnboardingService welcomeService,
+            IReferenceDataService referenceDataService,
+            SignInManager signInManager,
             IHttpContextAccessor httpContextAccessor,
             ILoggerFactory loggerFactory,
             IConfiguration configuration,
@@ -39,6 +45,9 @@ namespace WebApp.Controllers
         {
             _dashboardService = dashboardService;
             _jobService = jobService;
+            _welcomeService = welcomeService;
+            _referenceDataService = referenceDataService;
+            _signInManager = signInManager;
         }
 
         /// <summary>
@@ -47,10 +56,13 @@ namespace WebApp.Controllers
         /// <returns> Home View </returns>
         [Route("/home")]
         [HttpGet]
-        [Authorize(Policy = "Applicant")]
-        public IActionResult Index()
+        [Authorize(Policy = "ApplicantGateway")]
+        public async Task<IActionResult> Index()
         {
-            var model = _jobService.GetAllJobsAsync().Result;
+            if (User.FindFirst("FromSignUp")?.Value == "true" && User.IsInRole("Applicant"))
+                return RedirectToAction("Onboarding", "Home");
+
+            var model = await _jobService.GetAllJobsAsync();
             return View(model);
         }
 

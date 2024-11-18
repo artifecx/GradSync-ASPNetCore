@@ -77,7 +77,10 @@ namespace Services.Services
                     throw new UserNotVerifiedException(Error_UserNotVerified, user.Email);
                 }
 
+                if(user.RoleId != Role_Applicant)
+                    user.FromSignUp = user.LastLoginDate == null;
                 user.LastLoginDate = DateTime.Now;
+
                 _repository.UpdateUserAsync(user).Wait();
                 return LoginResult.Success;
             }

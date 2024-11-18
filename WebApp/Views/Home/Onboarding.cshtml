@@ -1,0 +1,253 @@
+﻿@model Services.ServiceModels.OnboardingViewModel
+@using Data.Models
+@using System.Text.Json;
+
+@{
+    ViewData["Title"] = "Finish Registration | GradSync";
+    ViewBag.LoginView = true;
+
+    var YearLevels = ViewBag.YearLevels as List<YearLevel>;
+    var Programs = ViewBag.Programs as List<Program>;
+    var Departments = ViewBag.Departments as List<Department>;
+    var Colleges = ViewBag.Colleges as List<College>;
+    var SkillsSoft = ViewBag.SkillsSoft as List<Skill>;
+    var SkillsTechnical = ViewBag.SkillsTechnical as List<Skill>;
+    var SkillsCertification = ViewBag.SkillsCertification as List<Skill>;
+}
+
+<div class="flex items-center justify-center p-6">
+    <div class="mx-auto w-full max-w-7xl rounded-lg p-6">
+        <!-- Header -->
+        <div class="flex items-center justify-between">
+            <h1 class="text-2xl font-bold text-[#7A1515]">Finish Registration</h1>
+            <a href="#" data-toggle="modal" data-target="#logoutModal"
+                class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
+                <i class="fa fa-sign-out mr-2"></i>
+                Log out
+            </a>
+        </div>
+
+        <div class="max-h-[calc(96vh-250px)] min-h-[calc(96vh-250px)] mt-6 flex">
+            <!-- Sidebar Navigation -->
+            <div class="w-1/4 rounded-lg bg-white p-4 shadow">
+                <span class="block text-sm font-semibold">Welcome, @Model.FirstName!</span>
+                <span class="text-xs">Submit the necessary details to proceed.</span>
+                <hr />
+                <h3 class="mb-4 text-lg font-semibold">Sections</h3>
+                <div class="flex flex-col space-y-2">
+                    <button class="tab-btn-registration active-tab rounded-md bg-gray-100 p-2 text-left hover:bg-gray-200" data-target="educational-details-section">
+                        Educational Details <span class="tab-btn-registration-validation text-red-600">*</span>
+                    </button>
+                    <button class="tab-btn-registration rounded-md p-2 text-left hover:bg-gray-200" data-target="skills-section">
+                        Skills <span class="tab-btn-registration-validation text-red-600">*</span>
+                    </button>
+                    <button class="tab-btn-registration rounded-md p-2 text-left hover:bg-gray-200" data-target="summary-section">
+                        Summary
+                    </button>
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="ml-6 w-3/4 flex-grow overflow-y-auto rounded-lg bg-white p-6 shadow">
+                <form id="registrationForm" enctype="multipart/form-data">
+                    @Html.AntiForgeryToken()
+                    <div>
+                        <!-- Educational Details Section -->
+                        <div id="educational-details-section" class="tab-content-registration">
+                            <h3 class="text-xl font-semibold">Educational Details</h3>
+                            <div class="mt-4 space-y-6">
+                                <div class="flex space-x-6">
+                                    <!-- Id Number -->
+                                    <div class="flex-1">
+                                        <label asp-for="IdNumber" class="block text-sm font-medium text-gray-700"></label>
+                                        <input placeholder="24-1234-567" asp-for="IdNumber" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="registrationIdNumber" name="IdNumber" maxlength="20" />
+                                        <span asp-validation-for="IdNumber" class="mt-1 text-sm text-red-500"></span>
+                                    </div>
+
+                                    <!-- Year Level -->
+                                    <div class="flex-1">
+                                        <label asp-for="YearLevelId" class="block text-sm font-medium text-gray-700"></label>
+                                        <select asp-for="YearLevelId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="registrationYearLevelId" name="YearLevelId">
+                                            <option value="">-- Select Year Level --</option>
+                                            @foreach (var yearLevel in YearLevels)
+                                            {
+                                                <option value="@yearLevel.YearLevelId">@yearLevel.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="YearLevelId" id="collegeValidation" class="text-sm text-red-500"></span>
+                                    </div>
+
+                                    <!-- Resume -->
+                                    <div class="flex-1">
+                                        <div class="justify-between">
+                                            <label asp-for="Resume" class="text-sm font-medium text-gray-700"></label>
+                                            <span class="ml-2 text-xs text-gray-600">file type: pdf - max file size: 5 MB</span>
+                                        </div>
+                                        <div class="relative">
+                                            <input asp-for="Resume" id="registrationUploadResume" name="Resume" type="file"
+                                                   class="z-10 opacity-0 absolute inset-0 cursor-pointer"
+                                                   accept=".pdf" />
+                                            <button type="button" id="uploadResumeButton"
+                                                    class="w-full rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]">
+                                                <i class="fa-solid fa-file-arrow-up mr-2"></i><span id="uploadResumeText">Upload</span>
+                                            </button>
+                                        </div>
+                                        <span asp-validation-for="Resume" id="resumeValidation" class="text-sm text-red-500"></span>
+                                    </div>
+                                </div>
+                                <div class="flex space-x-6">
+                                    <!-- College -->
+                                    <div class="flex-1">
+                                        <label asp-for="CollegeId" class="block text-sm font-medium text-gray-700"></label>
+                                        <select asp-for="CollegeId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="registrationCollegeId" name="CollegeId">
+                                            <option value="">-- Select College --</option>
+                                            @foreach (var college in Colleges)
+                                            {
+                                                <option value="@college.CollegeId" title="@college.ShortName">@college.Name</option>
+                                            }
+                                        </select>
+                                        <span asp-validation-for="CollegeId" id="collegeValidation" class="text-sm text-red-500"></span>
+                                    </div>
+
+                                    <!-- Department -->
+                                    <div class="flex-1">
+                                        <label asp-for="DepartmentId" class="block text-sm font-medium text-gray-700"></label>
+                                        <select asp-for="DepartmentId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="registrationDepartmentId" name="DepartmentId" disabled>
+                                            <option value="">-- Select Department --</option>
+                                        </select>
+                                        <span asp-validation-for="DepartmentId" id="departmentValidation" class="text-sm text-red-500"></span>
+                                    </div>
+
+                                    <!-- Program -->
+                                    <div class="flex-1">
+                                        <label asp-for="ProgramId" class="block text-sm font-medium text-gray-700"></label>
+                                        <select asp-for="ProgramId" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="registrationProgramId" name="ProgramId" disabled>
+                                            <option value="">-- Select Program --</option>
+                                        </select>
+                                        <span asp-validation-for="ProgramId" id="programValidation" class="text-sm text-red-500"></span>
+                                    </div>
+                                </div>
+
+                                <hr />
+                                <!-- Notes -->
+                                <div>
+                                    <label for="applicantDetailsSectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                    <ul class="space-y-2 text-xs text-[#7A1515]">
+                                        <li>
+                                            - This section will determine which jobs you can view and apply to.
+                                        </li>
+                                        <li>
+                                            - Ensure your educational details are <strong>accurate and up to date</strong>, changing them later requires administrator approval.
+                                        </li>
+                                        <li>
+                                            - Your resume holds <strong>50% weight</strong> in match calculation, construct it properly and avoid unecessary details unrelated to your job interests.
+                                        </li>
+                                        <li>
+                                            - If you need help constructing an effective resume, visit the following resources provided by Harvard University:
+                                            <ul class="mt-2 list-disc space-y-1 pl-4 font-medium">
+                                                <li><a href="https://cdn-careerservices.fas.harvard.edu/wp-content/uploads/sites/161/2024/08/2024-gsas-cvs-and-cover-letters.pdf" target="_blank">Guide (CVs and Cover Letters)</a></li>
+                                                <li><a href="https://docs.google.com/document/d/1EujuYFWxVXZ2PUaJ2uizvK5raMoMsz1KMys-UYpUSk4/edit?tab=t.0" target="_blank">Template (Bullet)</a></li>
+                                                <li><a href="https://docs.google.com/document/d/1Gv7ACYJIrNC2TRPfCqjH8406JcKru9SfiRcJ9i-Ecwk/edit?tab=t.0" target="_blank">Template (Paragraph)</a></li>
+                                                <li><a href="https://cdn-careerservices.fas.harvard.edu/wp-content/uploads/sites/161/2024/08/2024-Harvard-College-CS-Resume-Example-edited.pdf" target="_blank">Example (Tech)</a></li>
+                                                <li><a href="https://cdn-careerservices.fas.harvard.edu/wp-content/uploads/sites/161/2024/08/2024-Harvard-College-Engineering-Example-edited.pdf" target="_blank">Example (Engineering)</a></li>
+                                            </ul>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Skills Section -->
+                        <div id="skills-section" class="tab-content-registration hidden">
+                            <h3 class="text-xl font-semibold">Skills</h3>
+                            <div class="mt-4 space-y-6">
+                                <!-- Cultural Skills -->
+                                <div class="flex-1">
+                                    <label asp-for="SkillsS" class="block text-sm font-medium text-gray-700"></label>
+                                    <input placeholder="Adaptability, Open Mindset, Communication, Detail Oriented, Leadership" type="text" id="registrationSkillsSInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                    <div type="hidden" id="skillsSHiddenInputs" name="SkillsS"></div>
+                                    <span asp-validation-for="SkillsS" class="text-sm text-red-500" id="skillsSValidation"></span>
+                                </div>
+                                <!-- Technical Skills -->
+                                <div class="flex-1">
+                                    <label asp-for="SkillsT" class="block text-sm font-medium text-gray-700"></label>
+                                    <input placeholder="C# (Programming Language), ASP.NET" type="text" id="registrationSkillsTInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                    <div type="hidden" id="skillsTHiddenInputs" name="SkillsT"></div>
+                                    <span asp-validation-for="SkillsT" class="text-sm text-red-500" id="skillsTValidation"></span>
+                                </div>
+                                <!-- Certification Skills -->
+                                <div class="flex-1">
+                                    <label asp-for="SkillsC" class="block text-sm font-medium text-gray-700"></label>
+                                    <input placeholder="PhilNITS FE, CompTIA CASP+ CE" type="text" id="registrationSkillsCInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                    <div type="hidden" id="skillsCHiddenInputs" name="SkillsC"></div>
+                                    <span asp-validation-for="SkillsC" class="text-sm text-red-500" id="skillsCValidation"></span>
+                                </div>
+                                <hr />
+                                <div>
+                                    <label for="skillsSectionNotes" class="block text-sm font-semibold text-gray-700">Guide:</label>
+                                    <ul class="space-y-2 text-xs text-[#7A1515]">
+                                        <li>
+                                            - Select at least <strong>5 skills or more</strong> in each <em>required</em> category to enhance the accuracy of match calculations.
+                                        </li>
+                                        <li>
+                                            - The skills you select will <strong>directly impact</strong> your <em>final match percentage</em> with available job opportunities.
+                                        </li>
+                                        <li>
+                                            - Certifications are evaluated alongside technical skills when assessing your compatibility with each job.
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+                <div id="summary-section" class="tab-content-registration hidden">
+                    <h3 class="text-xl font-semibold text-gray-700">Summary</h3>
+                    <div class="mt-4 space-y-4">
+                        <!-- Job Details Summary -->
+                        <div class="space-y-2">
+                            <span class="text-lg font-semibold">Educational Details</span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>ID Number:</strong> <span id="summaryIdNumber">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Year Level:</strong> <span id="summaryYearLevelId">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>College:</strong> <span id="summaryCollegeId">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Department:</strong> <span id="summaryDepartmentId">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Program:</strong> <span id="summaryProgramId">-</span></span>
+                        </div>
+                        <hr />
+                        <!-- Skills Summary -->
+                        <div class="space-y-2">
+                            <span class="text-lg font-semibold">Skills</span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Cultural:</strong> <span id="summarySkillsS">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Technical:</strong> <span id="summarySkillsT">-</span></span>
+                            <span class="block text-sm font-medium text-gray-700"><strong>Certification:</strong> <span id="summarySkillsC">-</span></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-6 flex justify-end space-x-4">
+            <span class="hidden pr-2 text-xs font-medium italic text-red-600" id="summaryValidation">Complete all sections before submitting (*)</span>
+            <button type="button" class="hidden min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="backCompleteRegistration">Previous</button>
+            <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D] disabled:bg-gray-400" id="nextCompleteRegistration">Next</button>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/welcome.js"></script>
+    <script>
+        window.appData = {
+            departments: @Html.Raw(Json.Serialize(Departments)),
+            programs: @Html.Raw(Json.Serialize(Programs)),
+            skillsS: @Html.Raw(JsonSerializer.Serialize(SkillsSoft
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsT: @Html.Raw(JsonSerializer.Serialize(SkillsTechnical
+                .Select(s => new { value = s.Name, id = s.SkillId }))),
+            skillsC: @Html.Raw(JsonSerializer.Serialize(SkillsCertification
+                .Select(s => new { value = s.Name, id = s.SkillId })))
+        };
+    </script>
+}

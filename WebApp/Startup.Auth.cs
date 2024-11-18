@@ -75,7 +75,7 @@ namespace WebApp
                 {
                     policy.RequireClaim("Role", "Recruiter");
                 });
-                options.AddPolicy("ApplicantWelcome", policy =>
+                options.AddPolicy("ApplicantOnboarding", policy =>
                     policy.RequireClaim("Role", "Applicant")
                           .RequireClaim("FromSignUp", "true")
                 );

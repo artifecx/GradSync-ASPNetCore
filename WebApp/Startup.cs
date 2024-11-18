@@ -133,7 +133,8 @@ namespace WebApp
 
             services.Configure<FormOptions>(options =>
             {
-                options.ValueLengthLimit = 1024 * 1024 * 100;
+                options.ValueLengthLimit = 100 * 1024 * 1024;
+                options.MultipartBodyLengthLimit = 5 * 1024 * 1024;
             });
 
             services.Configure<EmailSettings>(Configuration.GetSection("EmailSettings"));
