@@ -76,6 +76,32 @@ namespace Services.Services
             }
         }
 
+        public async Task<List<Department>> GetDepartmentsAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("Departments", _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetDepartmentsAsync();
+                });
+            }
+        }
+
+        public async Task<List<College>> GetCollegesAsync()
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var cachingService = scope.ServiceProvider.GetRequiredService<ICachingService>();
+                return await cachingService.GetOrCacheAsync("Colleges", _serviceProvider, async (innerScope) =>
+                {
+                    var repository = innerScope.ServiceProvider.GetRequiredService<IReferenceDataRepository>();
+                    return await repository.GetCollegesAsync();
+                });
+            }
+        }
+
         public async Task<List<Skill>> GetSkillsAsync()
         {
             using (var scope = _serviceProvider.CreateScope())
