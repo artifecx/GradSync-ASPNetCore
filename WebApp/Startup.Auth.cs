@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using System;
 
 namespace WebApp
 {
@@ -61,14 +62,23 @@ namespace WebApp
                 {
                     policy.RequireRole("Admin", "NLO", "Recruiter");
                 });
-                options.AddPolicy("Applicant", policy =>
+                options.AddPolicy("ApplicantGateway", policy =>
                 {
                     policy.RequireClaim("Role", "Applicant");
+                });
+                options.AddPolicy("Applicant", policy =>
+                {
+                    policy.RequireClaim("Role", "Applicant")
+                          .RequireClaim("FromSignUp", "false");
                 });
                 options.AddPolicy("Recruiter", policy =>
                 {
                     policy.RequireClaim("Role", "Recruiter");
                 });
+                options.AddPolicy("ApplicantOnboarding", policy =>
+                    policy.RequireClaim("Role", "Applicant")
+                          .RequireClaim("FromSignUp", "true")
+                );
             });
 
             this._services.AddMvc(options =>

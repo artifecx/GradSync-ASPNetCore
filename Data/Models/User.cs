@@ -27,6 +27,8 @@ public partial class User
 
     public DateTime? LastLoginDate { get; set; }
 
+    public bool FromSignUp { get; set; }
+
     public bool IsDeleted { get; set; }
 
     public bool IsVerified { get; set; }

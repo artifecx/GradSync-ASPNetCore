@@ -91,6 +91,14 @@ namespace WebApp.Mvc
         }
 
         /// <summary>
+        /// Get UserEmail.
+        /// </summary>
+        public string UserEmail
+        {
+            get { return User.FindFirst(ClaimTypes.Email)?.Value; }
+        }
+
+        /// <summary>
         /// Get RoleId.
         /// </summary>
         public string Supervisor

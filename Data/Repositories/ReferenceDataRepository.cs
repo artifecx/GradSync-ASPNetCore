@@ -41,6 +41,20 @@ namespace Data.Repositories
                 .AsNoTracking()
                 .ToListAsync();
 
+        public async Task<List<Department>> GetDepartmentsAsync() =>
+            await this.GetDbSet<Department>()
+                .Where(p => !p.IsDeleted)
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
+        public async Task<List<College>> GetCollegesAsync() =>
+            await this.GetDbSet<College>()
+                .Where(p => !p.IsDeleted)
+                .OrderBy(s => s.Name)
+                .AsNoTracking()
+                .ToListAsync();
+
         public async Task<List<Skill>> GetSkillsAsync() =>
             await this.GetDbSet<Skill>()
                 .OrderBy(s => s.Name)

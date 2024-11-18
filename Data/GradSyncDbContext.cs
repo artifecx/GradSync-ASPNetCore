@@ -806,6 +806,7 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.FirstName)
                 .IsRequired()
                 .HasMaxLength(100);
+            entity.Property(e => e.FromSignUp).HasDefaultValue(true);
             entity.Property(e => e.JoinDate)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");

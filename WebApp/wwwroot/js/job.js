@@ -114,9 +114,9 @@ document.addEventListener('DOMContentLoaded', function () {
             searchKeys: ['value'],
             pattern: null,
             dropdown: {
-                classname: "color-blue",
                 enabled: 0,
-                maxItems: 10
+                maxItems: 20,
+                sortby: 'startsWith'
             },
         });
 
@@ -244,6 +244,8 @@ function tagifyValuesValid() {
 /// ------------------------------------
 function submitEditJob() {
     let form = $('#editJobForm');
+    const submitButton = document.getElementById('saveEditJob');
+    submitButton.disabled = true;
 
     form.validate();
     if (!form.valid() || !tagifyValuesValid()) {
@@ -260,8 +262,8 @@ function submitEditJob() {
             if (response.success) {
                 location.reload();
             } else {
-                let errorMessage = response.error || "An error occurred.";
-                toastr.error(errorMessage);
+                submitButton.disabled = false;
+                toastr.error(response.error || "An error occurred.");
             }
         },
         error: function (xhr, status, error) {

@@ -88,6 +88,7 @@ namespace WebApp.Authentication
                 new Claim("Email", user.Email, ClaimValueTypes.String, Const.Issuer),
                 new Claim("Role", user.RoleId, ClaimValueTypes.String, Const.Issuer),
                 new Claim("IsSuperAdmin", isSuper.ToString(), ClaimValueTypes.Boolean, Const.Issuer),
+                new Claim("FromSignUp", user.FromSignUp.ToString(), ClaimValueTypes.Boolean, Const.Issuer)
             };
             return new ClaimsIdentity(claims, Const.AuthenticationScheme);
         }
