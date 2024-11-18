@@ -60,6 +60,22 @@ namespace Data.Repositories
         /// <returns>A <see cref="User"/> with no related data.</returns>
         public async Task<User> GetUserByTokenAsync(string token) =>
             await this.GetDbSet<User>().FirstOrDefaultAsync(u => u.Token == token);
+
+        /// <summary>
+        /// Retrieves an applicant's User model with all related data for first sign up.
+        /// </summary>
+        /// <returns>A <see cref="User"/> with no related data.</returns>
+        public async Task<User> GetUserApplicantForFirstLoginAsync(string id) =>
+            await this.GetDbSet<User>()
+                .Where(u => u.UserId == id)
+                .Include(u => u.Applicant)
+                    .ThenInclude(a => a.Resume)
+                .Include(u => u.Applicant)
+                    .ThenInclude(a => a.ApplicantSkills)
+                .Include(u => u.Applicant)
+                    .ThenInclude(a => a.EducationalDetail)
+                .Include(u => u.Avatar)
+                .FirstOrDefaultAsync();
         #endregion
 
         #region User CRUD Methods
