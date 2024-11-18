@@ -47,6 +47,7 @@ namespace WebApp
             this._services.AddScoped<ICompanyService, CompanyService>();
             this._services.AddScoped<IDashboardService, DashboardService>();
             this._services.AddScoped<IUserProfileService, UserProfileService>();
+            this._services.AddScoped<IPdfTextExtractorService, PdfTextExtractorService>();
             this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
             this._services.TryAddSingleton<IEventBus, EventBus>();
