@@ -27,7 +27,7 @@
                         @if (User.IsInRole("Applicant"))
                         {
                             <!-- Withdraw -->
-                            <button class="flex items-center justify-center rounded-lg px-4 py-2 transition-all text-white bg-[#7A1515] hover:bg-[#991b1b] hover:text-white"
+                            <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b] hover:text-white"
                                     id="withdrawButton"
                                     data-action-url="@Url.Action("WithdrawApplication", "Application")"
                                     onclick="withdrawApplicationHandler('@Model.ApplicationId')">
@@ -104,7 +104,6 @@
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
-    <script src="~/js/job.js"></script>
     <script src="~/js/messaging.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
@@ -121,7 +120,8 @@
 
         document.querySelector('#back-button').addEventListener('click', function (event) {
             event.preventDefault();
-            const baseUrl = '@Url.Action($"{aspAction}", "Application")';
+            
+            const baseUrl = '@Url.Action(aspAction, "Application")';
             const params = new URLSearchParams();
             params.set('sortBy', sessionStorage.getItem('sortBy') || '');
             params.set('search', sessionStorage.getItem('search') || '');
