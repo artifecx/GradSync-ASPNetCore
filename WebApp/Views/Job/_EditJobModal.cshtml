@@ -60,7 +60,7 @@
                             <!-- Soft Skills -->
                             <div class="flex-1">
                                 <label asp-for="SkillsS" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsSInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <input placeholder="Open Mindset, Communication, Leadership" type="text" id="editJobSkillsSInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
                                 <div type="hidden" id="skillsSHiddenInputs" name="Skills"></div>
                                 <span asp-validation-for="SkillsS" class="text-sm text-red-500" id="skillsSValidation"></span>
                             </div>
@@ -68,7 +68,7 @@
                             <!-- Technical Skills -->
                             <div class="flex-1">
                                 <label asp-for="SkillsT" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsTInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <input placeholder="C# (Programming Language), ASP.NET" type="text" id="editJobSkillsTInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
                                 <div type="hidden" id="skillsTHiddenInputs" name="SkillsT"></div>
                                 <span asp-validation-for="SkillsT" class="text-sm text-red-500" id="skillsTValidation"></span>
                             </div>
@@ -76,7 +76,7 @@
                             <!-- Certification Skills -->
                             <div class="flex-1">
                                 <label asp-for="SkillsC" class="block text-sm font-medium text-gray-700"></label>
-                                <input placeholder="C#, ASP.NET, Problem solving, Communication" type="text" id="editJobSkillsCInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
+                                <input placeholder="PhilNITS FE, CompTIA CASP+ CE" type="text" id="editJobSkillsCInput" class="block w-full rounded-lg border border-gray-300 p-2 text-sm" />
                                 <div type="hidden" id="skillsCHiddenInputs" name="SkillsC"></div>
                                 <span asp-validation-for="SkillsC" class="text-sm text-red-500" id="skillsCValidation"></span>
                             </div>
@@ -197,7 +197,7 @@
 
             <div class="modal-footer">
                 <button type="button" class="rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelEditJob" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]" onclick="submitEditJob()">Save Changes</button>
+                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]" id="saveEditJob" onclick="submitEditJob()">Save Changes</button>
             </div>
         </div>
     </div>

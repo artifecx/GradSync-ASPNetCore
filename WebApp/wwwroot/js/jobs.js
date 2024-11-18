@@ -331,9 +331,8 @@
 
     // next button logic
     nextButton.addEventListener('click', () => {
-        validateCurrentSection();
-
         if (currentSectionIndex < tabContents.length - 1) {
+            validateCurrentSection();
             updateSummary(currentSectionIndex);
             switchToTab(currentSectionIndex, currentSectionIndex + 1);
             currentSectionIndex++
@@ -530,6 +529,8 @@ function programValuesValid() { return !programsEmpty; }
 /// ------------------------------------
 function submitCreateJob() {
     let form = $('#createJobForm');
+    const submitButton = document.getElementById('nextCreateJob');
+    submitButton.disabled = true;
 
     form.validate();
     if (!form.valid()) {
@@ -546,8 +547,8 @@ function submitCreateJob() {
             if (response.success) {
                 location.reload();
             } else {
-                let errorMessage = response.error || "An error occurred.";
-                toastr.error(errorMessage);
+                submitButton.disabled = false;
+                toastr.error(response.error || "An error occurred.");
             }
         },
         error: function (xhr, status, error) {
