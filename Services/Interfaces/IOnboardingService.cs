@@ -10,6 +10,7 @@ namespace Services.Interfaces
 {
     public interface IOnboardingService
     {
+        Task<Resume> GetApplicantResumeByIdAsync(string id);
         Task<User> CompleteOnboardingAsync(OnboardingViewModel model);
     }
 }

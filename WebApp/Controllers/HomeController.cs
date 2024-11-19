@@ -19,7 +19,7 @@ namespace WebApp.Controllers
     {
         private readonly IDashboardService _dashboardService;
         private readonly IJobService _jobService;
-        private readonly IOnboardingService _welcomeService;
+        private readonly IOnboardingService _onboardingService;
         private readonly IReferenceDataService _referenceDataService;
         private readonly SignInManager _signInManager;
 
@@ -35,7 +35,7 @@ namespace WebApp.Controllers
         public HomeController(
             IDashboardService dashboardService,
             IJobService jobService,
-            IOnboardingService welcomeService,
+            IOnboardingService onboardingService,
             IReferenceDataService referenceDataService,
             SignInManager signInManager,
             IHttpContextAccessor httpContextAccessor,
@@ -45,7 +45,7 @@ namespace WebApp.Controllers
         {
             _dashboardService = dashboardService;
             _jobService = jobService;
-            _welcomeService = welcomeService;
+            _onboardingService = onboardingService;
             _referenceDataService = referenceDataService;
             _signInManager = signInManager;
         }

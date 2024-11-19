@@ -76,6 +76,9 @@ namespace Data.Repositories
                     .ThenInclude(a => a.EducationalDetail)
                 .Include(u => u.Avatar)
                 .FirstOrDefaultAsync();
+
+        public async Task<Resume> GetApplicantResumeByIdAsync(string id) =>
+            await this.GetDbSet<Resume>().AsNoTracking().FirstOrDefaultAsync(r => r.ResumeId == id);
         #endregion
 
         #region User CRUD Methods
