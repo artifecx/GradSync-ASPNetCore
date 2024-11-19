@@ -99,6 +99,7 @@ namespace Services.Services
                 throw new UserException(Error_UserExists);
 
             var user = _mapper.Map<User>(model);
+            user.FromSignUp = true;
             user.UserId = Guid.NewGuid().ToString();
             user.Password = PasswordManager.EncryptPassword(model.Password);
             user.RoleId = model.AsRecruiter ? Role_Recruiter : Role_Applicant;
