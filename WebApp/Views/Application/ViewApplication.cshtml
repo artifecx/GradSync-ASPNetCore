@@ -13,9 +13,9 @@
     <div class="mb-2 w-full justify-between">
         <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
             <div class="flex justify-between">
-                <a href="#" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] hover:!no-underline">
+                <button type="button" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] focus:!outline-none">
                     <i class="fas fa-arrow-left mr-2"></i> Back
-                </a>
+                </button>
             </div>
 
             <div class="flex justify-between">
@@ -105,12 +105,6 @@
     <script src="~/js/messaging.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
-        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-        sessionStorage.setItem('search', urlParams.get('search') || '');
-        sessionStorage.setItem('filterByWorkSetup', urlParams.get('filterByWorkSetup') || '');
-        sessionStorage.setItem('filterByProgram', urlParams.get('filterByProgram') || '');
-        sessionStorage.setItem('filterByStatus', urlParams.get('filterByStatus') || '');
-        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
 
         const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
         const newUrl = window.location.origin + window.location.pathname + idParam;
@@ -118,16 +112,7 @@
 
         document.querySelector('#back-button').addEventListener('click', function (event) {
             event.preventDefault();
-            
-            const baseUrl = '@Url.Action(aspAction, "Application")';
-            const params = new URLSearchParams();
-            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-            params.set('search', sessionStorage.getItem('search') || '');
-            params.set('filterByWorkSetup', sessionStorage.getItem('filterByWorkSetup') || '');
-            params.set('filterByProgram', sessionStorage.getItem('filterByProgram') || '');
-            params.set('filterByStatus', sessionStorage.getItem('filterByStatus') || '');
-            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            window.location.href = `${baseUrl}?${params.toString()}`;
+            window.history.back();
         });
     </script>
 }

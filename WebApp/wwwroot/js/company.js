@@ -1,4 +1,26 @@
-﻿function submitRegisterCompany() {
+﻿document.addEventListener('click', function (e) {
+    const actionBtn = e.target.closest('.actionDropdownCompanyBtn');
+    if (actionBtn) {
+        const CompanyId = actionBtn.dataset.companyid;
+        const menu = document.getElementById(`actionDropdownCompanyMenu-${CompanyId}`);
+        menu.classList.toggle('hidden');
+
+        document.querySelectorAll('.actionDropdownCompanyMenu').forEach(m => {
+            if (m.id !== `actionDropdownCompanyMenu-${CompanyId}`) {
+                m.classList.add('hidden');
+            }
+        });
+        return;
+    }
+
+    if (!e.target.closest('.actionDropdownCompanyMenu') && !e.target.closest('.actionDropdownCompanyBtn')) {
+        document.querySelectorAll('.actionDropdownCompanyMenu').forEach(menu => {
+            menu.classList.add('hidden');
+        });
+    }
+});
+
+function submitRegisterCompany() {
     var form = $('#registerCompanyForm');
     var redirectUrl = $('#redirectUrl').val();
     var actionUrl = $('#actionUrl').val();

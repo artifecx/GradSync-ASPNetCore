@@ -7,11 +7,9 @@
     string aspAction = isAdmin ? "GetAllCompanies" : "GetCompanyRecruiter";
     string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
-    //int pageIndex = Model.PageIndex;
 
     string sortByName = string.IsNullOrEmpty(sortBy) ? "name_desc" : null;
     string sortByEmail = sortBy == "email" ? "email_desc" : "email";
-
 }
 
 <div class="flex size-full flex-col bg-gray-100">
@@ -21,9 +19,9 @@
             @if (!User.IsInRole("Recruiter"))
             {
                 <div class="mb-3 flex justify-between">
-                    <a href="#" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] hover:!no-underline">
+                    <button type="button" id="back-button" onclick="goBack()" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] focus:!outline-none">
                         <i class="fas fa-arrow-left mr-2"></i> Back
-                    </a>
+                    </button>
                 </div>
             }
             <div class="flex items-center justify-between">
@@ -70,11 +68,11 @@
                         <div class="text-xs font-medium text-gray-500">Update your company details here.</div>
                     </div>
                     <div>
-                        <button type="button" id="cancelButton" class="hidden rounded bg-gray-500 px-2 py-2 text-sm font-semibold text-white hover:bg-gray-600"
+                        <button type="button" id="cancelButton" class="hidden min-w-[128px] rounded bg-[#6c757d] px-2 py-2 text-sm font-semibold text-white hover:bg-[#939BA2]"
                                 onclick="cancelEdit()">
                             Cancel
                         </button>
-                        <button type="button" id="saveButton" class="hidden rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A53D3D]"
+                        <button type="button" id="saveButton" class="hidden min-w-[128px] rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A04747]"
                                 onclick="submitChanges()">
                             Save Changes
                         </button>
@@ -202,33 +200,18 @@
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/company.js"></script>
     <script>
-        document.querySelector('.back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            window.history.back();
-        });
-    </script>
-    <script>
         const urlParams = new URLSearchParams(window.location.search);
-        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-        sessionStorage.setItem('search', urlParams.get('search') || '');
-        sessionStorage.setItem('hasValidMOA', urlParams.get('hasValidMOA') || '');
-        sessionStorage.setItem('verified', urlParams.get('verified') || '');
-        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
-
         const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
-        const newUrl = window.location.origin + window.location.pathname + idParam;
-        window.history.replaceState({}, document.title, newUrl);
 
-        document.querySelector('#back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            const baseUrl = '@Url.Action($"{aspAction}", "Company")';
-            const params = new URLSearchParams();
-            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-            params.set('search', sessionStorage.getItem('search') || '');
-            params.set('hasValidMOA', sessionStorage.getItem('hasValidMOA') || '');
-            params.set('verified', sessionStorage.getItem('verified') || '');
-            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            window.location.href = `${baseUrl}?${params.toString()}`;
-        });
+        if(urlParams.get('showModal') === 'editCompany'){
+            enableEditMode();
+        }
+
+        const newUrl = window.location.origin + window.location.pathname + idParam;
+                window.history.replaceState({}, document.title, newUrl);
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 }
