@@ -314,7 +314,7 @@ namespace Services.Services
         private async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
         {
             var applications = await GetOrCacheAllApplicationsByUserAsync(userId);
-            return applications.Exists(a => a.JobId == jobId);
+            return applications != null && applications.Exists(a => a.JobId == jobId);
         }
 
         /// <summary>
