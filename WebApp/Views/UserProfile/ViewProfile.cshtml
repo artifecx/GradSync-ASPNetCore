@@ -8,11 +8,11 @@
     var isApplicant = User.IsInRole("Applicant");
 }
 
-<div class="flex min-h-screen items-center justify-center bg-[#F5F7F8]">
-    <div class="h-[60vh] w-full max-w-7xl rounded-lg p-6">
+<div class="flex h-full items-center justify-center">
+    <div class="h-[80%] w-full max-w-7xl p-6">
         <div class="flex h-full">
             <!-- Sidebar for navigation -->
-            <div class="flex h-full w-1/4 flex-col justify-between overflow-hidden rounded-lg bg-white p-4 shadow">
+            <div class="border-r-2 flex h-full w-1/4 flex-col justify-between overflow-auto bg-white p-4">
                 <div>
                     <div class="relative mb-6">
                         <!-- Profile picture section -->
@@ -58,7 +58,7 @@
             </div>
 
             <!-- Content Section -->
-            <div class="ml-6 w-3/4 rounded-lg bg-white p-6 shadow">
+            <div class="w-3/4 overflow-auto bg-white p-6">
                 <!-- SECTION: Profile (default) -->
                 <div id="profile-section" class="tab-content">
                     <div class="flex justify-between">

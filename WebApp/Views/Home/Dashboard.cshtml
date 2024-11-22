@@ -3,43 +3,37 @@
     ViewData["Title"] = "Dashboard | GradSync";
 }
 
-<div class="bg-[#F5F7F8]">
-    <div class="flex">
-        <div class="flex-1 bg-[#F5F7F8] p-3">
-            <div class="flex-1 rounded-lg bg-white p-6 shadow-md">
-                <h1 class="mb-12 text-left text-4xl font-bold text-[#7A1515]">Admin Dashboard</h1>
+<div class="flex-1 rounded-lg p-6 shadow-md">
+    <h1 class="mb-12 text-left text-4xl font-bold text-[#7A1515]">Admin Dashboard</h1>
 
-                <div class="grid-cols-1 mb-8 grid gap-6 lg:grid-cols-3">
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">User Data</h2>
-                        <canvas id="userChart"></canvas>
-                    </div>
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Application Data</h2>
-                        <canvas id="applicationChart"></canvas>
-                    </div>
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Job Data</h2>
-                        <canvas id="jobChart"></canvas>
-                    </div>
-                </div>
+    <div class="grid-cols-1 mb-8 grid gap-6 lg:grid-cols-3">
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">User Data</h2>
+            <canvas id="userChart"></canvas>
+        </div>
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Application Data</h2>
+            <canvas id="applicationChart"></canvas>
+        </div>
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Job Data</h2>
+            <canvas id="jobChart"></canvas>
+        </div>
+    </div>
 
-                <div class="grid-cols-1 grid gap-6 lg:grid-cols-2">
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Jobs Salary Distribution</h2>
-                        <canvas id="jobSalaryDistribution"></canvas>
-                    </div>
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Total Applications vs Total Jobs</h2>
-                        <canvas id="applicationsVsJobsChart"></canvas>
-                    </div>
+    <div class="grid-cols-1 grid gap-6 lg:grid-cols-2">
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Jobs Salary Distribution</h2>
+            <canvas id="jobSalaryDistribution"></canvas>
+        </div>
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Total Applications vs Total Jobs</h2>
+            <canvas id="applicationsVsJobsChart"></canvas>
+        </div>
 
-                    <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
-                        <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Applications by Employment Type</h2>
-                        <canvas id="applicationsByEmploymentTypeChart"></canvas>
-                    </div>
-                </div>
-            </div>
+        <div class="rounded-lg bg-[#F5F7F8] p-6 shadow-md">
+            <h2 class="mb-6 text-2xl font-semibold text-[#7A1515]">Applications by Employment Type</h2>
+            <canvas id="applicationsByEmploymentTypeChart"></canvas>
         </div>
     </div>
 </div>

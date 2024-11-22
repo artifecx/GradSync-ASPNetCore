@@ -29,137 +29,132 @@
     string sortByUpdated = string.Equals(sortBy, "updated_asc") ? "updated_desc" : "updated_asc";
 }
 
-<div class="flex min-h-screen bg-[#F5F7F8]">
-    <div class="flex-1 flex items-center justify-center p-3">
-        <div class="h-full w-full max-w-7xl rounded-lg bg-white p-6 shadow-md">
-            <div class="mb-2 flex">
-                <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
-                </a>
-            </div>
-            <div class="flex items-center justify-between">
-                
-                <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
-                    Archived Jobs
-                </h1>
-                
-                <!-- Search and Add Job Button -->
-                <div class="flex items-center space-x-2 pb-8">
-                    <div class="flex items-center space-x-2">
-                        <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
-                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Title, description" })
-                            <input type="hidden" name="sortBy" value="@sortBy" />
-                        </form>
-                    </div>
-                </div>
-            </div>
+<div class="h-full w-full p-6 shadow-md">
+    <div class="mb-2 flex">
+        <a href="#" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] hover:!no-underline">
+            <i class="fas fa-arrow-left mr-2"></i> Back
+        </a>
+    </div>
+    <div class="flex items-center justify-between">
 
-            <!-- Table -->
-            <div class="min-w-full rounded-lg bg-white">
-                <table class="min-w-full table-auto rounded-lg border bg-white">
-                    <thead class="rounded-lg border bg-gray-100">
-                        <tr>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                                @Html.DisplayNameFor(model => model.First().Title)
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                                @Html.DisplayNameFor(model => model.First().Description)
-                            </th>
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
-                                <a asp-action="@aspAction"
-                                   asp-route-search="@search"
-                                   asp-route-sortBy="@sortByUpdated"
-                                   class="text-black">
-                                        Date Archived
-                                    @(sortBy == "updated_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "updated_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                                </a>
-                            </th>
-                            <!-- Action-->
-                            <th class="px-6 py-3 text-left text-xs font-medium uppercase">Action</th>
-                        <tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="4" class="px-6 py-4 text-center text-[#7A1515]">No Archived Jobs</td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td class="px-6 py-3 text-sm text-gray-700">
-                                        @item.Title
-                                    </td>
-                                    <td class="cursor-pointer px-6 py-3 text-sm text-gray-700">
-                                        @{
-                                            var originalDetails = item.Description;
-                                            var details = originalDetails?.Length > 80 ? originalDetails?.Substring(0, 80) + "..." : originalDetails;
-                                        }
-                                        <text title="@originalDetails">@details</text>
-                                    </td>
-                                    <td class="px-6 py-3 text-sm text-gray-700">
-                                        @item.UpdatedDate
-                                    </td>
-                                    <td>
+        <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
+            Archived Jobs
+        </h1>
 
-                                        <button data-toggle="modal" data-target="#unarchiveJobModal" data-job-id="@item.JobId" data-postedby-id="@item.PostedById"
-                                                class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                            <i class="fa-solid fa-box-open mr-2"></i> Unarchive Job
-                                        </button>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-
-                <!-- Pagination -->
-                <nav class="flex justify-center pt-3">
-                    <ul class="pagination flex items-center">
-                        @if (Model.HasPreviousPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@(Model.PageIndex - 1)"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        }
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@i"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                        @if (Model.HasNextPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction"
-                                   asp-route-pageIndex="@(Model.PageIndex + 1)"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search">
-                                    <i class="fas fa-chevron-right"></i>
-                                </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
+        <!-- Search and Add Job Button -->
+        <div class="flex items-center space-x-2 pb-8">
+            <div class="flex items-center space-x-2">
+                <form method="get" asp-action="@aspAction" asp-route-sortBy="@sortBy" asp-route-search="@search" class="flex items-center">
+                    @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Title, description" })
+                    <input type="hidden" name="sortBy" value="@sortBy" />
+                </form>
             </div>
         </div>
     </div>
+
+    <!-- Table -->
+    <div class="h-[75vh] overflow-auto rounded-lg bg-[#F5F7F8]">
+        <table class="min-w-full table-auto rounded-lg bg-white">
+            <thead class="rounded-md bg-gray-100 text-[#625f5f]">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                        @Html.DisplayNameFor(model => model.First().Title)
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                        @Html.DisplayNameFor(model => model.First().Description)
+                    </th>
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider">
+                        <a asp-action="@aspAction"
+                           asp-route-search="@search"
+                           asp-route-sortBy="@sortByUpdated"
+                           class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "updated_asc" || sortBy == "updated_desc" ? "text-[#A04747]" : "")">
+                            Date Archived
+                            @(sortBy == "updated_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "updated_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                        </a>
+                    </th>
+                    <!-- Action-->
+                    <th class="px-6 py-3 text-left text-xs font-medium uppercase">Action</th>
+                <tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200 bg-white">
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="px-6 py-4 text-center text-[#625f5f]">No archived jobs</td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr>
+                            <td class="px-6 py-3 text-sm text-[#625f5f]">
+                                @item.Title
+                            </td>
+                            <td class="cursor-pointer px-6 py-3 text-sm text-[#625f5f]">
+                                @{
+                                    var originalDetails = item.Description;
+                                    var details = originalDetails?.Length > 80 ? originalDetails?.Substring(0, 80) + "..." : originalDetails;
+                                }
+                                <text title="@originalDetails">@details</text>
+                            </td>
+                            <td class="px-6 py-3 text-sm text-[#625f5f]">
+                                @item.UpdatedDate
+                            </td>
+                            <td>
+
+                                <button data-toggle="modal" data-target="#unarchiveJobModal" data-job-id="@item.JobId" data-postedby-id="@item.PostedById"
+                                        class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A04747] focus:outline-none">
+                                    <i class="fa-solid fa-box-open mr-2"></i> Unarchive Job
+                                </button>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+    </div>
+    <!-- Pagination -->
+    <nav class="flex justify-center pt-3">
+        <ul class="pagination flex items-center">
+            @if (Model.HasPreviousPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-red-300 px-3 py-1 text-[#625f5f] hover:bg-gray-200"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@(Model.PageIndex - 1)"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                </li>
+            }
+            @for (int i = 1; i <= Model.TotalPages; i++)
+            {
+                <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@i"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search">
+                        @i
+                    </a>
+                </li>
+            }
+            @if (Model.HasNextPage)
+            {
+                <li class="page-item">
+                    <a class="page-link border border-red-300 px-3 py-1 text-[#625f5f] hover:bg-gray-200"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@(Model.PageIndex + 1)"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                </li>
+            }
+        </ul>
+    </nav>
 </div>
 
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>

@@ -21,53 +21,51 @@
         hasValidMOA.HasValue;
 }
 
-<div class="min-h-[calc(96vh-60px)] flex bg-[#F5F7F8]">
-    <div class="flex-1 flex items-center justify-center p-3">
-        <div class="h-full w-full max-w-7xl overflow-auto rounded-lg bg-white p-6 shadow-md">
-            <div class="flex items-center justify-between">
-                <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
-                    Company Management
-                </h1>
+<div class="h-full w-full overflow-auto p-6 shadow-md">
+    <div class="flex items-center justify-between">
+        <h1 class="pb-8 text-left text-4xl font-bold text-[#7A1515]">
+            Company Management
+        </h1>
 
-                <!-- Search Button -->
-                <div class="flex items-center space-x-2 pb-8">
-                    <div class="flex items-center space-x-2">
-                        @if (hasFilters)
-                        {
-                            <form method="get" asp-action="@aspAction">
-                                <button type="submit" class="rounded bg-gray-300 px-2 py-1 text-black">
-                                    <i class="fa-solid fa-xmark"></i>
-                                </button>
-                            </form>
-                        }
-                        <form method="get" asp-action="@aspAction"
-                              class="flex items-center space-x-2">
-                            @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
-                            <input type="hidden" name="sortBy" value="@sortBy" />
-                            <input type="hidden" name="verified" value="@verified" />
-                            <input type="hidden" name="hasValidMOA" value="@hasValidMOA" />
-                        </form>
+        <!-- Search Button -->
+        <div class="flex items-center space-x-2 pb-8">
+            <div class="flex items-center space-x-2">
+                @if (hasFilters)
+                {
+                    <form method="get" asp-action="@aspAction">
+                        <button type="submit" class="rounded bg-gray-300 px-2 py-1 text-black">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </form>
+                }
+                <form method="get" asp-action="@aspAction"
+                      class="flex items-center space-x-2">
+                    @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Name, contact, address" })
+                    <input type="hidden" name="sortBy" value="@sortBy" />
+                    <input type="hidden" name="verified" value="@verified" />
+                    <input type="hidden" name="hasValidMOA" value="@hasValidMOA" />
+                </form>
 
-                        @if (User.IsInRole("NLO"))
-                        {
-                            <div class="ml-3">
-                                <button type="button" 
-                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]" 
-                                    data-toggle="modal" 
-                                    data-target="#addCompanyModal">
-                                    <i class="fa fa-plus"></i>
-                                    Add Company
-                                </button>
-                            </div>
-                        }
+                @if (User.IsInRole("NLO"))
+                {
+                    <div class="ml-3">
+                        <button type="button"
+                                class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]"
+                                data-toggle="modal"
+                                data-target="#addCompanyModal">
+                            <i class="fa fa-plus"></i>
+                            Add Company
+                        </button>
                     </div>
-                </div>
+                }
             </div>
+        </div>
+    </div>
 
-            <!-- Table -->
-            <div class="min-w-full rounded-lg bg-white">
-                <div class="float-right py-2">
-                    <button onclick="location.href='@Url.Action("", "",
+    <!-- Table -->
+    <div class="min-w-full rounded-lg bg-white">
+        <div class="float-right py-2">
+            <button onclick="location.href='@Url.Action("", "",
                         new {
                             sortBy = sortBy,
                             search = search,
@@ -75,139 +73,139 @@
                             verified = verified,
                             hasValidMOA = hasValidMOA,
                         })'"
-                            class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
-                        <i class="fa fa-archive"></i> Archived Companies
-                    </button>
-                </div>
-                <table class="min-w-full table-auto rounded-lg border bg-white">
-                    <thead class="rounded-lg border bg-gray-100">
-                        <tr>
-                            <!-- Name -->
-                            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                                <a asp-action="@aspAction"
-                                   asp-route-sortBy="@sortByName"
+                    class="text-grey-700 w-full cursor-pointer text-left hover:text-[#A53D3D] focus:outline-none">
+                <i class="fa fa-archive"></i> Archived Companies
+            </button>
+        </div>
+        <table class="min-w-full table-auto rounded-lg border bg-white">
+            <thead class="rounded-lg border bg-gray-100">
+                <tr>
+                    <!-- Name -->
+                    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <a asp-action="@aspAction"
+                           asp-route-sortBy="@sortByName"
+                           asp-route-search="@search"
+                           asp-route-pageIndex="@pageIndex"
+                           asp-route-verified="@verified"
+                           asp-route-hasValidMOA="@hasValidMOA"
+                           class="text-gray-500">
+                            @Html.DisplayNameFor(model => model.First().Name)
+                            @(sortBy == "name_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                        </a>
+                    </th>
+                    <!-- Email -->
+                    <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().ContactEmail)</th>
+                    <!-- Number -->
+                    <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Number</th>
+                    <!-- Address -->
+                    <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Address)</th>
+                    <!-- Active Listings -->
+                    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <a asp-action="@aspAction"
+                           asp-route-sortBy="@sortByActiveListings"
+                           asp-route-search="@search"
+                           asp-route-pageIndex="@pageIndex"
+                           asp-route-verified="@verified"
+                           asp-route-hasValidMOA="@hasValidMOA"
+                           class="text-gray-500">
+                            @Html.DisplayNameFor(model => model.First().ActiveJobListings)
+                            @(string.Equals(sortBy, "jobs_asc") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                        </a>
+                    </th>
+                    <!-- Is Verified -->
+                    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <div class="dropdown relative">
+                            <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @if (!verified.HasValue)
+                                {
+                                    @Html.DisplayNameFor(model => model.First().IsVerified)
+                                }
+                                else
+                                {
+                                    <text>@(verified == true ? "Verified" : "Unverified")</text>
+                                }
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </a>
+                            <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
                                    asp-route-search="@search"
-                                   asp-route-pageIndex="@pageIndex"
-                                   asp-route-verified="@verified"
                                    asp-route-hasValidMOA="@hasValidMOA"
-                                   class="text-gray-500">
-                                    @Html.DisplayNameFor(model => model.First().Name)
-                                    @(sortBy == "name_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                                </a>
-                            </th>
-                            <!-- Email -->
-                            <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().ContactEmail)</th>
-                            <!-- Number -->
-                            <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Number</th>
-                            <!-- Address -->
-                            <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Address)</th>
-                            <!-- Active Listings -->
-                            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                                <a asp-action="@aspAction"
-                                   asp-route-sortBy="@sortByActiveListings"
+                                   asp-route-verified="">All</a>
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
                                    asp-route-search="@search"
-                                   asp-route-pageIndex="@pageIndex"
-                                   asp-route-verified="@verified"
                                    asp-route-hasValidMOA="@hasValidMOA"
-                                   class="text-gray-500">
-                                    @Html.DisplayNameFor(model => model.First().ActiveJobListings)
-                                    @(string.Equals(sortBy, "jobs_asc") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                                </a>
-                            </th>
-                            <!-- Is Verified -->
-                            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                                <div class="dropdown relative">
-                                    <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        @if (!verified.HasValue)
-                                        {
-                                            @Html.DisplayNameFor(model => model.First().IsVerified)
-                                        }
-                                        else
-                                        {
-                                            <text>@(verified == true ? "Verified" : "Unverified")</text>
-                                        }
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                    </a>
-                                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA="@hasValidMOA"
-                                           asp-route-verified="">All</a>
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA="@hasValidMOA"
-                                           asp-route-verified="true">Verified</a>
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA="@hasValidMOA"
-                                           asp-route-verified="false">Unverified</a>
-                                    </div>
-                                </div>
-                            </th>
-                            <!-- Has MOA -->
-                            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                                <div class="dropdown relative">
-                                    <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        @if (!hasValidMOA.HasValue)
-                                        {
-                                            @Html.DisplayNameFor(model => model.First().HasValidMOA)
-                                        }
-                                        else
-                                        {
-                                            <text>@(hasValidMOA == true ? "With MOA" : "No MOA")</text>
-                                        }
-                                        <i class="fa-solid fa-chevron-down"></i>
-                                    </a>
-                                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA=""
-                                           asp-route-verified="@verified">All</a>
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA="true"
-                                           asp-route-verified="@verified">With MOA</a>
-                                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-hasValidMOA="false"
-                                           asp-route-verified="@verified">No MOA</a>
-                                    </div>
-                                </div>
-                            </th>
-                            <!-- Actions -->
-                            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
-                        </tr>
-                    </thead>
+                                   asp-route-verified="true">Verified</a>
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search"
+                                   asp-route-hasValidMOA="@hasValidMOA"
+                                   asp-route-verified="false">Unverified</a>
+                            </div>
+                        </div>
+                    </th>
+                    <!-- Has MOA -->
+                    <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
+                        <div class="dropdown relative">
+                            <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                @if (!hasValidMOA.HasValue)
+                                {
+                                    @Html.DisplayNameFor(model => model.First().HasValidMOA)
+                                }
+                                else
+                                {
+                                    <text>@(hasValidMOA == true ? "With MOA" : "No MOA")</text>
+                                }
+                                <i class="fa-solid fa-chevron-down"></i>
+                            </a>
+                            <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search"
+                                   asp-route-hasValidMOA=""
+                                   asp-route-verified="@verified">All</a>
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search"
+                                   asp-route-hasValidMOA="true"
+                                   asp-route-verified="@verified">With MOA</a>
+                                <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                                   asp-action="@aspAction"
+                                   asp-route-sortBy="@sortBy"
+                                   asp-route-search="@search"
+                                   asp-route-hasValidMOA="false"
+                                   asp-route-verified="@verified">No MOA</a>
+                            </div>
+                        </div>
+                    </th>
+                    <!-- Actions -->
+                    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
+                </tr>
+            </thead>
 
-                    <!-- Table Body/Rows -->
-                    <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
-                        @if (!Model.Any())
-                        {
-                            <tr>
-                                <td colspan="10" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
-                                    @(hasFilters ? "No companies found" : "No company found matching the criteria")
-                                </td>
-                            </tr>
-                        }
-                        else
-                        {
-                            @foreach (var item in Model)
-                            {
-                                <tr class="hover:bg-gray-100">
-                                    <td class="py-3 pl-3 text-xs font-medium text-[#7A1515]">
-                                        <button onclick="location.href='@Url.Action("GetCompany", "Company",
+            <!-- Table Body/Rows -->
+            <tbody class="divide-y divide-gray-200 rounded-lg border bg-white">
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="10" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
+                            @(hasFilters ? "No companies found" : "No company found matching the criteria")
+                        </td>
+                    </tr>
+                }
+                else
+                {
+                    @foreach (var item in Model)
+                    {
+                        <tr class="hover:bg-gray-100">
+                            <td class="py-3 pl-3 text-xs font-medium text-[#7A1515]">
+                                <button onclick="location.href='@Url.Action("GetCompany", "Company",
                                             new {
                                                 id = item.CompanyId,
                                                 sortBy = sortBy,
@@ -216,47 +214,47 @@
                                                 verified = verified,
                                                 hasValidMOA = hasValidMOA,
                                             })'">
-                                            @Html.DisplayFor(modelItem => item.Name)
-                                        </button>
-                                    </td>
-                                    <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ContactEmail)</td>
-                                    <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ContactNumber)</td>
-                                    <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.Address)</td>
-                                    <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ActiveJobListings)</td>
-                                    <td class="py-3 pl-3 text-xs font-medium text-gray-700">
-                                        @if (item.IsVerified)
-                                        {
-                                            <span>&#10004;</span>
-                                        }
-                                        else
-                                        {
-                                            <span>&#10006;</span>
-                                        }
-                                    </td>
-                                    <td class="py-3 pl-3 text-xs font-medium text-gray-700">
-                                        @if (item.HasValidMOA)
-                                        {
-                                            <span>&#10004;</span>
-                                        }
-                                        else
-                                        {
-                                            <span>&#10006;</span>
-                                        }
-                                    </td>
+                                    @Html.DisplayFor(modelItem => item.Name)
+                                </button>
+                            </td>
+                            <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ContactEmail)</td>
+                            <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ContactNumber)</td>
+                            <td class="py-3 pr-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.Address)</td>
+                            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.ActiveJobListings)</td>
+                            <td class="py-3 pl-3 text-xs font-medium text-gray-700">
+                                @if (item.IsVerified)
+                                {
+                                    <span>&#10004;</span>
+                                }
+                                else
+                                {
+                                    <span>&#10006;</span>
+                                }
+                            </td>
+                            <td class="py-3 pl-3 text-xs font-medium text-gray-700">
+                                @if (item.HasValidMOA)
+                                {
+                                    <span>&#10004;</span>
+                                }
+                                else
+                                {
+                                    <span>&#10006;</span>
+                                }
+                            </td>
 
-                                    <td class="py-3 pl-6 text-left">
-                                        <div class="relative">
-                                            <!--Action Button DropDown-->
-                                            <button data-companyid="@item.CompanyId"
-                                                    class="actionDropdownCompanyBtn cursor-pointer px-6 text-black hover:text-[#A53D3D] focus:outline-none">
-                                                <i class="fas fa-ellipsis-v"></i>
-                                            </button>
+                            <td class="py-3 pl-6 text-left">
+                                <div class="relative">
+                                    <!--Action Button DropDown-->
+                                    <button data-companyid="@item.CompanyId"
+                                            class="actionDropdownCompanyBtn cursor-pointer px-6 text-black hover:text-[#A53D3D] focus:outline-none">
+                                        <i class="fas fa-ellipsis-v"></i>
+                                    </button>
 
-                                            <div id="actionDropdownCompanyMenu-@item.CompanyId"
-                                                 class="actionDropdownCompanyMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white text-left shadow-lg ring-black">
-                                                <div class="space-y-1 py-1">
-                                                    <!-- Company Details -->
-                                                    <button onclick="location.href='@Url.Action("GetCompany", "Company",
+                                    <div id="actionDropdownCompanyMenu-@item.CompanyId"
+                                         class="actionDropdownCompanyMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white text-left shadow-lg ring-black">
+                                        <div class="space-y-1 py-1">
+                                            <!-- Company Details -->
+                                            <button onclick="location.href='@Url.Action("GetCompany", "Company",
                                                                 new {
                                                                     id = item.CompanyId,
                                                                     sortBy = sortBy,
@@ -265,12 +263,12 @@
                                                                     verified = verified,
                                                                     hasValidMOA = hasValidMOA,
                                                                 })'"
-                                                            class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                                        <i class="fas fa-info-circle mr-2"></i> Details
-                                                    </button>
+                                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                                <i class="fas fa-info-circle mr-2"></i> Details
+                                            </button>
 
-                                                    <!-- Edit Company -->
-                                                    <button onclick="location.href='@Url.Action("", "",
+                                            <!-- Edit Company -->
+                                            <button onclick="location.href='@Url.Action("", "",
                                                                 new {
                                                                     id = item.CompanyId,
                                                                     sortBy = sortBy,
@@ -280,74 +278,72 @@
                                                                     hasValidMOA = hasValidMOA,
                                                                     showModal = "editCompany"
                                                                 })'"
-                                                            class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                                        <i class="fas fa-edit -circle mr-2"></i> Update
-                                                    </button>
+                                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                                <i class="fas fa-edit -circle mr-2"></i> Update
+                                            </button>
 
-                                                    <!-- Archive Company -->
-                                                    <button onclick=" displayDeleteModal('@item.CompanyId' , '@item.Name')"
-                                                            class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                                        <i class="fas fa-archive mr-2"></i> Archive
-                                                    </button>
-                                                </div>
-                                            </div>
+                                            <!-- Archive Company -->
+                                            <button onclick=" displayDeleteModal('@item.CompanyId' , '@item.Name')"
+                                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                                <i class="fas fa-archive mr-2"></i> Archive
+                                            </button>
                                         </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
 
-                <!-- Pagination -->
-                <nav class="flex justify-center pt-3">
-                    <ul class="pagination flex items-center">
-                        @if (Model.HasPreviousPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction" 
-                                   asp-route-pageIndex="@(Model.PageIndex - 1)" 
-                                   asp-route-sortBy="@sortBy" 
-                                   asp-route-search="@search" 
-                                   asp-route-verified="@verified" 
-                                   asp-route-hasValidMOA="@hasValidMOA">
-                                    <i class="fas fa-chevron-left"></i>
-                                </a>
-                            </li>
-                        }
-                        @for (int i = 1; i <= Model.TotalPages; i++)
-                        {
-                            <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                                <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
-                                   asp-action="@aspAction" 
-                                   asp-route-pageIndex="@i" 
-                                   asp-route-sortBy="@sortBy" 
-                                   asp-route-search="@search" 
-                                   asp-route-verified="@verified" 
-                                   asp-route-hasValidMOA="@hasValidMOA">
-                                    @i
-                                </a>
-                            </li>
-                        }
-                        @if (Model.HasNextPage)
-                        {
-                            <li class="page-item">
-                                <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                                   asp-action="@aspAction" 
-                                   asp-route-pageIndex="@(Model.PageIndex + 1)" 
-                                   asp-route-sortBy="@sortBy" 
-                                   asp-route-search="@search" 
-                                   asp-route-verified="@verified" 
-                                   asp-route-hasValidMOA="@hasValidMOA">
-                                    <i class="fas fa-chevron-right"></i>
-                               </a>
-                            </li>
-                        }
-                    </ul>
-                </nav>
-            </div>
-        </div>
+        <!-- Pagination -->
+        <nav class="flex justify-center pt-3">
+            <ul class="pagination flex items-center">
+                @if (Model.HasPreviousPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                           asp-action="@aspAction"
+                           asp-route-pageIndex="@(Model.PageIndex - 1)"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-search="@search"
+                           asp-route-verified="@verified"
+                           asp-route-hasValidMOA="@hasValidMOA">
+                            <i class="fas fa-chevron-left"></i>
+                        </a>
+                    </li>
+                }
+                @for (int i = 1; i <= Model.TotalPages; i++)
+                {
+                    <li class="page-item @(i == Model.PageIndex ? "active" : "")">
+                        <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                           asp-action="@aspAction"
+                           asp-route-pageIndex="@i"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-search="@search"
+                           asp-route-verified="@verified"
+                           asp-route-hasValidMOA="@hasValidMOA">
+                            @i
+                        </a>
+                    </li>
+                }
+                @if (Model.HasNextPage)
+                {
+                    <li class="page-item">
+                        <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                           asp-action="@aspAction"
+                           asp-route-pageIndex="@(Model.PageIndex + 1)"
+                           asp-route-sortBy="@sortBy"
+                           asp-route-search="@search"
+                           asp-route-verified="@verified"
+                           asp-route-hasValidMOA="@hasValidMOA">
+                            <i class="fas fa-chevron-right"></i>
+                        </a>
+                    </li>
+                }
+            </ul>
+        </nav>
     </div>
 </div>
 

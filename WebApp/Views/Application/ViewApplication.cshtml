@@ -9,62 +9,60 @@
     string aspAction = "GetAllApplications";
 }
 
-<div class="mt-8 min-h-screen bg-gray-100 text-black">
-    <div class="mx-auto mt-10 flex max-w-7xl gap-6 rounded-lg bg-gray-100 px-6">
-        <div class="w-full justify-between">
-            <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
-                <div class="flex justify-between">         
-                    <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
-                        <i class="fas fa-arrow-left mr-2"></i> Back
-                    </a>
+<div class="flex flex-col bg-gray-100 @(User.IsInRole("Applicant") ? "my-20  max-w-7xl max-h-screen mx-auto" : "size-full")">
+    <div class="mb-2 w-full justify-between">
+        <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+            <div class="flex justify-between">
+                <a href="#" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] hover:!no-underline">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </a>
+            </div>
+
+            <div class="flex justify-between">
+                <div class="font-bold text-[40px] text-[#7A1515]">@Model.Job.Title</div>
+
+                <!-- Action Buttons -->
+                <div class="flex justify-between space-x-4 p-2">
+                    @if (User.IsInRole("Applicant"))
+                    {
+                        <!-- Withdraw -->
+                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                id="withdrawButton"
+                                data-action-url="@Url.Action("WithdrawApplication", "Application")"
+                                onclick="withdrawApplicationHandler('@Model.ApplicationId')">
+                            Withdraw Application
+                        </button>
+                    }
+                    else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
+                    {
+                        <!-- Update Status -->
+                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                data-toggle="modal"
+                                data-target="#">
+                            <i class="fa-solid fa-arrows-rotate pr-2"></i> Update Status
+                        </button>
+                    }
                 </div>
+            </div>
 
-                <div class="flex justify-between">
-                    <div class="font-bold text-[40px]">@Model.Job.Title</div>
-
-                    <!-- Action Buttons -->
-                    <div class="flex justify-between space-x-4 p-2">
-                        @if (User.IsInRole("Applicant"))
-                        {
-                            <!-- Withdraw -->
-                            <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b] hover:text-white"
-                                    id="withdrawButton"
-                                    data-action-url="@Url.Action("WithdrawApplication", "Application")"
-                                    onclick="withdrawApplicationHandler('@Model.ApplicationId')">
-                                Withdraw Application
-                            </button>
-                        }
-                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
-                        {
-                            <!-- Update Status -->
-                            <button class="btn-primary flex items-center justify-center rounded-lg px-4 py-2 transition-all hover:bg-[#991b1b] hover:text-white"
-                                    data-toggle="modal"
-                                    data-target="#">
-                                <i class="fa-solid fa-arrows-rotate pr-2"></i> Update Status
-                            </button>
-                        }
+            <!-- Date Updated -->
+            <div class="w-full text-sm text-[##625f5f]">
+                <div class="">
+                    <!-- Date Applied -->
+                    <div class="text-xs text-gray-500" title="@Model.CreatedDate">
+                        Applied
+                        @(Model.CreatedDate == DateTime.MinValue ? "Date Not Available" : Model.CreatedDate.ToUniversalTime().Humanize())
                     </div>
                 </div>
-
-                <!-- Applicant Name and Date Updated -->
-                <div class="w-full text-sm text-gray-700">
-                   <div class="">
-                       <!-- Date Applied -->
-                        <div class="text-xs text-gray-500" title="@Model.CreatedDate">
-                            Applied
-                            @(Model.CreatedDate == DateTime.MinValue ? "Date Not Available" : Model.CreatedDate.ToUniversalTime().Humanize())
-                      </div>
-                   </div>
-                </div>          
             </div>
         </div>
-    </div>     
+    </div>
 
     <!-- Main Content with Sidebar -->
-    <div class="max-h-[calc(96vh-250px)] mx-auto mt-6 flex max-w-7xl gap-6 px-6">
+    <div class="flex flex-grow">
         <!-- Messages Section -->
-        <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
-            <h2 class="mb-4 pl-4 text-2xl font-bold text-gray-500">Chat History</h2>
+        <div class="mr-2 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+            <h2 class="mb-4 pl-4 text-2xl font-bold text-[#625f5f]">Chat History</h2>
 
             <!-- Chat Box Container -->
             <div class="max-h-[calc(100%-100px)] min-h-[calc(100%-100px)] mx-4 flex flex-col rounded-lg border border-gray-200 bg-gray-50">

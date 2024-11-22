@@ -19,42 +19,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="layout bg-[#F5F7F8]">
-        @if(ViewBag.loginView != true)
-        {
-            if (User.IsInRole("Applicant"))
-            {
-                @await Html.PartialAsync("_Header")
-            }
-            else
-            {
-                @await Html.PartialAsync("_Sidebar")
-            }
-        }
-        <main role="main" class="content">
-            @{
-                await Html.RenderPartialAsync("_LogoutModal");
-            }
-            @RenderBody()
-            @if(ViewBag.loginView == true)
-			{
-                <footer class="footer d-flex justify-content-between align-items-center mb-3 p-0" style="color:black; z-index:1;">
-                    <div>
-                        <img src="~/img/logo1.png" style="width: 150px;" alt="login-logo" class="ml-5" />
+    @{
+        await Html.RenderPartialAsync("_LogoutModal");
+    }
+    <div class="h-screen w-screen bg-[#F5F7F8]">
+        <div class="flex size-full flex-col">
+            <div class="flex size-full flex-row overflow-hidden data-[panel-group-direction=vertical]:flex-col">
+                <div>
+                    @if (ViewBag.loginView != true)
+                    {
+                        if (User.IsInRole("Applicant"))
+                        {
+                            @await Html.PartialAsync("_Header")
+                        }
+                        else
+                        {
+                            @await Html.PartialAsync("_Sidebar")
+                        }
+                    }
+                </div>
+                <div class="flex w-full flex-col overflow-auto @((User.IsInRole("Applicant") || ViewBag.loginView == true) 
+                        ? "min-h-screen" : "max-h-screen mb-[11.75px] mr-2.5 mt-2.5 rounded-md bg-white shadow-md 2xl:rounded-xl")">
+                    <div class="flex-grow overflow-auto">
+                        @RenderBody()
+                        @if (User.IsInRole("Applicant") || ViewBag.loginView == true)
+                        {
+                            <div class="flex items-center justify-between bg-[#7A1515] py-2.5 text-center font-semibold text-white">
+                                <div>
+                                    <img src="~/img/logo2.png" style="width: 150px;" alt="login-logo" class="ml-5" />
+                                </div>
+                                <text class="text-sm">For inquiries contact: info@gradsync.org</text>
+                                <div class="mr-5">
+                                    &copy; @DateTime.Now.Year GradSync
+                                </div>
+                            </div>
+                        }
                     </div>
-                    <div class="mr-5">
-                        &copy; @DateTime.Now.Year GradSync
-                    </div>
-                </footer>
-
-            }
-            else
-            {
-                <footer class="footer" style="border-top: 1px solid var(--border-color); ">
-                    @Copyright
-                </footer>
-            }
-        </main>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js"></script>

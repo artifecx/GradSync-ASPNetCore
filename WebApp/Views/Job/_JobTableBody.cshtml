@@ -23,7 +23,7 @@
 @if (!Model.Any())
 {
     <tr>
-        <td colspan="8" class="whitespace-nowrap px-6 py-3 text-center text-sm text-gray-500">
+        <td colspan="8" class="whitespace-nowrap px-6 py-3 text-center text-sm text-[#625f5f]">
             @(noResult ? Html.Raw("No jobs found") : Html.Raw("No jobs found matching the criteria"))
         </td>
     </tr>
@@ -33,8 +33,8 @@ else
     @foreach (var item in Model)
     {
         <tr class="hover:bg-gray-100">
-            <td class="py-3 pl-3 text-sm text-gray-700">
-                <div class="text-xs font-semibold text-[#7A1515]">
+            <td class="py-3 pl-3 text-sm text-[#625f5f]">
+                <div class="text-xs font-medium text-[#A04747]">
                     <button onclick="location.href='@Url.Action("GetJob", "Job",
                         new { 
                             id = item.JobId,
@@ -52,21 +52,21 @@ else
             </td>
             @if (!User.IsInRole("Recruiter"))
             {
-                <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.Company.Name)</td>
+                <td class="py-3 pl-3 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.Company.Name)</td>
             }
             else
             {
-                <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.AvailableSlots)</td>
+                <td class="py-3 pl-3 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.AvailableSlots)</td>
             }
-            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.EmploymentType.Name)</td>
-            <td class="py-3 pl-6 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.StatusType.Name)</td>
-            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.SetupType.Name)</td>
-            <td class="py-3 pl-3 text-xs font-medium text-gray-700">@Html.DisplayFor(modelItem => item.CreatedDate)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.EmploymentType.Name)</td>
+            <td class="py-3 pl-6 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.StatusType.Name)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.SetupType.Name)</td>
+            <td class="py-3 pl-3 text-xs font-medium text-[#625f5f]">@Html.DisplayFor(modelItem => item.CreatedDate)</td>
             <td class="py-3 pl-6 text-left">
                 <div class="relative">
                     <!-- Dropdown Button -->
                     <button data-jobid="@item.JobId"
-                            class="actionDropdownJobBtn cursor-pointer px-6 text-black hover:text-[#A53D3D] focus:outline-none">
+                            class="actionDropdownJobBtn cursor-pointer px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
                         <i class="fas fa-ellipsis-v"></i>
                     </button>
 
@@ -85,7 +85,7 @@ else
                                         filterByEmploymentType = filterByEmploymentType,
                                         filterByCompany = filterByCompany
                                     })'"
-                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
                                 <i class="fas fa-info-circle mr-2"></i> Job Details
                             </button>
 
@@ -94,7 +94,7 @@ else
                                     data-target="#updateJobStatusModal"
                                     data-jobid="@item.JobId"
                                     data-statusId="@item.StatusTypeId"
-                                    class="update-job-status text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                    class="update-job-status w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
                                     disabled="@(User.IsInRole("Recruiter") && (item.StatusTypeId == "Pending" || item.StatusTypeId == "BlackListed"))">
                                 <i class="fa-solid fa-rotate mr-2"></i> Update Status
                             </button>
@@ -112,13 +112,13 @@ else
                                         filterByCompany = filterByCompany,
                                         showModal = "editJob" 
                                     })'"
-                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
                                 <i class="fas fa-edit -circle mr-2"></i> Edit Job Info
                             </button>
 
                             <!-- Archive Job -->
                             <button onclick="displayDeleteModal('@item.JobId' , '@item.Title')"
-                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
                                 <i class="fas fa-archive mr-2"></i> Archive Job
                             </button>
                         </div>

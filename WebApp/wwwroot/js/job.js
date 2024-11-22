@@ -64,6 +64,7 @@ document.addEventListener('DOMContentLoaded', function () {
             addCharCountListener('editJobDescription', 'remainingDescriptionChars', 800);
             initializeAllTagify();
             updateSkillWeights();
+            document.getElementById('saveEditJob').disabled = false;
         }
         cancelClicked = false;
     });
@@ -249,6 +250,7 @@ function submitEditJob() {
 
     form.validate();
     if (!form.valid() || !tagifyValuesValid()) {
+        submitButton.disabled = false;
         return;
     }
 

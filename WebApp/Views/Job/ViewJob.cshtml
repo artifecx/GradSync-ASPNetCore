@@ -25,81 +25,79 @@
     var SkillsCertification = ViewBag.SkillsCertification as List<Skill>;
 }
 
-<div class="mt-8 min-h-screen bg-gray-100 text-black">
-    <div class="mx-auto mt-10 flex max-w-7xl gap-6 rounded-lg bg-gray-100 px-6">
-        <div class="w-full justify-between">
-            <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
-                <div class="flex justify-between">
-                    <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
-                        <i class="fas fa-arrow-left mr-2"></i> Back
-                    </a>
-                </div>
+<div class="flex flex-col bg-gray-100 @(User.IsInRole("Applicant") ? "my-20 max-w-7xl max-h-screen min-h-screen mx-auto" : "size-full")">
+    <div class="mb-2 w-full justify-between">
+        <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+            <div class="flex justify-between">
+                <a href="#" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] hover:!no-underline">
+                    <i class="fas fa-arrow-left mr-2"></i> Back
+                </a>
+            </div>
 
-                <div class="flex justify-between">
-                    <div class="font-bold text-[40px]">@Model.Title</div>
+            <div class="flex justify-between">
+                <div class="font-bold text-[40px] text-[#7A1515]">@Model.Title</div>
 
-                    <!-- Action Buttons Placeholders Only-->
-                    <div class="flex justify-between space-x-4 p-2">
-                        @if (User.IsInRole("Applicant"))
+                <!-- Action Buttons Placeholders Only-->
+                <div class="flex justify-between space-x-4 p-2">
+                    @if (User.IsInRole("Applicant"))
+                    {
+                        var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+                        var hasApplied = Model.HasApplied;
+
+                        if (hasApplied)
                         {
-                            var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                            var hasApplied = Model.HasApplied;
+                            <!-- Withdraw Application Button -->
+                            <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                    id="withdrawButton"
+                                    data-action-url="@Url.Action("WithdrawApplication", "Application")"
+                                    onclick="withdrawApplicationHandler('@Model.ApplicationId')">
+                                Withdraw Application
+                            </button>
 
-                            if (hasApplied)
-                            {
-                                <!-- Withdraw Application Button -->
-                                <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b] hover:text-white"
-                                        id="withdrawButton"
-                                        data-action-url="@Url.Action("WithdrawApplication", "Application")"
-                                        onclick="withdrawApplicationHandler('@Model.ApplicationId')">
-                                    Withdraw Application
-                                </button>
-
-                                <button onclick="location.href='@Url.Action("GetApplication", "Application",
+                            <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                         new { id = Model.ApplicationId })'"
-                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
-                                    <i class="fa-solid fa-info-circle pr-1"></i> See Details
-                                </button>
-                            }
-                            else
-                            {
-                                <!-- Save -->
-                                <button onclick="saveJobHandler('@Model.JobId')"
-                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
-                                    <i class="fa-regular fa-bookmark"></i>
-                                </button>
-
-                                <!-- Apply Button -->
-                                <button onclick="applyJobHandler('@Model.JobId')"
-                                        class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]">
-                                    <i class="fa-regular fa-paper-plane pr-1"></i> Apply
-                                </button>
-                            }
-                        }
-                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
-                        {
-                            <!-- Edit Button -->
-                            <button class="flex items-center justify-center rounded-lg bg-[#7A1515] px-4 py-2 text-white transition-all hover:bg-[#991b1b]"
-                                    data-toggle="modal"
-                                    data-target="#editJobModal">
-                                <i class="fas fa-edit pr-2"></i> Edit
+                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                <i class="fa-solid fa-info-circle pr-1"></i> See Details
                             </button>
                         }
-                    </div>
+                        else
+                        {
+                            <!-- Save -->
+                            <button onclick="saveJobHandler('@Model.JobId')"
+                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                <i class="fa-regular fa-bookmark"></i>
+                            </button>
+
+                            <!-- Apply Button -->
+                            <button onclick="applyJobHandler('@Model.JobId')"
+                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                <i class="fa-regular fa-paper-plane pr-1"></i> Apply
+                            </button>
+                        }
+                    }
+                    else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
+                    {
+                        <!-- Edit Button -->
+                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                data-toggle="modal"
+                                data-target="#editJobModal">
+                            <i class="fas fa-edit pr-2"></i> Update
+                        </button>
+                    }
                 </div>
+            </div>
 
-                <!-- Second Row: Company Name and Date Posted -->
-                <div class="w-full text-sm text-gray-700">
-                    <div class="">
-                        <span>
-                            @Model.PostedBy.User?.FirstName - @Model.Company.Name
-                        </span>
+            <!-- Second Row: Company Name and Date Posted -->
+            <div class="w-full text-sm text-gray-700">
+                <div class="">
+                    <span>
+                        @Model.PostedBy.User?.FirstName - @Model.Company.Name
+                    </span>
 
-                        <!-- Date Created -->
-                        <div class="text-xs text-gray-500" title="@Model.UpdatedDate">
-                            Updated
-                            @(Model.UpdatedDate == DateTime.MinValue ? "Date Not Available" : Model.UpdatedDate.ToUniversalTime().Humanize())
-                        </div>
+                    <!-- Date Created -->
+                    <div class="text-xs text-gray-500" title="@Model.UpdatedDate">
+                        Updated
+                        @(Model.UpdatedDate == DateTime.MinValue ? "Date Not Available" : Model.UpdatedDate.ToUniversalTime().Humanize())
                     </div>
                 </div>
             </div>
@@ -107,13 +105,13 @@
     </div>
 
     <!--MAIN CONTENT W/SIDEBAR-->
-    <div class="mx-auto mt-6 flex max-w-7xl gap-6 px-6">
+    <div class="flex flex-grow">
         <!-- Job Listings Section -->
-        <div class="w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
+        <div class="mr-2 w-full rounded-lg border border-gray-200 bg-white p-6 shadow-sm">
             <h2 class="mb-2 pl-4 text-2xl font-bold text-gray-500">Job Details</h2>
 
             <!-- Main Content -->
-            <div class="gap-6 px-4 pb-4">
+            <div class="h-full gap-6 px-4 pb-4">
                 <!-- Skills Required -->
                 <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <div class="rounded-xl border bg-white p-4">
