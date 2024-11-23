@@ -90,7 +90,7 @@ namespace Services.Services
             var results = await GetApiResponse(payload, "/compare-job-with-applicants");
 
             var applicantIds = applicants.Select(applicant => applicant.applicant_id).ToList();
-            var matchPercentages = await GenerateJobApplicantMatchesAsync(results, "jobs", jobId, applicantIds);
+            var matchPercentages = await GenerateJobApplicantMatchesAsync(results, "applicants", jobId, applicantIds);
 
             return matchPercentages;
         }
