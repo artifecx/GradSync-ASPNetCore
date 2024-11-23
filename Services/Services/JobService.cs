@@ -135,6 +135,7 @@ namespace Services.Services
             job.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateJobAsync(job);
+            await _jobMatchingApiService.UpdateMatchJobApplicantsAsync(job.JobId);
         }
 
         private bool SetJobSkills(Job job, JobViewModel model)

@@ -12,6 +12,8 @@ namespace Services.Interfaces
     {
         Task MatchAndSaveApplicantJobsAsync(string userId);
         Task MatchAndSaveJobApplicantsAsync(string jobId);
+        Task UpdateMatchApplicantJobsAsync(string applicantId);
+        Task UpdateMatchJobApplicantsAsync(string jobId);
         Task<JobApplicantMatch> CalculateSimilarityAsync(string jobId, string applicantId);
         Task<List<JobApplicantMatch>> CompareJobWithApplicantsAsync(string jobId);
         Task<List<JobApplicantMatch>> CompareApplicantWithJobsAsync(string applicantId);

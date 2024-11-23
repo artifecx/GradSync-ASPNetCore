@@ -53,6 +53,19 @@ namespace Services.Services
             }
         }
 
+        public async Task UpdateMatchApplicantJobsAsync(string applicantId)
+        {
+            await _repository.DeleteJobApplicantMatchesByApplicantIdAsync(applicantId);
+            await MatchAndSaveApplicantJobsAsync(applicantId);
+        }
+
+        public async Task UpdateMatchJobApplicantsAsync(string jobId)
+        {
+            await _repository.DeleteJobApplicantMatchesByJobIdAsync(jobId);
+            await MatchAndSaveJobApplicantsAsync(jobId);
+        }
+        
+
         public async Task<JobApplicantMatch> CalculateSimilarityAsync(string jobId, string applicantId)
         {
             var jobDetails = await _repository.GetJobDetailsByIdAsync(jobId);

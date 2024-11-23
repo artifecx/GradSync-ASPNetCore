@@ -18,6 +18,16 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
+        public async Task DeleteJobApplicantMatchesByApplicantIdAsync(string applicantId) =>
+            await this.GetDbSet<JobApplicantMatch>()
+                .Where(jam => jam.UserId == applicantId)
+                .ForEachAsync(jam => this.GetDbSet<JobApplicantMatch>().Remove(jam));
+
+        public async Task DeleteJobApplicantMatchesByJobIdAsync(string jobId) =>
+            await this.GetDbSet<JobApplicantMatch>()
+                .Where(jam => jam.JobId == jobId)
+                .ForEachAsync(jam => this.GetDbSet<JobApplicantMatch>().Remove(jam));
+
         public async Task<ApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id) =>
             await this.GetDbSet<Applicant>()
                 .Include(a => a.Resume)
