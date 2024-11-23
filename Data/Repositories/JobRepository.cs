@@ -54,7 +54,7 @@ namespace Data.Repositories
                 .Include(jam => jam.Job)
                     .ThenInclude(j => j.Company)
                 .Where(jam => jam.UserId == userId 
-                    && jam.MatchPercentage >= 60 
+                    && jam.MatchPercentage >= 70 
                     && !jam.Job.IsArchived 
                     && (jam.Job.StatusTypeId != "Closed" 
                     && jam.Job.StatusTypeId != "BlackListed"))
