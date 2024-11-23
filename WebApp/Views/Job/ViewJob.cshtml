@@ -135,17 +135,27 @@
                     </div>
                 </div>
 
-                <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
                     <!-- About the Job -->
                     <div class="rounded-xl border bg-white p-4">
                         <h3 class="mb-4 text-xl font-bold">About the Job</h3>
                         <p class="whitespace-pre-wrap text-base text-gray-600">@Model.Description</p>
                     </div>
                 </div>
+
+                @if (!User.IsInRole("Applicant"))
+                {
+                    <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                        <div class="rounded-xl border bg-white p-4">
+                            <h3 class="mb-4 text-xl font-bold">Job Matches</h3>
+                            @await Html.PartialAsync("_JobMatchesTable", Model.JobMatches)
+                        </div>
+                    </div>
+                }
             </div>
         </div>
         <!-- Infotab Sidebar -->
-        @await Html.PartialAsync("InfoTab")
+        @await Html.PartialAsync("_InfoTab")
     </div>
 </div>
 

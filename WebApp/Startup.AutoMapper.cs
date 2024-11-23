@@ -51,11 +51,13 @@ namespace WebApp
                     .ForMember(dest => dest.StatusTypeId, opt => opt.Ignore())
                     .ForMember(dest => dest.StatusType, opt => opt.Ignore())
                     .ForMember(dest => dest.YearLevel, opt => opt.Ignore())
+                    .ForMember(dest => dest.JobApplicantMatches, opt => opt.Ignore())
                     .ReverseMap()
                     .ForMember(dest => dest.Company, opt => opt.MapFrom(src => src.PostedBy.Company))
                     .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.JobSkills.Select(s => s.Skill)))
                     .ForMember(dest => dest.Programs, opt => opt.MapFrom(src => src.JobPrograms.Select(s => s.Program)))
-                    .ForMember(dest => dest.SkillWeights, opt => opt.MapFrom(src => src.SkillWeights));
+                    .ForMember(dest => dest.SkillWeights, opt => opt.MapFrom(src => src.SkillWeights))
+                    .ForMember(dest => dest.JobMatches, opt => opt.MapFrom(src => src.JobApplicantMatches.OrderByDescending(j => j.MatchPercentage)));
                 CreateMap<JobApplicantMatch, FeaturedJobsViewModel>()
                     .ForMember(dest => dest.JobId, opt => opt.MapFrom(src => src.JobId))
                     .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Job.Title))
