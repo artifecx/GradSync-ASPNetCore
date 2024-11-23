@@ -152,7 +152,7 @@ namespace Data.Repositories
         public bool HasChanges(Job job)
         {
             var entry = this.GetDbSet<Job>().Entry(job);
-            return entry.Properties.Any(p => p.IsModified);
+            return entry.Properties.Any(p => !string.Equals(p.Metadata.Name, nameof(job.CompanyId), StringComparison.OrdinalIgnoreCase) && p.IsModified);
         }
     }
 }
