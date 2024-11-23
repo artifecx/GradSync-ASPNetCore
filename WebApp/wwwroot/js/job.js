@@ -37,7 +37,7 @@ document.addEventListener('DOMContentLoaded', function () {
             editJobForm.reset();
             $(".text-red-500").text('');
             addCharCountListener('editJobTitle', 'remainingTitleChars', 100);
-            addCharCountListener('editJobDescription', 'remainingDescriptionChars', 800);
+            addCharCountListener('editJobDescription', 'remainingDescriptionChars', 3000);
             initializeAllTagify();
             updateSkillWeights();
             document.getElementById('saveEditJob').disabled = false;
@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         contentTextarea.addEventListener('keyup', updateRemainingChars);
     }
     addCharCountListener('editJobTitle', 'remainingTitleChars', 100);
-    addCharCountListener('editJobDescription', 'remainingDescriptionChars', 800);
+    addCharCountListener('editJobDescription', 'remainingDescriptionChars', 3000);
 
     /// ------------------------------------
     /// Tagify: Initialize

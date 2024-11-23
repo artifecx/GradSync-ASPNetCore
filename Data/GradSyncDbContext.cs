@@ -405,7 +405,7 @@ public partial class GradSyncDbContext : DbContext
                 .HasColumnType("datetime");
             entity.Property(e => e.Description)
                 .IsRequired()
-                .HasMaxLength(800);
+                .HasMaxLength(3000);
             entity.Property(e => e.EmploymentTypeId)
                 .IsRequired()
                 .HasMaxLength(255);
@@ -472,7 +472,11 @@ public partial class GradSyncDbContext : DbContext
         {
             entity.ToTable("JobApplicantMatch");
 
+            entity.HasIndex(e => e.JobId, "IX_JobApplicantMatch_JobId");
+
             entity.HasIndex(e => e.MatchPercentage, "IX_JobApplicantMatch_MatchPercentage");
+
+            entity.HasIndex(e => e.UserId, "IX_JobApplicantMatch_UserId");
 
             entity.Property(e => e.JobApplicantMatchId).HasMaxLength(255);
             entity.Property(e => e.JobId)

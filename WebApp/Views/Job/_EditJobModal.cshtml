@@ -50,9 +50,9 @@
                         <div>
                             <label asp-for="Description" class="block text-sm font-semibold text-gray-700">Description</label>
                             <textarea placeholder="Job description, benefits, etc. (make this field as descriptive as possible)" 
-                                asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobDescription" name="Description" maxlength="800">@Model.Description</textarea>
+                                asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobDescription" name="Description" maxlength="3000">@Model.Description</textarea>
                             <span asp-validation-for="Description" class="text-sm text-red-500"></span>
-                            <span id="remainingDescriptionChars" class="text-xs text-gray-500">800 characters remaining</span>
+                            <span id="remainingDescriptionChars" class="text-xs text-gray-500">3000 characters remaining</span>
                         </div>
 
                         <!-- Third Row: Soft Skills | Technical Skills | Certification Skills -->
