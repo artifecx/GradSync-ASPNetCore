@@ -21,6 +21,7 @@ namespace Services.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IPdfTextExtractorService _pdfTextExtractorService;
+        private readonly IJobMatchingApiService _jobMatchingApiService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OnboardingService"/> class.
@@ -31,11 +32,13 @@ namespace Services.Services
             (
                 IUserRepository userRepository,
                 IPdfTextExtractorService pdfTextExtractorService,
+                IJobMatchingApiService jobMatchingApiService,
                 ILogger<OnboardingService> logger
             )
         {
             _userRepository = userRepository;
             _pdfTextExtractorService = pdfTextExtractorService;
+            _jobMatchingApiService = jobMatchingApiService;
         }
 
         public async Task<Resume> GetApplicantResumeByIdAsync(string id) =>

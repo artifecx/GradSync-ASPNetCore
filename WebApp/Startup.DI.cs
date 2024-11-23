@@ -49,6 +49,7 @@ namespace WebApp
             this._services.AddScoped<IUserProfileService, UserProfileService>();
             this._services.AddScoped<IOnboardingService, OnboardingService>();
             this._services.AddScoped<IPdfTextExtractorService, PdfTextExtractorService>();
+            this._services.AddScoped<IJobMatchingApiService, JobMatchingApiService>();
             this._services.TryAddSingleton<IApplicationService, ApplicationService>();
             this._services.TryAddSingleton<IMessageService, MessageService>();
             this._services.TryAddSingleton<IEventBus, EventBus>();
@@ -62,6 +63,7 @@ namespace WebApp
             this._services.AddScoped<IUserProfileRepository, UserProfileRepository>();
             this._services.AddScoped<IApplicationRepository, ApplicationRepository>();
             this._services.AddScoped<IMessageRepository, MessageRepository>();
+            this._services.AddScoped<IJobMatchRepository, JobMatchRepository>();
 
             // Manager Class
             this._services.AddScoped<SignInManager>();
