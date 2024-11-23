@@ -39,6 +39,58 @@ namespace Data.Repositories
         public async Task<List<Job>> GetAllJobsProgramsIncludeAsync() =>
             await this.GetDbSet<Job>().Include(j => j.JobPrograms).ThenInclude(j => j.Program).AsNoTracking().ToListAsync();
 
+        public async Task<List<JobApplicantMatch>> GetApplicantFeaturedJobsAsync(string userId)
+        {
+            return await this.GetDbSet<JobApplicantMatch>()
+                .Include(jam => jam.Job)
+                    .ThenInclude(j => j.JobSkills)
+                        .ThenInclude(js => js.Skill)
+                .Include(jam => jam.Job)
+                    .ThenInclude(j => j.EmploymentType)
+                .Include(jam => jam.Job)
+                    .ThenInclude(j => j.SetupType)
+                .Include(jam => jam.Job)
+                    .ThenInclude(j => j.StatusType)
+                .Include(jam => jam.Job)
+                    .ThenInclude(j => j.Company)
+                .Where(jam => jam.UserId == userId 
+                    && jam.MatchPercentage >= 60 
+                    && !jam.Job.IsArchived 
+                    && (jam.Job.StatusTypeId != "Closed" 
+                    && jam.Job.StatusTypeId != "BlackListed"))
+                .Select(jam => new JobApplicantMatch
+                {
+                    JobId = jam.JobId,
+                    MatchPercentage = jam.MatchPercentage,
+                    Job = new Job
+                    {
+                        JobId = jam.Job.JobId,
+                        Title = jam.Job.Title,
+                        Location = jam.Job.Location,
+                        Salary = jam.Job.Salary == "0" ? "Unpaid" : jam.Job.Salary,
+                        JobSkills = jam.Job.JobSkills,
+                        EmploymentType = new EmploymentType
+                        {
+                            Name = jam.Job.EmploymentType.Name
+                        },
+                        SetupType = new SetupType
+                        {
+                            Name = jam.Job.SetupType.Name
+                        },
+                        StatusType = new StatusType
+                        {
+                            Name = jam.Job.StatusType.Name
+                        },
+                        Company = new Company
+                        {
+                            Name = jam.Job.Company.Name
+                        }
+                    },
+                })
+                .AsNoTracking()
+                .ToListAsync();
+        }
+
         public async Task<List<Job>> GetAllJobsAsync() =>
             await GetJobsWithIncludes().AsNoTracking().ToListAsync();
 

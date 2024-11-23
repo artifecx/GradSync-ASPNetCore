@@ -10,8 +10,10 @@ namespace Services.Interfaces
 {
     public interface IJobMatchingApiService
     {
-        Task<ApiResponseServiceModel> CalculateSimilarityAsync(string jobId, string applicantId);
-        Task<ApiResponseServiceModel> CompareJobWithApplicantsAsync(string jobId);
-        Task<ApiResponseServiceModel> CompareApplicantWithJobsAsync(string applicantId);
+        Task MatchAndSaveApplicantJobsAsync(string userId);
+        Task MatchAndSaveJobApplicantsAsync(string jobId);
+        Task<JobApplicantMatch> CalculateSimilarityAsync(string jobId, string applicantId);
+        Task<List<JobApplicantMatch>> CompareJobWithApplicantsAsync(string jobId);
+        Task<List<JobApplicantMatch>> CompareApplicantWithJobsAsync(string applicantId);
     }
 }

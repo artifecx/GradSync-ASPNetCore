@@ -56,6 +56,16 @@ namespace WebApp
                     .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.JobSkills.Select(s => s.Skill)))
                     .ForMember(dest => dest.Programs, opt => opt.MapFrom(src => src.JobPrograms.Select(s => s.Program)))
                     .ForMember(dest => dest.SkillWeights, opt => opt.MapFrom(src => src.SkillWeights));
+                CreateMap<JobApplicantMatch, FeaturedJobsViewModel>()
+                    .ForMember(dest => dest.JobId, opt => opt.MapFrom(src => src.JobId))
+                    .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Job.Title))
+                    .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Job.Location))
+                    .ForMember(dest => dest.Salary, opt => opt.MapFrom(src => src.Job.Salary))
+                    .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => src.Job.JobSkills.Select(s => s.Skill)))
+                    .ForMember(dest => dest.EmploymentTypeName, opt => opt.MapFrom(src => src.Job.EmploymentType.Name))
+                    .ForMember(dest => dest.SetupTypeName, opt => opt.MapFrom(src => src.Job.SetupType.Name))
+                    .ForMember(dest => dest.CompanyName, opt => opt.MapFrom(src => src.Job.Company.Name))
+                    .ForMember(dest => dest.MatchPercentage, opt => opt.MapFrom(src => src.MatchPercentage));
                 CreateMap<CompanyViewModel, Company>()
                     .ForMember(dest => dest.CompanyId, opt => opt.Ignore())
                     .ForMember(dest => dest.CompanyLogoId, opt => opt.Ignore())

@@ -1,4 +1,5 @@
-﻿using Data.Interfaces;
+﻿using Data.Dtos;
+using Data.Interfaces;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
@@ -17,13 +18,16 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<object> GetApplicantDetailsByIdAsync(string id) =>
+        public async Task<ApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id) =>
             await this.GetDbSet<Applicant>()
                 .Include(a => a.Resume)
                 .Include(a => a.ApplicantSkills)
                     .ThenInclude(s => s.Skill)
-                .Where(a => a.UserId == id && a.Resume != null && a.ApplicantSkills.Any())
-                .Select(a => new
+                .Include(a => a.EducationalDetail)
+                .Where(a => a.UserId == id 
+                    && a.Resume != null 
+                    && a.ApplicantSkills.Any())
+                .Select(a => new ApplicantDetailsDto
                 {
                     resume_text = a.Resume.ExtractedText,
                     technical_skills = a.ApplicantSkills
@@ -34,17 +38,22 @@ namespace Data.Repositories
                         .Where(s => s.Type == "Cultural")
                         .Select(s => s.Skill.Name)
                         .ToList(),
+                    department_id = a.EducationalDetail.DepartmentId
                 })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-        public async Task<List<object>> GetAllApplicantDetailsAsync() =>
-            (await this.GetDbSet<Applicant>()
+        public async Task<List<ApplicantDetailsDto>> GetAllApplicantDetailsAsync(HashSet<string> departmentIds) =>
+            await this.GetDbSet<Applicant>()
                 .Include(a => a.Resume)
                 .Include(a => a.ApplicantSkills)
                     .ThenInclude(s => s.Skill)
-                .Where(a => a.Resume != null && a.ApplicantSkills.Any())
-                .Select(a => new
+                .Include(a => a.EducationalDetail)
+                .Include(a => a.JobApplicantMatches)
+                .Where(a => a.Resume != null 
+                    && a.ApplicantSkills.Any() 
+                    && departmentIds.Contains(a.EducationalDetail.DepartmentId))
+                .Select(a => new ApplicantDetailsDto
                 {
                     applicant_id = a.UserId,
                     resume_text = a.Resume.ExtractedText,
@@ -58,36 +67,50 @@ namespace Data.Repositories
                         .ToList(),
                 })
                 .AsNoTracking()
-                .ToListAsync()).Cast<object>().ToList();
+                .ToListAsync();
 
-        public async Task<object> GetJobDetailsByIdAsync(string id) =>
+        public async Task<JobDetailsDto> GetJobDetailsByIdAsync(string id) =>
            await this.GetDbSet<Job>()
-               .Include(j => j.JobSkills)
-                   .ThenInclude(js => js.Skill)
-               .Where(j => !j.IsArchived && j.JobId == id && j.SkillWeights != null && j.JobSkills.Any())
-               .Select(j => new
-               {
-                   title = j.Title,
-                   description = j.Description,
-                   technical_skills = j.JobSkills
+                .Include(j => j.JobSkills)
+                    .ThenInclude(js => js.Skill)
+                .Include(j => j.JobPrograms)
+                    .ThenInclude(jp => jp.Program)
+                .Where(j => !j.IsArchived 
+                    && j.JobId == id 
+                    && j.SkillWeights != null 
+                    && j.JobSkills.Any())
+                .Select(j => new JobDetailsDto
+                {
+                    title = j.Title,
+                    description = j.Description,
+                    technical_skills = j.JobSkills
                         .Where(s => s.Type == "Technical" || s.Type == "Certification")
                         .Select(s => s.Skill.Name)
                         .ToList(),
-                   cultural_skills = j.JobSkills
+                    cultural_skills = j.JobSkills
                         .Where(s => s.Type == "Cultural")
                         .Select(s => s.Skill.Name)
                         .ToList(),
-                   tech_cult_weight = j.SkillWeights
-               })
-               .AsNoTracking()
-               .FirstOrDefaultAsync();
+                    tech_cult_weight = j.SkillWeights,
+                    department_ids = j.JobPrograms
+                        .Select(jp => jp.Program.DepartmentId)
+                        .Distinct()
+                        .ToList()
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
 
-        public async Task<List<object>> GetAllJobDetailsAsync() =>
-            (await this.GetDbSet<Job>()
+        public async Task<List<JobDetailsDto>> GetAllJobDetailsAsync(string departmentId) =>
+            await this.GetDbSet<Job>()
                 .Include(j => j.JobSkills)
                     .ThenInclude(js => js.Skill)
-                .Where(j => !j.IsArchived && j.SkillWeights != null && j.JobSkills.Any())
-                .Select(j => new
+                .Include(j => j.JobPrograms)
+                    .ThenInclude(jp => jp.Program)
+                .Where(j => !j.IsArchived 
+                    && j.SkillWeights != null 
+                    && j.JobSkills.Any() 
+                    && j.JobPrograms.Any(jp => jp.Program.DepartmentId == departmentId))
+                .Select(j => new JobDetailsDto
                 {
                     job_id = j.JobId,
                     title = j.Title,
@@ -103,6 +126,6 @@ namespace Data.Repositories
                     tech_cult_weight = j.SkillWeights
                 })
                 .AsNoTracking()
-                .ToListAsync()).Cast<object>().ToList();
+                .ToListAsync();
     }
 }

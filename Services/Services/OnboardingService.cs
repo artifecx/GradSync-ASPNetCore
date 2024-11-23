@@ -69,7 +69,9 @@ namespace Services.Services
             .ToList();
 
             user.FromSignUp = false;
+            
             await _userRepository.UpdateUserAsync(user);
+            await _jobMatchingApiService.MatchAndSaveApplicantJobsAsync(user.UserId);
 
             return user;
         }

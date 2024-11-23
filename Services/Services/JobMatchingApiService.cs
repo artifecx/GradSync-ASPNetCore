@@ -11,6 +11,8 @@ using System.Text;
 using System.Text.Json;
 using System.Threading.Tasks;
 using System.Linq;
+using static Services.Exceptions.JobMatchingExceptions;
+using Data.Repositories;
 
 namespace Services.Services
 {
@@ -33,13 +35,31 @@ namespace Services.Services
             _logger = logger;
         }
 
-        public async Task<ApiResponseServiceModel> CalculateSimilarityAsync(string jobId, string applicantId)
+        public async Task MatchAndSaveApplicantJobsAsync(string userId)
+        {
+            var matches = await CompareApplicantWithJobsAsync(userId);
+            if (matches != null && matches.Any())
+            {
+                await _repository.AddJobApplicantMatchesAsync(matches);
+            }
+        }
+
+        public async Task MatchAndSaveJobApplicantsAsync(string jobId)
+        {
+            var matches = await CompareJobWithApplicantsAsync(jobId);
+            if (matches != null && matches.Any())
+            {
+                await _repository.AddJobApplicantMatchesAsync(matches);
+            }
+        }
+
+        public async Task<JobApplicantMatch> CalculateSimilarityAsync(string jobId, string applicantId)
         {
             var jobDetails = await _repository.GetJobDetailsByIdAsync(jobId);
-            if (jobDetails == null) return new ApiResponseServiceModel();
+            if (jobDetails == null) return null;
 
             var applicantDetails = await _repository.GetApplicantDetailsByIdAsync(applicantId);
-            if (applicantDetails == null) return new ApiResponseServiceModel();
+            if (applicantDetails == null) return null;
 
             var payload = new
             {
@@ -47,29 +67,19 @@ namespace Services.Services
                 applicant = applicantDetails
             };
 
-            var json = JsonSerializer.Serialize(payload);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-
-            var response = await _httpClient.PostAsync("/calculate-similarity", content);
-            response.EnsureSuccessStatusCode();
-
-            var responseString = await response.Content.ReadAsStringAsync();
-            var matchPercentage = JsonSerializer.Deserialize<ApiResponseServiceModel>(responseString, new JsonSerializerOptions
-            {
-                PropertyNameCaseInsensitive = true
-            });
+            var result = await GetApiResponse(payload, "/calculate-similarity");
+            var matchPercentage = await GenerateJobApplicantMatchAsync(result, jobId, applicantId);
 
             return matchPercentage;
         }
 
-
-        public async Task<ApiResponseServiceModel> CompareJobWithApplicantsAsync(string jobId)
+        public async Task<List<JobApplicantMatch>> CompareJobWithApplicantsAsync(string jobId)
         {
             var jobDetails = await _repository.GetJobDetailsByIdAsync(jobId);
-            if (jobDetails == null) return new ApiResponseServiceModel();
+            if (jobDetails == null) return null;
 
-            var applicants = await _repository.GetAllApplicantDetailsAsync();
-            if (applicants == null) return new ApiResponseServiceModel();
+            var applicants = await _repository.GetAllApplicantDetailsAsync(jobDetails.department_ids.ToHashSet());
+            if (applicants == null) return null;
 
             var payload = new
             {
@@ -77,23 +87,21 @@ namespace Services.Services
                 applicants
             };
 
-            var results = await GetResultsFromApi(payload, "/compare-job-with-applicants");
+            var results = await GetApiResponse(payload, "/compare-job-with-applicants");
 
-            var applicantIds = applicants.Select(applicant => applicant.GetType().GetProperty("applicant_id")?.GetValue(applicant)?.ToString()).ToList();
-            var matches = await GenerateJobApplicantMatchesAsync(results, "jobs", jobId, applicantIds);
+            var applicantIds = applicants.Select(applicant => applicant.applicant_id).ToList();
+            var matchPercentages = await GenerateJobApplicantMatchesAsync(results, "jobs", jobId, applicantIds);
 
-            await _repository.AddJobApplicantMatchesAsync(matches);
-
-            return results;
+            return matchPercentages;
         }
 
-        public async Task<ApiResponseServiceModel> CompareApplicantWithJobsAsync(string applicantId)
+        public async Task<List<JobApplicantMatch>> CompareApplicantWithJobsAsync(string applicantId)
         {
             var applicantDetails = await _repository.GetApplicantDetailsByIdAsync(applicantId);
-            if (applicantDetails == null) return new ApiResponseServiceModel();
+            if (applicantDetails == null) return null;
 
-            var jobs = await _repository.GetAllJobDetailsAsync();
-            if (jobs == null) return new ApiResponseServiceModel();
+            var jobs = await _repository.GetAllJobDetailsAsync(applicantDetails.department_id);
+            if (jobs == null) return null;
 
             var payload = new
             {
@@ -101,17 +109,15 @@ namespace Services.Services
                 jobs
             };
 
-            var results = await GetResultsFromApi(payload, "/compare-applicant-with-jobs");
+            var results = await GetApiResponse(payload, "/compare-applicant-with-jobs");
 
-            var jobIds = jobs.Select(job => job.GetType().GetProperty("job_id")?.GetValue(job)?.ToString()).ToList();
-            var matches = await GenerateJobApplicantMatchesAsync(results, "jobs", applicantId, jobIds);
+            var jobIds = jobs.Select(job => job.job_id).ToList();
+            var matchPercentages = await GenerateJobApplicantMatchesAsync(results, "jobs", applicantId, jobIds);
 
-            await _repository.AddJobApplicantMatchesAsync(matches);
-
-            return results;
+            return matchPercentages;
         }
 
-        private async Task<ApiResponseServiceModel> GetResultsFromApi(object payload, string route)
+        private async Task<ApiResponseServiceModel> GetApiResponse(object payload, string route)
         {
             var json = JsonSerializer.Serialize(payload);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
@@ -131,16 +137,49 @@ namespace Services.Services
             }
             catch (HttpRequestException ex)
             {
-                _logger.LogError(ex, "Error occurred while calling the external comparison service.");
-                return new ApiResponseServiceModel();
+                var message = "Error occurred while calling the external comparison service.";
+                _logger.LogError(ex, message);
+                throw new JobMatchingException(message);
             }
             catch (JsonException ex)
             {
-                _logger.LogError(ex, "Error occurred while deserializing the response from the external comparison service.");
-                return new ApiResponseServiceModel();
+                var message = "Error occurred while deserializing the response from the external comparison service.";
+                _logger.LogError(ex, message);
+                throw new JobMatchingException(message);
             }
 
             return results;
+        }
+
+        private Task<JobApplicantMatch> GenerateJobApplicantMatchAsync(
+            ApiResponseServiceModel result, 
+            string jobId, 
+            string applicantId)
+        {
+            if (result?.MatchPercentages == null || !result.MatchPercentages.Any())
+            {
+                throw new JobMatchingException("No match percentages found in the response.");
+            }
+
+            var match = result.MatchPercentages
+                .Select(kvp =>
+                {
+                    if (int.TryParse(kvp.Key, out int index))
+                    {
+                        return new JobApplicantMatch
+                        {
+                            JobApplicantMatchId = Guid.NewGuid().ToString(),
+                            UserId = applicantId,
+                            JobId = jobId,
+                            MatchPercentage = kvp.Value
+                        };
+                    }
+
+                    throw new JobMatchingException("Invalid index found in the response.");
+                })
+                .FirstOrDefault(match => match != null);
+
+            return Task.FromResult(match);
         }
 
         private Task<List<JobApplicantMatch>> GenerateJobApplicantMatchesAsync(
@@ -151,7 +190,7 @@ namespace Services.Services
         {
             if (results?.MatchPercentages == null || !results.MatchPercentages.Any())
             {
-                return Task.FromResult(new List<JobApplicantMatch>());
+                throw new JobMatchingException("No match percentages found in the response.");
             }
 
             var jobApplicantMatches = results.MatchPercentages
@@ -170,7 +209,7 @@ namespace Services.Services
                         };
                     }
 
-                    return null;
+                    throw new JobMatchingException("Invalid index found in the response.");
                 })
                 .Where(match => match != null)
                 .ToList();

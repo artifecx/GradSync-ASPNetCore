@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using WebApp.Authentication;
+using System.Linq;
 
 namespace WebApp.Controllers
 {
@@ -62,8 +63,8 @@ namespace WebApp.Controllers
             if (User.FindFirst("FromSignUp")?.Value == "true" && User.IsInRole("Applicant"))
                 return RedirectToAction("Onboarding", "Home");
 
-            var model = await _jobService.GetAllJobsAsync();
-            return View(model);
+            var model = await _jobService.GetApplicantFeaturedJobsAsync(UserId);
+            return View(model.OrderByDescending(m => m.MatchPercentage).ToList());
         }
 
         [Route("dashboard")]

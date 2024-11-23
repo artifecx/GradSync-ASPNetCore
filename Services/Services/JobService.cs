@@ -13,6 +13,7 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
+using Data.Repositories;
 
 namespace Services.Services
 {
@@ -23,18 +24,21 @@ namespace Services.Services
     {
         private readonly IJobRepository _repository;
         private readonly ICompanyRepository _companyRepository;
+        private readonly IJobMatchingApiService _jobMatchingApiService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public JobService(
             IJobRepository repository,
             ICompanyRepository companyRepository,
+            IJobMatchingApiService jobMatchingApiService,
             IMapper mapper,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _companyRepository = companyRepository;
+            _jobMatchingApiService = jobMatchingApiService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -77,6 +81,7 @@ namespace Services.Services
             job.SkillWeights = ((decimal)model.SkillWeights);
 
             await _repository.AddJobAsync(job);
+            await _jobMatchingApiService.MatchAndSaveJobApplicantsAsync(job.JobId);
         }
 
         private static string SetSalaryRange(double? lower, double? upper)
@@ -262,6 +267,12 @@ namespace Services.Services
         }
 
         #region Get Methods        
+        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId)
+        {
+            var jobs = await _repository.GetApplicantFeaturedJobsAsync(userId);
+            return _mapper.Map<List<FeaturedJobsViewModel>>(jobs);
+        }
+
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {
             var jobs = string.Equals(archived, "archived") ?

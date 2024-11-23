@@ -18,6 +18,8 @@ using static Services.Exceptions.JobExceptions;
 using System.Diagnostics;
 using Data.Models;
 using WebApp.Models;
+using Services.Exceptions;
+using static Services.Exceptions.JobMatchingExceptions;
 
 namespace WebApp.Mvc
 {
@@ -289,6 +291,14 @@ namespace WebApp.Mvc
             {
                 return RedirectToAction(actionName, new { id = ex.Id });
             }
+            catch (JobMatchingException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName);
+            }
+            catch (JobMatchingException ex) when (LogAndSetErrorMessage(ex, actionName))
+            {
+                return RedirectToAction(actionName, new { id = ex.Id });
+            }
             catch (UserNotVerifiedException ex) when (LogAndSetErrorMessage(ex, actionName))
             {
                 TempData["ErrorMessageLogin"] = ex.Message;
@@ -350,6 +360,12 @@ namespace WebApp.Mvc
                 return new JsonResult(new { success = false, error = ex.Message });
             }
             catch (JobException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message.ToString();
+                _logger.LogError(ex, "Error in {Action}", actionName);
+                return new JsonResult(new { success = false, error = ex.Message });
+            }
+            catch (JobMatchingException ex)
             {
                 TempData["ErrorMessage"] = ex.Message.ToString();
                 _logger.LogError(ex, "Error in {Action}", actionName);
