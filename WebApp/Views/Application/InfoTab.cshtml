@@ -29,7 +29,7 @@
         </div>
         <div class="ml-2">
             <a href="@Url.Action("GetJob", "Job", new { id = Model.JobId })"
-               class="font-semibold hover:text-[#A53D3D] hover:underline">
+               class="font-semibold hover:!no-underline hover:text-[#A04747]">
                 View Job
             </a>
         </div>
@@ -62,9 +62,12 @@
             <span class="pr-2 font-semibold">Email: </span>
             <span>@Model.Applicant.User.Email</span>
         </li>
-        <li class="flex pr-2">
-            <span class="pr-2 font-semibold">Resume: </span>
-            <a href="" class="font-semibold">View</a>
+        <li class="flex justify-center">
+            <a href="#"
+               class="view-details mt-2 font-semibold hover:!no-underline hover:text-[#A04747]"
+               data-id="@Model.ApplicantId">
+                View More Details
+            </a>
         </li>
     </ul>
 

@@ -46,22 +46,6 @@ namespace WebApp.Controllers
 
         [HttpGet]
         [Authorize(Policy = "Recruiter")]
-        [Route("get-applicant-details")]
-        public async Task<IActionResult> GetApplicantDetails(string id)
-        {
-            return await HandleExceptionAsync(async () =>
-            {
-                if (ModelState.IsValid && !string.IsNullOrEmpty(id))
-                {
-                    var model = await _jobService.GetApplicantDetailsAsync(id);
-                    return PartialView("_ApplicantDetailsModal", model);
-                }
-                return PartialView("_ApplicantDetailsModal", new Applicant());
-            }, "GetApplicantDetails");
-        }
-
-        [HttpGet]
-        [Authorize(Policy = "Recruiter")]
         [Route("recruiter/archived")]
         public async Task<IActionResult> GetArchivedJobsRecruiter(FilterServiceModel filters)
         {

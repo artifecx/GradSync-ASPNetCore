@@ -96,6 +96,25 @@
     </div>
 </div>
 
+<!-- Modal -->
+<div class="modal fade" id="applicantDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-[#343131]">
+                    Applicant Details
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
+            </div>
+            <div class="modal-body mt-2 py-1 pl-4 text-[#343131]" id="applicantDetailsModalContent">
+                <!-- Content will be loaded here -->
+            </div>
+        </div>
+    </div>
+</div>
+
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 <input type="hidden" id="actionUrl" value="@Url.Action("WithdrawApplication", "Application")" />
@@ -114,5 +133,53 @@
             event.preventDefault();
             window.history.back();
         });
+
+        document.addEventListener('DOMContentLoaded', function () {
+            const viewDetailsLinks = document.querySelectorAll('a.view-details');
+
+            viewDetailsLinks.forEach(function (link) {
+                link.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const id = this.getAttribute('data-id');
+
+                    fetch(`@Url.Action("GetApplicantDetails", "Job")?id=${id}`)
+                        .then(response => response.text())
+                        .then(html => {
+                            const modalContent = document.getElementById('applicantDetailsModalContent');
+                            modalContent.innerHTML = html;
+                            $('#applicantDetailsModal').modal('show');
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            toastr.error('An error occurred while loading the applicant details.');
+                        });
+                });
+            });
+        });
+
+        function viewResume(id) {
+            const newWindow = window.open('', '_blank');
+
+            fetch(`@Url.Action("GetResume", "Home")?id=${id}`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+
+                    newWindow.location.href = url;
+
+                    setTimeout(() => {
+                        window.URL.revokeObjectURL(url);
+                    }, 10000);
+                })
+                .catch(error => {
+                    console.error('Error displaying resume:', error);
+                    newWindow.document.write('<p>Failed to load the resume. Please try again later.</p>');
+                });
+        }
     </script>
 }
