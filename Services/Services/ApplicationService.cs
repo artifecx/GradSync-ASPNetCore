@@ -56,7 +56,7 @@ namespace Services.Services
         /// <returns>A task representing the asynchronous operation.</returns>
         public async Task SendApplicationAsync(string userId, string jobId)
         {
-            if(await HasExistingApplicationAsync(userId, jobId))
+            if (await HasExistingApplicationAsync(userId, jobId))
                 throw new JobApplicationException(Error_ApplicationExists);
 
             var application = new Application

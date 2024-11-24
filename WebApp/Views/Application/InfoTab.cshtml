@@ -16,10 +16,10 @@
     }
 }
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
-    <div class="flex items-center justify-between pb-2 text-sm font-normal">
+<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md max-w-md mx-auto">
+    <div class="flex items-center justify-between text-xs pb-1 font-normal text-gray-700">
         <div>
-            <i class="fa-solid fa-percent pr-1 text-sm"></i>
+            <i class="fa-solid fa-percent pr-1"></i>
             Match Percent
         </div>
         <div class="ml-2">
@@ -30,27 +30,27 @@
         </div>
     </div>
 
-    <div class="mt-2 flex">
-        <div class="text-lg font-bold">Status:</div>
+    <div class="mt-2 flex align-content-center">
+        <div class="text-base font-bold">Status:</div>
         <div class="border-2 ml-1 rounded-md px-2 py-1 text-xs font-medium uppercase tracking-wider text-gray-900"
              style="background-color:@GetStatusColor(Model.ApplicationStatusType.Name);">
             @Model.ApplicationStatusType.Name
         </div>
     </div>
-    <span class="text-sm font-semibold text-gray-700">
+    <span class="text-xs font-semibold text-gray-500">
         Last Update: @(Model.UpdatedDate == Model.CreatedDate || Model.UpdatedDate == DateTime.MinValue ? "Unavailable" : Model.UpdatedDate.ToUniversalTime().Humanize())
     </span>
 
     <hr class="border-gray-300" />
-    <h3 class="mb-3 text-sm font-semibold text-gray-500">Applicant Information</h3>
+    <h3 class="mb-2 text-xs font-semibold text-gray-500">Applicant Information</h3>
 
-    <ul class="space-y-2 text-sm text-gray-700">
+    <ul class="space-y-1 text-xs text-gray-700">
         <li class="flex pr-2">
             <span class="pr-2 font-semibold">Name: </span>
             <span>@Model.ApplicantName</span>
         </li>
         <li class="flex pr-2">
-            <span class="pr-2 font-semibold">Id Number: </span>
+            <span class="pr-2 font-semibold">ID Number: </span>
             <span>@Model.Applicant.EducationalDetail.IdNumber</span>
         </li>
         <li class="flex pr-2">
@@ -64,9 +64,9 @@
     </ul>
 
     <hr class="border-gray-300" />
-    <h3 class="mb-3 text-sm font-semibold text-gray-500">Recruiter Information</h3>
+    <h3 class="mb-2 text-xs font-semibold text-gray-500">Recruiter Information</h3>
 
-    <ul class="space-y-2 text-sm text-gray-700">
+    <ul class="space-y-1 text-xs text-gray-700">
         <li class="flex pr-2">
             <span class="pr-2 font-semibold">Name: </span>
             <span>@Model.RecruiterName</span>
@@ -82,9 +82,9 @@
     </ul>
 
     <hr class="border-gray-300" />
-    <h3 class="mb-3 text-sm font-semibold text-gray-500">Company Information</h3>
+    <h3 class="mb-2 text-xs font-semibold text-gray-500">Company Information</h3>
 
-    <ul class="space-y-2 text-sm text-gray-700">
+    <ul class="space-y-1 text-xs text-gray-700">
         <li class="flex pr-2">
             <span class="pr-2 font-semibold">Name: </span>
             <span>@Model.Job.Company.Name</span>

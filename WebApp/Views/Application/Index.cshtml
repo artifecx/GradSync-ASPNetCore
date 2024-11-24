@@ -6,6 +6,7 @@
 
 @{
     ViewData["Title"] = "Application List";
+    await Html.RenderPartialAsync("_UpdateStatusModal");
 
     string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
@@ -523,20 +524,12 @@
                                                         <i class="fas fa-info-circle mr-2"></i> Details
                                                     </button>
 
-                                                    <!-- Edit Application -->
-                                                    <button onclick="location.href='@Url.Action("", "",
-                                                                new {
-                                                                    id = item.ApplicationId,
-                                                                    sortBy = sortBy,
-                                                                    search = search,
-                                                                    pageIndex = Model.PageIndex,
-                                                                    filterByWorkSetup = filterByWorkSetup,
-                                                                    filterByProgram = filterByProgram,
-                                                                    filterByStatus = filterByStatus,
-                                                                    showModal = "editApplication"
-                                                                })'"
-                                                            class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
-                                                        <i class="fas fa-edit -circle mr-2"></i> Update
+                                                    <button class="update-job-status text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                                            data-applicationid="@item.ApplicationId"
+                                                            data-statusid="@item.ApplicationStatusTypeId"
+                                                            data-toggle="modal"
+                                                            data-target="#updateApplicationStatusModal">
+                                                        <i class="fa-solid fa-rotate mr-2"></i>Update Status
                                                     </button>
 
                                                     <!-- Archive Job -->
@@ -599,6 +592,7 @@
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
+    <script src="~/js/application.js"></script>
     <script>
         document.addEventListener('click', function (e) {
             const actionBtn = e.target.closest('.actionDropdownApplicationBtn');
