@@ -36,6 +36,7 @@
         <!-- Applicant details -->
         <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">ID NO.</th>
         <th class="py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Applicant)</th>
+        <th class="py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">Match Percentage</th>
         <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
                 <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByProgram) ? "text-[#A04747]" : "")"
@@ -222,6 +223,8 @@
                 @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
             </a>
         </th>
+        <!-- Match Percentage -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">Match Percentage</th>
         <!-- Company details -->
         <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
         <!-- Job location -->
