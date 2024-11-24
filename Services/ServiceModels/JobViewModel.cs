@@ -115,8 +115,6 @@ namespace Services.ServiceModels
         public bool HasApplied { get; set; } = false;
         public string ApplicationId { get; set; } = null;
 
-        public decimal? MatchPercentage { get; set; } = 0;
-
         public List<JobApplicantMatch> JobMatches { get; set; }
     }
 }

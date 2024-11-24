@@ -273,7 +273,7 @@ namespace Services.Services
         public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId) =>
             _mapper.Map<List<FeaturedJobsViewModel>>(await _repository.GetApplicantFeaturedJobsAsync(userId));
 
-        public async Task<ApplicantDto> GetApplicantDetailsAsync(string applicantId) =>
+        public async Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId) =>
             await _repository.GetApplicantDetailsAsync(applicantId);
 
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)

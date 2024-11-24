@@ -2,7 +2,7 @@
 
 namespace Data.Dtos;
 
-public partial class ApplicantDto
+public partial class ApplicantViewDto
 {
     public string ApplicantId { get; set; }
     public string Name { get; set; }
@@ -14,4 +14,5 @@ public partial class ApplicantDto
     public string DepartmentName { get; set; }
     public string CollegeName { get; set; }
     public string YearLevelName { get; set; }
+    public string DepartmentId { get; set; }
 }

@@ -95,7 +95,7 @@ namespace Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<ApplicantDto> GetApplicantDetailsAsync(string applicantId)
+        public async Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId)
         {
             var applicant = await this.GetDbSet<Applicant>()
                 .Where(a => a.UserId == applicantId)
@@ -110,7 +110,7 @@ namespace Data.Repositories
                     .ThenInclude(e => e.College)
                 .Include(a => a.EducationalDetail)
                     .ThenInclude(e => e.YearLevel)
-                .Select(a => new ApplicantDto
+                .Select(a => new ApplicantViewDto
                 {
                     ApplicantId = a.UserId,
                     Name = $"{a.User.FirstName}"
@@ -133,7 +133,8 @@ namespace Data.Repositories
                     ProgramName = a.EducationalDetail.Program.Name,
                     DepartmentName = a.EducationalDetail.Department.Name,
                     CollegeName = a.EducationalDetail.College.Name,
-                    YearLevelName = a.EducationalDetail.YearLevel.Name
+                    YearLevelName = a.EducationalDetail.YearLevel.Name,
+                    DepartmentId = a.EducationalDetail.DepartmentId
                 })
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
