@@ -414,10 +414,12 @@ namespace Services.Services
                     .OrderByDescending(j => j.JobMatches
                         .Where(m => m.UserId == userId)
                         .Max(m => m.MatchPercentage)).ToList(),
-                _ => jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
-                    .OrderByDescending(j => j.JobMatches
-                        .Where(m => m.UserId == userId)
-                        .Max(m => m.MatchPercentage)).ToList(),
+                _ => userRole == Role_Applicant
+                    ? jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
+                        .OrderByDescending(j => j.JobMatches
+                            .Where(m => m.UserId == userId)
+                            .Max(m => m.MatchPercentage)).ToList() 
+                    : jobs.OrderByDescending(j => j.CreatedDate).ToList(),
             };
 
             return jobs;
