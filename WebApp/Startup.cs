@@ -170,7 +170,7 @@ namespace WebApp
                         partitionKey: context.User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? context.Connection.RemoteIpAddress?.ToString() ?? "anonymous",
                         factory: partition => new FixedWindowRateLimiterOptions
                         {
-                            PermitLimit = 3,
+                            PermitLimit = 5,
                             Window = TimeSpan.FromMinutes(15),
                             QueueLimit = 0,
                             QueueProcessingOrder = QueueProcessingOrder.OldestFirst

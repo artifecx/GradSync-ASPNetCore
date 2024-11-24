@@ -161,6 +161,8 @@ namespace Services.Services
             {
                 _accountService.RegisterUser(userModel);
             }
+
+            await Task.CompletedTask;
         }
 
         /// <summary>

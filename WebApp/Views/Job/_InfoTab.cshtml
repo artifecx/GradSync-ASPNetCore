@@ -16,7 +16,7 @@
     }
 }
 
-<div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
+<div class="overflow-auto rounded-lg border border-gray-200 bg-white p-6 shadow-md">
     <div class="flex items-center justify-between pb-2 text-sm font-normal">
         <div>
             <i class="fas fa-map-marker-alt pr-1 text-sm"></i>
@@ -24,11 +24,12 @@
         </div>
 
         <!-- Status and Employment Type Badge -->
-        <div class="justify-between text-gray-900">
-            <span class="border-2 ml-1 rounded-md border-green-500 px-2 py-1 pr-2 text-xs font-medium text-gray-900">
-                @Model.StatusType.Name </span>
-            <span class="border-2 ml-1 rounded-md px-2 py-1 text-xs font-medium text-gray-900"
-                  style="background-color:@GetEmploymentTypeColor(Model.EmploymentType.Name);">
+        <div class="flex items-center text-gray-900 space-x-1">
+            <span class="border-2 rounded-md border-green-500 px-2 py-1 pr-2 text-xs font-medium text-gray-900 whitespace-nowrap">
+                @Model.StatusType.Name
+            </span>
+            <span class="border-2 rounded-md px-2 py-1 text-xs font-medium text-gray-900 whitespace-nowrap"
+                style="background-color:@GetEmploymentTypeColor(Model.EmploymentType.Name);">
                 @Model.EmploymentType.Name
             </span>   
         </div>

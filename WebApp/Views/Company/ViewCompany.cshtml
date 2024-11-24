@@ -7,25 +7,23 @@
     string aspAction = isAdmin ? "GetAllCompanies" : "GetCompanyRecruiter";
     string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
-    //int pageIndex = Model.PageIndex;
 
     string sortByName = string.IsNullOrEmpty(sortBy) ? "name_desc" : null;
     string sortByEmail = sortBy == "email" ? "email_desc" : "email";
-
 }
 
-<div class="min-h-screen bg-[#F5F6F8]">
-    <div class="mx-auto mt-10 max-w-7xl rounded-lg bg-[#F5F6F8] px-6">
-        @if (!User.IsInRole("Recruiter"))
-        {
-            <div class="mb-3 flex justify-between">         
-                <a href="#" id="back-button" class="hover-[#991b1b] flex items-center text-xs font-semibold text-[#7A1515]">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
-                </a>
-            </div>
-        }
+<div class="flex size-full flex-col bg-gray-100">
+    <div class="mb-2 w-full justify-between">
         <!-- Header Section -->
-        <div class="mb-6 w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+        <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
+            @if (!User.IsInRole("Recruiter"))
+            {
+                <div class="mb-3 flex justify-between">
+                    <button type="button" id="back-button" onclick="goBack()" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] focus:!outline-none">
+                        <i class="fas fa-arrow-left mr-2"></i> Back
+                    </button>
+                </div>
+            }
             <div class="flex items-center justify-between">
                 <!-- Logo + Company Info -->
                 <div class="flex items-center space-x-6">
@@ -58,141 +56,139 @@
                 </div>
             </div>
         </div>
-
-        <!-- Main Content -->
-        <div class="grid-cols-2 grid gap-6">
-            <!-- Company Form Section-->
-            <div class="rounded-lg bg-white p-6 shadow-sm">
-                <form id="editCompanyForm">
-                    <div class="flex items-center justify-between space-x-4 pb-3">
-                        <div class="space-y-0">
-                            <div class="text-lg font-bold text-gray-600">Company Profile</div>
-                            <div class="text-xs font-medium text-gray-500">Update your company details here.</div>
-                        </div>
-                        <div>
-                            <button type="button" id="cancelButton" class="hidden rounded bg-gray-500 px-2 py-2 text-sm font-semibold text-white hover:bg-gray-600"
-                                    onclick="cancelEdit()">
-                                Cancel
-                            </button>
-                            <button type="button" id="saveButton" class="hidden rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A53D3D]"
-                                    onclick="submitChanges()">
-                                Save Changes
-                            </button>
-                            <button type="button" onclick="enableEditMode()" id="editButton"
-                                    class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                                <i class="fas fa-edit pr-1"></i> Update
-                            </button>
-                        </div>
+    </div>
+    <!-- Main Content -->
+    <div class="flex flex-grow">
+        <!-- Company Form Section-->
+        <div class="flex-1 mr-2 overflow-auto rounded-lg bg-white p-6 shadow-sm">
+            <form id="editCompanyForm">
+                <div class="flex items-center justify-between space-x-4 pb-3">
+                    <div class="space-y-0">
+                        <div class="text-lg font-bold text-gray-600">Company Profile</div>
+                        <div class="text-xs font-medium text-gray-500">Update your company details here.</div>
                     </div>
-
-                    <input type="hidden" name="CompanyId" id="companyId" value="@Model.CompanyId" />
-
-                    <div class="mb-3">
-                        <label asp-for="Name" class="mb-1 block text-sm font-bold text-[#934141]">Company Name</label>
-                        <input asp-for="Name" id="companyName" value="@Model.Name"
-                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
-                               readonly />
-                        <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                    <div>
+                        <button type="button" id="cancelButton" class="hidden min-w-[128px] rounded bg-[#6c757d] px-2 py-2 text-sm font-semibold text-white hover:bg-[#939BA2]"
+                                onclick="cancelEdit()">
+                            Cancel
+                        </button>
+                        <button type="button" id="saveButton" class="hidden min-w-[128px] rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A04747]"
+                                onclick="submitChanges()">
+                            Save Changes
+                        </button>
+                        <button type="button" onclick="enableEditMode()" id="editButton"
+                                class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                            <i class="fas fa-edit pr-1"></i> Update
+                        </button>
                     </div>
+                </div>
 
-                    <div class="mb-3 flex space-x-4">
-                        <div class="w-1/2">
-                            <label asp-for="ContactEmail" class="mb-1 block text-sm font-bold text-[#934141]">Email</label>
-                            <input asp-for="ContactEmail" id="companyEmail" value="@Model.ContactEmail"
-                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
-                                   readonly />
-                            <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
-                        </div>
-                        <div class="w-1/2">
-                            <label asp-for="ContactNumber" class="mb-1 block text-sm font-bold text-[#934141]">Contact Number</label>
-                            <input asp-for="ContactNumber" id="companyNumber" value="@Model.ContactNumber"
-                                   class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
-                                   readonly />
-                            <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
-                        </div>
-                    </div>
+                <input type="hidden" name="CompanyId" id="companyId" value="@Model.CompanyId" />
 
-                    <div class="mb-3">
-                        <label asp-for="Address" class="mb-1 block text-sm font-bold text-[#934141]">Address</label>
-                        <input asp-for="Address" id="companyAddress" value="@Model.Address"
-                               class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
-                               readonly />
-                        <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
-                    </div>
+                <div class="mb-3">
+                    <label asp-for="Name" class="mb-1 block text-sm font-bold text-[#934141]">Company Name</label>
+                    <input asp-for="Name" id="companyName" value="@Model.Name"
+                            class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
+                            readonly />
+                    <span asp-validation-for="Name" class="mt-1 block text-sm text-red-500"></span>
+                </div>
 
-                    <div class="mb-3">
-                        <label asp-for="Description" class="mb-2 block text-sm font-bold text-[#934141]">Description</label>
-                        <textarea asp-for="Description" id="companyDescription"
-                                  class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
-                                  readonly>@(string.IsNullOrEmpty(Model.Description) ? "No description." : Model.Description)</textarea>
-                        <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
+                <div class="mb-3 flex space-x-4">
+                    <div class="w-1/2">
+                        <label asp-for="ContactEmail" class="mb-1 block text-sm font-bold text-[#934141]">Email</label>
+                        <input asp-for="ContactEmail" id="companyEmail" value="@Model.ContactEmail"
+                                class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
+                                readonly />
+                        <span asp-validation-for="ContactEmail" class="mt-1 block text-sm text-red-500"></span>
                     </div>
+                    <div class="w-1/2">
+                        <label asp-for="ContactNumber" class="mb-1 block text-sm font-bold text-[#934141]">Contact Number</label>
+                        <input asp-for="ContactNumber" id="companyNumber" value="@Model.ContactNumber"
+                                class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
+                                readonly />
+                        <span asp-validation-for="ContactNumber" class="mt-1 block text-sm text-red-500"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Address" class="mb-1 block text-sm font-bold text-[#934141]">Address</label>
+                    <input asp-for="Address" id="companyAddress" value="@Model.Address"
+                            class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
+                            readonly />
+                    <span asp-validation-for="Address" class="mt-1 block text-sm text-red-500"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Description" class="mb-2 block text-sm font-bold text-[#934141]">Description</label>
+                    <textarea asp-for="Description" id="companyDescription"
+                                class="w-full cursor-not-allowed rounded border bg-gray-100 px-3 py-2 text-sm leading-tight text-gray-500"
+                                readonly>@(string.IsNullOrEmpty(Model.Description) ? "No description." : Model.Description)</textarea>
+                    <span asp-validation-for="Description" class="mt-1 block text-sm text-red-500"></span>
+                </div>
+            </form>
+        </div>
+
+        <!-- Recruiter Information -->
+        <div class="flex-1 overflow-auto rounded-lg bg-white p-6 shadow-sm">
+            <div class="flex items-center justify-between">
+                <h3 class="text-lg font-bold text-gray-600">Recruiter Information</h3>
+
+                <form method="get" asp-action="@aspAction" class="flex items-center">
+                    @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Search recruiter" })
+                    <input type="hidden" name="sortBy" value="@sortBy" />
                 </form>
             </div>
 
-            <!-- Recruiter Information -->
-            <div class="rounded-lg bg-white p-6 shadow-sm">
-                <div class="flex items-center justify-between">
-
-                    <h3 class="text-lg font-bold text-gray-600">Recruiter Information</h3>
-
-                    <form method="get" asp-action="@aspAction" class="flex items-center">
-                        @await Component.InvokeAsync("SearchInput", new { searchValue = search, placeholder = "Search recruiter" })
-                        <input type="hidden" name="sortBy" value="@sortBy" />
-                    </form>
-                </div>
-
-                @if (Model.Recruiters != null && Model.Recruiters.Any())
-                {
-                    <div class="mt-4 h-[50vh] overflow-auto rounded-lg bg-[#F5F7F8]">
-                        <table class="min-w-full table-auto rounded-lg bg-white">
-                            <thead class="bg-gray-100">
-                                <tr>
-                                    <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
-                                        <a asp-action="@aspAction" 
-                                           asp-route-sortBy="@sortByName" 
-                                           asp-route-search="@search"
-                                           class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
-                                            Name
-                                            @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fas fa-sort'></i>") :
-                                                (sortBy == "name_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort-up'></i>")))
+            @if (Model.Recruiters != null && Model.Recruiters.Any())
+            {
+                <div class="mt-4 h-[50vh] overflow-auto rounded-lg bg-[#F5F7F8]">
+                    <table class="min-w-full table-auto rounded-lg bg-white">
+                        <thead class="bg-gray-100">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <a asp-action="@aspAction" 
+                                        asp-route-sortBy="@sortByName" 
+                                        asp-route-search="@search"
+                                        class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
+                                        Name
+                                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fas fa-sort'></i>") :
+                                            (sortBy == "name_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort-up'></i>")))
+                                    </a>
+                                </th>
+                                <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
+                                    <a asp-action="@aspAction" 
+                                        asp-route-sortBy="@sortByEmail" 
+                                        asp-route-search="@search" 
+                                        class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
+                                        Email
+                                        @(sortBy == "email" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
+                                            (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
+                                    </a>
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-200 bg-white">
+                            @foreach (var recruiter in Model.Recruiters)
+                            {
+                                <tr class="hover:bg-gray-100">
+                                    <td class="px-6 py-3 text-sm text-gray-900">
+                                        @($"{recruiter.User.FirstName} {recruiter.User.MiddleName} {recruiter.User.LastName} {recruiter.User.Suffix}")
+                                    </td>
+                                    <td class="px-6 py-3 text-sm text-gray-500">
+                                        <a href="mailto:@recruiter.User.Email" class="text-blue-500 hover:underline">
+                                            @recruiter.User.Email
                                         </a>
-                                    </th>
-                                    <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
-                                        <a asp-action="@aspAction" 
-                                           asp-route-sortBy="@sortByEmail" 
-                                           asp-route-search="@search" 
-                                           class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
-                                            Email
-                                            @(sortBy == "email" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
-                                                (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
-                                        </a>
-                                    </th>
+                                    </td>
                                 </tr>
-                            </thead>
-                            <tbody class="divide-y divide-gray-200 bg-white">
-                                @foreach (var recruiter in Model.Recruiters)
-                                {
-                                    <tr class="hover:bg-gray-100">
-                                        <td class="px-6 py-3 text-sm text-gray-900">
-                                            @($"{recruiter.User.FirstName} {recruiter.User.MiddleName} {recruiter.User.LastName} {recruiter.User.Suffix}")
-                                        </td>
-                                        <td class="px-6 py-3 text-sm text-gray-500">
-                                            <a href="mailto:@recruiter.User.Email" class="text-blue-500 hover:underline">
-                                                @recruiter.User.Email
-                                            </a>
-                                        </td>
-                                    </tr>
-                                }
-                            </tbody>
-                        </table>
-                    </div>
-                }
-                else
-                {
-                    <p class="mt-4 text-gray-600">No recruiters assigned to this company.</p>
-                }
-            </div>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <p class="mt-4 text-gray-600">No recruiters assigned to this company.</p>
+            }
         </div>
     </div>
 </div>
@@ -204,33 +200,18 @@
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/company.js"></script>
     <script>
-        document.querySelector('.back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            window.history.back();
-        });
-    </script>
-    <script>
         const urlParams = new URLSearchParams(window.location.search);
-        sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-        sessionStorage.setItem('search', urlParams.get('search') || '');
-        sessionStorage.setItem('hasValidMOA', urlParams.get('hasValidMOA') || '');
-        sessionStorage.setItem('verified', urlParams.get('verified') || '');
-        sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
-
         const idParam = urlParams.get('id') ? `?id=${urlParams.get('id')}` : '';
-        const newUrl = window.location.origin + window.location.pathname + idParam;
-        window.history.replaceState({}, document.title, newUrl);
 
-        document.querySelector('#back-button').addEventListener('click', function (event) {
-            event.preventDefault();
-            const baseUrl = '@Url.Action($"{aspAction}", "Company")';
-            const params = new URLSearchParams();
-            params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-            params.set('search', sessionStorage.getItem('search') || '');
-            params.set('hasValidMOA', sessionStorage.getItem('hasValidMOA') || '');
-            params.set('verified', sessionStorage.getItem('verified') || '');
-            params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-            window.location.href = `${baseUrl}?${params.toString()}`;
-        });
+        if(urlParams.get('showModal') === 'editCompany'){
+            enableEditMode();
+        }
+
+        const newUrl = window.location.origin + window.location.pathname + idParam;
+                window.history.replaceState({}, document.title, newUrl);
+
+        function goBack() {
+            window.history.back();
+        }
     </script>
 }

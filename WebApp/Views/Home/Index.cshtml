@@ -1,5 +1,5 @@
 ﻿<!-- Applicant Homepage -->
-@model List<Services.ServiceModels.JobViewModel>
+@model List<Services.ServiceModels.FeaturedJobsViewModel>
 @{
     ViewData["Title"] = "GradSync";
 }
@@ -43,7 +43,7 @@
         </div>
 
         <div class="max-w-[calc(100vw-200px)] mx-12 mb-4 flex-grow overflow-x-auto text-left">
-            <div>@await Html.PartialAsync("FeaturedJobs", Model)</div>
+            <div>@await Html.PartialAsync("_FeaturedJobs", Model)</div>
         </div>
     </div>
 </div>

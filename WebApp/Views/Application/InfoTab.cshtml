@@ -18,13 +18,18 @@
 
 <div class="rounded-lg border border-gray-200 bg-white p-6 shadow-md">
     <div class="flex items-center justify-between pb-2 text-sm font-normal">
-        <div>
-            <i class="fa-solid fa-percent pr-1 text-sm"></i>
-            Match Percent
+        <div class="font-semibold">
+            @{
+                var match = Model.Job.JobApplicantMatches.FirstOrDefault(j => j.UserId == Model.ApplicantId);
+                var percentage = match == null ? "Unavailable" : match.MatchPercentage.ToString() + "%";
+                var scale = match.MatchPercentage;
+                var color = scale < 60 ? "text-red-500" : scale >= 60 && scale <= 80 ? "text-orange-500" : "text-green-500";
+            }
+            Match: <span class="@(color) font-medium">@percentage</span>
         </div>
         <div class="ml-2">
             <a href="@Url.Action("GetJob", "Job", new { id = Model.JobId })"
-               class="font-semibold hover:text-[#A53D3D] hover:underline">
+               class="font-semibold hover:!no-underline hover:text-[#A04747]">
                 View Job
             </a>
         </div>
@@ -57,9 +62,12 @@
             <span class="pr-2 font-semibold">Email: </span>
             <span>@Model.Applicant.User.Email</span>
         </li>
-        <li class="flex pr-2">
-            <span class="pr-2 font-semibold">Resume: </span>
-            <a href="" class="font-semibold">View</a>
+        <li class="flex justify-center">
+            <a href="#"
+               class="view-details mt-2 font-semibold hover:!no-underline hover:text-[#A04747]"
+               data-id="@Model.ApplicantId">
+                View More Details
+            </a>
         </li>
     </ul>
 

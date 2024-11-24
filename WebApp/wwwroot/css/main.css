@@ -1,19 +1,6 @@
 ﻿@import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
     font-family: "Inter", sans-serif;
-}
-
-html {
-    position: relative;
-    min-height: 100%;
-}
-
-body {
-    max-width: 100%;
-    overflow-x: hidden;
 }
 
 header {
@@ -34,74 +21,13 @@ header {
     height: auto
 }
 
-.layout {
-    display: flex;
-    min-height: 100vh;
-}
-
-.hide-navbar {
-    display: none;
-}
-
-.main {
-    height: calc(100vh - 70px);
-    width: 100%;
-    overflow-y: scroll;
-    overflow-x: hidden;
-    padding: 40px 30px 30px 30px;
-}
-    .main::-webkit-scrollbar-thumb {
-        background-image: linear-gradient(to bottom, rgb(0, 0, 85), rgb(0, 0, 50));
-    }
-    .main::-webkit-scrollbar {
-        width: 5px;
-    }
-    .main::-webkit-scrollbar-track {
-        background-color: #9e9e9eb2;
-    }
-
-.sidebar {
-    display: flex;
-    flex-direction: column;
-    position: sticky;
-    width: 250px;
-    min-height: 100vh;
-    background-color: var(--background-color1);
-    z-index: 100;
-    padding: 20px;
-    border-right: 1px solid var(--border-color);
-    font-weight: bold;
-}
-
-    /* Styling for sidebar links */
-            .sidebar ul li a:hover {
-                color: #991b1b;
-            }
-
-            s
-        /* Hover, focus, and active states */
-        .sidebar li a:hover,
-        .sidebar li a:focus,
-        .sidebar li a:active {
-            color: #991b1b !important; /* Override default hover color */
-            text-decoration: underline; /* Add underline on hover, focus, or active */
-            text-decoration-color: #991b1b; /* Ensure underline matches text color */
-        }
-
-        /* Ensure that items with bg-gray-200 still apply the hover color correctly */
-        .sidebar li a.bg-gray-200:hover,
-        .sidebar li a.bg-gray-200:focus,
-        .sidebar li a.bg-gray-200:active {
-            color: #991b1b !important;
-        }
-
 .nav {
     min-height: 91vh;
     width: 273px;
     background-color: #1e272e;
     position: absolute;
     top: 0px;
-    left: 00;
+    left: 0;
     box-shadow: 1px 1px 10px rgba(198, 189, 248, 0.825);
     display: flex;
     justify-content: space-between;
@@ -168,18 +94,6 @@ header {
     background: linear-gradient(-90deg, #052542 0%, #0D5EA8 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
-}
-
-.user-info .icon {
-font-size:32px;
-margin-right: 10px;
-margin-left:20px;
-}
-
-.user-info .text {
-display: flex;
-flex-direction: column;
-align-items: center; 
 }
 
 .list-unstyled li a {

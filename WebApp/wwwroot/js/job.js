@@ -3,14 +3,6 @@
     /// Back Button & Url Manipulation
     /// ------------------------------------
     const urlParams = new URLSearchParams(window.location.search);
-    sessionStorage.setItem('sortBy', urlParams.get('sortBy') || '');
-    sessionStorage.setItem('filterByEmploymentType', JSON.stringify(urlParams.getAll('filterByEmploymentType')) || '[]');
-    sessionStorage.setItem('filterByStatusType', urlParams.get('filterByStatusType') || '');
-    sessionStorage.setItem('filterByWorkSetup', JSON.stringify(urlParams.getAll('filterByWorkSetup')) || '[]');
-    sessionStorage.setItem('search', urlParams.get('search') || '');
-    sessionStorage.setItem('pageIndex', urlParams.get('pageIndex') || '1');
-    sessionStorage.setItem('filterByDatePosted', urlParams.get('filterByDatePosted') || '');
-    sessionStorage.setItem('filterBySalary', urlParams.get('filterBySalary') || '');
 
     if (urlParams.get('showModal') === 'editJob') {
         $('#editJobModal').modal('show');
@@ -22,23 +14,7 @@
 
     document.querySelector('#back-button').addEventListener('click', function (event) {
         event.preventDefault();
-        const baseUrl = $('#baseUrl').val();
-        const params = new URLSearchParams();
-        const filterByEmploymentType = JSON.parse(sessionStorage.getItem('filterByEmploymentType') || '[]');
-        const filterByWorkSetup = JSON.parse(sessionStorage.getItem('filterByWorkSetup') || '[]');
-        filterByEmploymentType.forEach(employmentType => {
-            params.append('filterByEmploymentType', employmentType);
-        });
-        filterByWorkSetup.forEach(workSetup => {
-            params.append('filterByWorkSetup', workSetup);
-        });
-        params.set('sortBy', sessionStorage.getItem('sortBy') || '');
-        params.set('filterByStatusType', sessionStorage.getItem('filterByStatusType') || '');
-        params.set('search', sessionStorage.getItem('search') || '');
-        params.set('pageIndex', sessionStorage.getItem('pageIndex') || '1');
-        params.set('filterByDatePosted', sessionStorage.getItem('filterByDatePosted') || '');
-        params.set('filterBySalary', sessionStorage.getItem('filterBySalary') || '');
-        window.location.href = `${baseUrl}?${params.toString()}`;
+        window.history.back();
     });
 });
 
@@ -61,9 +37,10 @@ document.addEventListener('DOMContentLoaded', function () {
             editJobForm.reset();
             $(".text-red-500").text('');
             addCharCountListener('editJobTitle', 'remainingTitleChars', 100);
-            addCharCountListener('editJobDescription', 'remainingDescriptionChars', 800);
+            addCharCountListener('editJobDescription', 'remainingDescriptionChars', 3000);
             initializeAllTagify();
             updateSkillWeights();
+            document.getElementById('saveEditJob').disabled = false;
         }
         cancelClicked = false;
     });
@@ -97,7 +74,7 @@ document.addEventListener('DOMContentLoaded', function () {
         contentTextarea.addEventListener('keyup', updateRemainingChars);
     }
     addCharCountListener('editJobTitle', 'remainingTitleChars', 100);
-    addCharCountListener('editJobDescription', 'remainingDescriptionChars', 800);
+    addCharCountListener('editJobDescription', 'remainingDescriptionChars', 3000);
 
     /// ------------------------------------
     /// Tagify: Initialize
@@ -249,6 +226,7 @@ function submitEditJob() {
 
     form.validate();
     if (!form.valid() || !tagifyValuesValid()) {
+        submitButton.disabled = false;
         return;
     }
 

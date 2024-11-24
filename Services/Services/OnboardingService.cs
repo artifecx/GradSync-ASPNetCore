@@ -21,6 +21,7 @@ namespace Services.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IPdfTextExtractorService _pdfTextExtractorService;
+        private readonly IJobMatchingApiService _jobMatchingApiService;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="OnboardingService"/> class.
@@ -31,19 +32,24 @@ namespace Services.Services
             (
                 IUserRepository userRepository,
                 IPdfTextExtractorService pdfTextExtractorService,
+                IJobMatchingApiService jobMatchingApiService,
                 ILogger<OnboardingService> logger
             )
         {
             _userRepository = userRepository;
             _pdfTextExtractorService = pdfTextExtractorService;
+            _jobMatchingApiService = jobMatchingApiService;
         }
+
+        public async Task<Resume> GetApplicantResumeByIdAsync(string id) =>
+            await _userRepository.GetApplicantResumeByIdAsync(id);
 
         public async Task<User> CompleteOnboardingAsync(OnboardingViewModel model)
         {
             var user = await _userRepository.GetUserApplicantForFirstLoginAsync(model.UserId);
             ValidateUser(user);
 
-            user.Applicant.Resume = await ProcessResumeAsync(model.Resume);
+            user.Applicant.Resume = await ProcessResumeAsync(model.Resume, model.UserId);
 
             user.Applicant.EducationalDetail = CreateEducationalDetails(model);
             user.Applicant.EducationalDetailId = user.Applicant.EducationalDetail.EducationalDetailId;
@@ -63,7 +69,9 @@ namespace Services.Services
             .ToList();
 
             user.FromSignUp = false;
+            
             await _userRepository.UpdateUserAsync(user);
+            await _jobMatchingApiService.MatchAndSaveApplicantJobsAsync(user.UserId);
 
             return user;
         }
@@ -76,9 +84,9 @@ namespace Services.Services
             }
         }
 
-        private async Task<Resume> ProcessResumeAsync(IFormFile resume) =>
-            resume != null && resume.Length > 0 
-                ? await CreateResumeAsync(resume) 
+        private async Task<Resume> ProcessResumeAsync(IFormFile resume, string userId) =>
+            resume != null && resume.Length > 0
+                ? await CreateResumeAsync(resume, userId) 
                 : throw new UserException("Resume cannot be empty!");
 
         private async Task<Avatar> ProcessAvatarAsync(IFormFile avatar) => 
@@ -98,14 +106,14 @@ namespace Services.Services
             };
         }
 
-        private async Task<Resume> CreateResumeAsync(IFormFile file)
+        private async Task<Resume> CreateResumeAsync(IFormFile file, string userId)
         {
             using (var stream = new MemoryStream())
             {
                 await file.CopyToAsync(stream);
                 return new Resume
                 {
-                    ResumeId = Guid.NewGuid().ToString(),
+                    ResumeId = userId,
                     FileName = file.FileName,
                     FileContent = stream.ToArray(),
                     FileType = file.ContentType,

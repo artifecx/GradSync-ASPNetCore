@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Dtos;
+using Data.Models;
 using Microsoft.Extensions.Logging;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,6 +11,8 @@ namespace Data.Interfaces
     {
         Task<List<Application>> GetAllApplicationsNoIncludesAsync();
         Task<List<Job>> GetAllJobsProgramsIncludeAsync();
+        Task<List<JobApplicantMatch>> GetApplicantFeaturedJobsAsync(string userId);
+        Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId);
         Task<List<Job>> GetAllJobsAsync();
         Task<List<Job>> GetArchivedJobsAsync();
         Task<List<Job>> GetRecruiterJobsAsync(string userId);

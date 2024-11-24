@@ -8,6 +8,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System.Threading.Tasks;
 using WebApp.Authentication;
+using System.Linq;
 
 namespace WebApp.Controllers
 {
@@ -19,7 +20,7 @@ namespace WebApp.Controllers
     {
         private readonly IDashboardService _dashboardService;
         private readonly IJobService _jobService;
-        private readonly IOnboardingService _welcomeService;
+        private readonly IOnboardingService _onboardingService;
         private readonly IReferenceDataService _referenceDataService;
         private readonly SignInManager _signInManager;
 
@@ -35,7 +36,7 @@ namespace WebApp.Controllers
         public HomeController(
             IDashboardService dashboardService,
             IJobService jobService,
-            IOnboardingService welcomeService,
+            IOnboardingService onboardingService,
             IReferenceDataService referenceDataService,
             SignInManager signInManager,
             IHttpContextAccessor httpContextAccessor,
@@ -45,7 +46,7 @@ namespace WebApp.Controllers
         {
             _dashboardService = dashboardService;
             _jobService = jobService;
-            _welcomeService = welcomeService;
+            _onboardingService = onboardingService;
             _referenceDataService = referenceDataService;
             _signInManager = signInManager;
         }
@@ -62,8 +63,8 @@ namespace WebApp.Controllers
             if (User.FindFirst("FromSignUp")?.Value == "true" && User.IsInRole("Applicant"))
                 return RedirectToAction("Onboarding", "Home");
 
-            var model = await _jobService.GetAllJobsAsync();
-            return View(model);
+            var model = await _jobService.GetApplicantFeaturedJobsAsync(UserId);
+            return View(model.OrderByDescending(m => m.MatchPercentage).ToList());
         }
 
         [Route("dashboard")]
@@ -92,6 +93,24 @@ namespace WebApp.Controllers
         public IActionResult InvalidAccess()
         {
             return View();
+        }
+
+        [HttpGet]
+        [Authorize]
+        [Route("/resume")]
+        public async Task<IActionResult> GetResume(string id)
+        {
+            if (ModelState.IsValid && !string.IsNullOrEmpty(id))
+            {
+                var resume = await _onboardingService.GetApplicantResumeByIdAsync(id);
+                if (resume == null)
+                {
+                    return NotFound();
+                }
+
+                return File(resume.FileContent, resume.FileType, resume.FileName);
+            }
+            return NotFound();
         }
     }
 }

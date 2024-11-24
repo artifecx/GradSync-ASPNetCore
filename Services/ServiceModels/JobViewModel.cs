@@ -115,5 +115,6 @@ namespace Services.ServiceModels
         public bool HasApplied { get; set; } = false;
         public string ApplicationId { get; set; } = null;
 
+        public List<JobApplicantMatch> JobMatches { get; set; }
     }
 }

@@ -11,7 +11,7 @@
     <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title text-2xl font-bold text-[#7A1515]" id="editJobModalLabel">Edit Job</h5>
+                <h5 class="modal-title text-2xl font-bold text-[#7A1515]" id="editJobModalLabel">Update Job</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeEditJobModal">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -50,9 +50,9 @@
                         <div>
                             <label asp-for="Description" class="block text-sm font-semibold text-gray-700">Description</label>
                             <textarea placeholder="Job description, benefits, etc. (make this field as descriptive as possible)" 
-                                asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobDescription" name="Description" maxlength="800">@Model.Description</textarea>
+                                asp-for="Description" class="block h-14 w-full rounded-lg border border-gray-300 p-2 text-sm" id="editJobDescription" name="Description" maxlength="3000">@Model.Description</textarea>
                             <span asp-validation-for="Description" class="text-sm text-red-500"></span>
-                            <span id="remainingDescriptionChars" class="text-xs text-gray-500">800 characters remaining</span>
+                            <span id="remainingDescriptionChars" class="text-xs text-gray-500">3000 characters remaining</span>
                         </div>
 
                         <!-- Third Row: Soft Skills | Technical Skills | Certification Skills -->
@@ -196,8 +196,8 @@
             </div>
 
             <div class="modal-footer">
-                <button type="button" class="rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelEditJob" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]" id="saveEditJob" onclick="submitEditJob()">Save Changes</button>
+                <button type="button" class="min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelEditJob" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747] disabled:bg-gray-400" id="saveEditJob" onclick="submitEditJob()">Update</button>
             </div>
         </div>
     </div>

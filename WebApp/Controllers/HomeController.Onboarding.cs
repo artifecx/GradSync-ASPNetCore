@@ -36,7 +36,7 @@ namespace WebApp.Controllers
                 model.UserId = UserId;
                 if (ModelState.IsValid)
                 {
-                    var user = await _welcomeService.CompleteOnboardingAsync(model);
+                    var user = await _onboardingService.CompleteOnboardingAsync(model);
                     await _signInManager.SignInAsync(user);
 
                     TempData["SuccessMessage"] = "Welcome to GradSync!";

@@ -59,7 +59,7 @@
             createJobForm.reset();
             $(".text-red-500").text('');
             $("#remainingTitleChars").text('100 characters remaining');
-            $("#remainingDescriptionChars").text('800 characters remaining');
+            $("#remainingDescriptionChars").text('3000 characters remaining');
             $("#skillWeights").text('30% - 70%');
             switchToTab(currentSectionIndex, 0);
             toggleCancelButton('show');
@@ -99,7 +99,7 @@
         contentTextarea.addEventListener('keyup', updateRemainingChars);
     }
     addCharCountListener('createJobTitle', 'remainingTitleChars', 100);
-    addCharCountListener('createJobDescription', 'remainingDescriptionChars', 800);
+    addCharCountListener('createJobDescription', 'remainingDescriptionChars', 3000);
 
     /// ------------------------------------
     /// Summary: Update Summary

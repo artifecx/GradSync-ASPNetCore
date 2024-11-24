@@ -48,6 +48,8 @@ namespace Data.Repositories
                 .Include(a => a.Job)
                     .ThenInclude(j => j.PostedBy)
                         .ThenInclude(r => r.User)
+                .Include(a => a.Job)
+                    .ThenInclude(j => j.JobApplicantMatches)
                 .Include(a => a.User)
                     .ThenInclude(u => u.EducationalDetail)
                         .ThenInclude(ed => ed.Department)
@@ -114,6 +116,7 @@ namespace Data.Repositories
                              EmploymentTypeId = a.Job.EmploymentType.EmploymentTypeId,
                              Name = a.Job.EmploymentType.Name
                          },
+                         JobApplicantMatches = a.Job.JobApplicantMatches,
                      },
                      User = new Applicant
                      {

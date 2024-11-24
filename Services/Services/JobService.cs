@@ -13,6 +13,9 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
+using Data.Repositories;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using Data.Dtos;
 
 namespace Services.Services
 {
@@ -23,18 +26,21 @@ namespace Services.Services
     {
         private readonly IJobRepository _repository;
         private readonly ICompanyRepository _companyRepository;
+        private readonly IJobMatchingApiService _jobMatchingApiService;
         private readonly IMapper _mapper;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public JobService(
             IJobRepository repository,
             ICompanyRepository companyRepository,
+            IJobMatchingApiService jobMatchingApiService,
             IMapper mapper,
             ILogger<JobService> logger,
             IHttpContextAccessor httpContextAccessor)
         {
             _repository = repository;
             _companyRepository = companyRepository;
+            _jobMatchingApiService = jobMatchingApiService;
             _mapper = mapper;
             _httpContextAccessor = httpContextAccessor;
         }
@@ -77,6 +83,7 @@ namespace Services.Services
             job.SkillWeights = ((decimal)model.SkillWeights);
 
             await _repository.AddJobAsync(job);
+            await _jobMatchingApiService.MatchAndSaveJobApplicantsAsync(job.JobId);
         }
 
         private static string SetSalaryRange(double? lower, double? upper)
@@ -130,6 +137,7 @@ namespace Services.Services
             job.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateJobAsync(job);
+            await _jobMatchingApiService.UpdateMatchJobApplicantsAsync(job.JobId);
         }
 
         private bool SetJobSkills(Job job, JobViewModel model)
@@ -262,6 +270,12 @@ namespace Services.Services
         }
 
         #region Get Methods        
+        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId) =>
+            _mapper.Map<List<FeaturedJobsViewModel>>(await _repository.GetApplicantFeaturedJobsAsync(userId));
+
+        public async Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId) =>
+            await _repository.GetApplicantDetailsAsync(applicantId);
+
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {
             var jobs = string.Equals(archived, "archived") ?
@@ -306,6 +320,17 @@ namespace Services.Services
             var filterByWorkSetup = filters.FilterByWorkSetup;
             var filterBySalary = filters.FilterBySalary;
             var sortBy = filters.SortBy;
+            var userRole = filters.UserRole;
+            var userId = filters.UserId;
+
+            if (!string.IsNullOrEmpty(userRole) && userRole == Role_Applicant)
+            {
+                var applicant = await _repository.GetApplicantDetailsAsync(userId);
+                if(applicant != null) 
+                {
+                    jobs = jobs.Where(job => job.Programs.Exists(jp => jp.DepartmentId == applicant.DepartmentId)).ToList();
+                }
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -385,8 +410,16 @@ namespace Services.Services
                 "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
                 "updated_desc" => jobs.OrderByDescending(j => j.UpdatedDate).ToList(),
                 "updated_asc" => jobs.OrderBy(j => j.UpdatedDate).ToList(),
-                //"match" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
-                _ => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
+                "match" => jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
+                    .OrderByDescending(j => j.JobMatches
+                        .Where(m => m.UserId == userId)
+                        .Max(m => m.MatchPercentage)).ToList(),
+                _ => userRole == Role_Applicant
+                    ? jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
+                        .OrderByDescending(j => j.JobMatches
+                            .Where(m => m.UserId == userId)
+                            .Max(m => m.MatchPercentage)).ToList() 
+                    : jobs.OrderByDescending(j => j.CreatedDate).ToList(),
             };
 
             return jobs;

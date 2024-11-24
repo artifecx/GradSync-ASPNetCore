@@ -7,111 +7,85 @@
     bool isRecruiter = User.IsInRole("Recruiter");
     var userId = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
+    var route = ViewContext.RouteData.Values["Controller"].ToString();
 }
 
-<div class="bg-[#F5F7F8] @((ViewBag.LoginView == true || ViewBag.create == true) ? "hide-navbar" : "sidebar")">
-    <div class="cursor-pointer">
+<div class="mx-2.5 mt-2.5 flex max-h-screen min-h-screen w-64 flex-col items-center gap-2.5 pb-4 @((ViewBag.LoginView == true || ViewBag.create == true) ? "hidden" : "")">
+    <div class="flex w-full flex-grow flex-col gap-1 overflow-y-auto rounded-md bg-white p-3 shadow-md xl:rounded-xl">
         <img src="~/img/logo1.png"
-             class="w-48"
+             class="my-3 w-full cursor-pointer px-2.5"
              alt="logo"
              onclick="window.location.href = '@(isRecruiter ? Url.Action("GetAllJobsRecruiter", "Job") : Url.Action("Dashboard", "Home"))';">
-    </div>
-    <div class="mb-2 mt-5 bg-[#F5F7F8] font-semibold text-gray-700">Navigation</div>
-    <ul class="flex-grow list-none text-[#7A1515]">
+        <hr />
         @if (isAdmin || isSuper)
         {
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="Dashboard" asp-controller="Home"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-area-chart mr-2"></i>
-                    Dashboard
-                </a>
-
-            </li>
+            <a asp-action="Dashboard" asp-controller="Home"
+               class="@(route == "Home" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-area-chart"></i>
+                DASHBOARD
+            </a>
         }
         @if (isSuper)
         {
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllUsers" asp-controller="User"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-users mr-2"></i>
-                    Users
-                </a>
-            </li>
+            <a asp-action="GetAllUsers" asp-controller="User"
+               class="@(route == "User" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-users"></i>
+                USERS
+            </a>
         }
         @if (isAdmin && !isSuper)
         {
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllCompanies" asp-controller="Company"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-building mr-2"></i>
-                    Companies
-                </a>
-            </li>
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllJobsAdmin" asp-controller="Job"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-suitcase mr-2"></i>
-                    Jobs
-                </a>
-            </li>
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllApplications" asp-controller="Application"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-check-circle-o mr-2"></i>
-                    Applications
-                </a>
-            </li>
+            <a asp-action="GetAllCompanies" asp-controller="Company"
+               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-building"></i>
+                COMPANIES
+            </a>
+            <a asp-action="GetAllJobsAdmin" asp-controller="Job"
+               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-suitcase"></i>
+                JOBS
+            </a>
+            <a asp-action="GetAllApplications" asp-controller="Application"
+               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-check-circle-o"></i>
+                APPLICATIONS
+            </a>
         }
         @if (isRecruiter)
         {
-                <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetCompanyRecruiter" asp-controller="Company"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-building mr-2"></i>
-                    Company
-                </a>
-            </li>
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllJobsRecruiter" asp-controller="Job"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-suitcase mr-2"></i>
-                    Jobs
-                </a>
-            </li>
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetAllApplications" asp-controller="Application"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-check-circle-o mr-2"></i>
-                    Applications
-                </a>
-            </li>
+            <a asp-action="GetCompanyRecruiter" asp-controller="Company"
+               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-building"></i>
+                COMPANY
+            </a>
+            <a asp-action="GetAllJobsRecruiter" asp-controller="Job"
+               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-suitcase"></i>
+                JOBS
+            </a>
+            <a asp-action="GetAllApplications" asp-controller="Application"
+               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-check-circle-o"></i>
+                APPLICATIONS
+            </a>
         }
-        <li>
-            <hr class="my-2 border-gray-300" />
-        </li>
+        <hr />
         @if (!isAdmin)
         {
-            <li class="bg-[#F5F7F8] py-2">
-                <a asp-action="GetUserProfile" asp-controller="UserProfile"
-                   class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                    <i class="fa fa-cog mr-2"></i> Settings
-                </a>
-            </li>
-        }
-        <li class="bg-[#F5F7F8] py-2">
-            <a href="#" data-toggle="modal" data-target="#logoutModal"
-               class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                <i class="fa fa-sign-out mr-2"></i>
-                Log out
+            <a asp-action="GetUserProfile" asp-controller="UserProfile"
+               class="@(route == "UserProfile" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                <i class="fa fa-cog"></i> SETTINGS
             </a>
-        </li>
-    </ul>
-    <div class="mt-4 flex items-center rounded bg-gray-100 p-4 text-[#7A1515]">
-        <i class="fa fa-user-circle mr-3 text-4xl text-[#7A1515]"></i>
-        <div>
+        }
+        <a href="#" data-toggle="modal" data-target="#logoutModal"
+           class="shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+            <i class="fa fa-sign-out"></i>
+            LOG OUT
+        </a>
+        <div class="shrink-0 mt-auto flex w-full flex-col items-center gap-1 overflow-y-auto rounded-md p-3 font-semibold text-[#A04747] xl:rounded-xl">
+            <img src="https://ui-avatars.com/api/?name=@HttpContextAccessor.HttpContext.User.Identity.Name" alt="Profile Image" class="h-10 w-10 rounded-full">
             <span>@HttpContextAccessor.HttpContext.User.Identity.Name</span>
-            <div class="text-sm text-gray-500">
+            <div class="text-sm tracking-wide text-[#625f5f]">
                 @if (isSuper)
                 {
                     <text>(Super Admin)</text>
