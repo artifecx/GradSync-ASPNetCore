@@ -34,6 +34,8 @@
     string sortByDefault = sortBy == "match" || string.IsNullOrEmpty(sortBy) ? "match" : null;
     string sortBySalary = sortBy == "salary_asc" ? "salary_desc" : "salary_asc";
     string sortByDate = sortBy == "created_asc" ? "created_desc" : "created_asc";
+
+    string userId = ViewBag.UserId;
 }
 
 <div class="mx-auto min-h-screen min-w-full bg-[#F5F6F8] pt-16 text-gray-900">
@@ -164,7 +166,13 @@
                                         <!-- Job Match Percentage Placeholder -->
                                         <div class="flex items-center space-x-1 text-sm font-semibold text-gray-700">
                                             <span class="pr-1 text-xs font-bold">Job Match:</span>
-                                            <span class="rounded-full border border-red-500 px-2 py-1 text-xs text-green-600">85%</span> <!--placeholder sheesh-->
+                                            <span class="rounded-full border border-red-500 px-2 py-1 text-xs text-green-600">
+                                                @{
+                                                    var match = job.JobMatches.FirstOrDefault(j => j.UserId == userId);
+                                                    var percentage = match == null ? "Unavailable" : match.MatchPercentage.ToString() + "%";
+                                                }
+                                                @percentage
+                                            </span> 
                                         </div>
 
                                         <!-- Details and Application Button -->

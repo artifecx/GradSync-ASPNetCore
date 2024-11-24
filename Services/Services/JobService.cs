@@ -320,6 +320,17 @@ namespace Services.Services
             var filterByWorkSetup = filters.FilterByWorkSetup;
             var filterBySalary = filters.FilterBySalary;
             var sortBy = filters.SortBy;
+            var userRole = filters.UserRole;
+            var userId = filters.UserId;
+
+            if (!string.IsNullOrEmpty(userRole) && userRole == Role_Applicant)
+            {
+                var applicant = await _repository.GetApplicantDetailsAsync(userId);
+                if(applicant != null) 
+                {
+                    jobs = jobs.Where(job => job.Programs.Exists(jp => jp.DepartmentId == applicant.DepartmentId)).ToList();
+                }
+            }
 
             if (!string.IsNullOrEmpty(search))
             {
@@ -399,8 +410,14 @@ namespace Services.Services
                 "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
                 "updated_desc" => jobs.OrderByDescending(j => j.UpdatedDate).ToList(),
                 "updated_asc" => jobs.OrderBy(j => j.UpdatedDate).ToList(),
-                //"match" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
-                _ => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
+                "match" => jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
+                    .OrderByDescending(j => j.JobMatches
+                        .Where(m => m.UserId == userId)
+                        .Max(m => m.MatchPercentage)).ToList(),
+                _ => jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
+                    .OrderByDescending(j => j.JobMatches
+                        .Where(m => m.UserId == userId)
+                        .Max(m => m.MatchPercentage)).ToList(),
             };
 
             return jobs;
