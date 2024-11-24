@@ -14,6 +14,8 @@ using System.Threading.Tasks;
 using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
 using Data.Repositories;
+using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
+using Data.Dtos;
 
 namespace Services.Services
 {
@@ -268,11 +270,11 @@ namespace Services.Services
         }
 
         #region Get Methods        
-        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId)
-        {
-            var jobs = await _repository.GetApplicantFeaturedJobsAsync(userId);
-            return _mapper.Map<List<FeaturedJobsViewModel>>(jobs);
-        }
+        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId) =>
+            _mapper.Map<List<FeaturedJobsViewModel>>(await _repository.GetApplicantFeaturedJobsAsync(userId));
+
+        public async Task<ApplicantDto> GetApplicantDetailsAsync(string applicantId) =>
+            await _repository.GetApplicantDetailsAsync(applicantId);
 
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {

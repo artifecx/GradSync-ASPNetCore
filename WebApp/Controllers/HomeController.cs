@@ -94,5 +94,23 @@ namespace WebApp.Controllers
         {
             return View();
         }
+
+        [HttpGet]
+        [Authorize]
+        [Route("/resume")]
+        public async Task<IActionResult> GetResume(string id)
+        {
+            if (ModelState.IsValid && !string.IsNullOrEmpty(id))
+            {
+                var resume = await _onboardingService.GetApplicantResumeByIdAsync(id);
+                if (resume == null)
+                {
+                    return NotFound();
+                }
+
+                return File(resume.FileContent, resume.FileType, resume.FileName);
+            }
+            return NotFound();
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using Data.Interfaces;
+﻿using Data.Dtos;
+using Data.Interfaces;
 using Data.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -92,6 +93,52 @@ namespace Data.Repositories
                 })
                 .AsNoTracking()
                 .ToListAsync();
+        }
+
+        public async Task<ApplicantDto> GetApplicantDetailsAsync(string applicantId)
+        {
+            var applicant = await this.GetDbSet<Applicant>()
+                .Where(a => a.UserId == applicantId)
+                .Include(a => a.User)
+                .Include(a => a.ApplicantSkills)
+                    .ThenInclude(a => a.Skill)
+                .Include(a => a.EducationalDetail)
+                    .ThenInclude(e => e.Program)
+                .Include(a => a.EducationalDetail)
+                    .ThenInclude(e => e.Department)
+                .Include(a => a.EducationalDetail)
+                    .ThenInclude(e => e.College)
+                .Include(a => a.EducationalDetail)
+                    .ThenInclude(e => e.YearLevel)
+                .Select(a => new ApplicantDto
+                {
+                    ApplicantId = a.UserId,
+                    Name = $"{a.User.FirstName}"
+                        + $"{(string.IsNullOrWhiteSpace(a.User.MiddleName) ? "" : " " + a.User.MiddleName)}"
+                        + $" {a.User.LastName}"
+                        + $"{(string.IsNullOrWhiteSpace(a.User.Suffix) ? "" : " " + a.User.Suffix)}",
+                    Email = a.User.Email,
+                    TechnicalSkills = a.ApplicantSkills
+                        .Where(s => s.Type == "Technical")
+                        .Select(s => s.Skill.Name)
+                        .ToList(),
+                    CulturalSkills = a.ApplicantSkills
+                        .Where(s => s.Type == "Cultural")
+                        .Select(s => s.Skill.Name)
+                        .ToList(),
+                    Certifications = a.ApplicantSkills
+                        .Where(s => s.Type == "Certification")
+                        .Select(s => s.Skill.Name)
+                        .ToList(),
+                    ProgramName = a.EducationalDetail.Program.Name,
+                    DepartmentName = a.EducationalDetail.Department.Name,
+                    CollegeName = a.EducationalDetail.College.Name,
+                    YearLevelName = a.EducationalDetail.YearLevel.Name
+                })
+                .AsNoTracking()
+                .FirstOrDefaultAsync();
+
+            return applicant;
         }
 
         public async Task<List<Job>> GetAllJobsAsync() =>

@@ -1,4 +1,5 @@
-﻿using Data.Models;
+﻿using Data.Dtos;
+using Data.Models;
 using Services.ServiceModels;
 using System;
 using System.Collections.Generic;
@@ -14,6 +15,7 @@ namespace Services.Interfaces
         Task ArchiveJobAsync(string id);
         Task UnarchiveJobAsync(JobServiceModel model);
         Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId);
+        Task<ApplicantDto> GetApplicantDetailsAsync(string applicantId);
         Task<List<JobViewModel>> GetAllJobsAsync();
         Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null);
         Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(FilterServiceModel filters, string archived = null);
