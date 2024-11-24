@@ -64,9 +64,9 @@ namespace WebApp.Controllers
                 if (ModelState.IsValid && !string.IsNullOrEmpty(id))
                 {
                     var model = await _jobService.GetApplicantDetailsAsync(id);
-                    return PartialView("_ApplicantDetailsModal", model);
+                    return PartialView("_ApplicantDetails", model);
                 }
-                return PartialView("_ApplicantDetailsModal", new Applicant());
+                return PartialView("_ApplicantDetails", new Applicant());
             }, "GetApplicantDetails");
         }
 

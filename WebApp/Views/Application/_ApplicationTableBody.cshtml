@@ -1,1 +1,176 @@
-﻿
+﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.ApplicationViewModel>
+
+@{
+    ViewData["Title"] = "Application List";
+
+    string search = ViewData["Search"] as string;
+    string sortBy = ViewData["SortBy"] as string;
+    string filterByProgram = ViewData["ProgramFilter"] as string;
+    string filterByWorkSetup = ViewData["WorkSetupFilter"] as string;
+    string filterByStatus = ViewData["StatusFilter"] as string;
+
+
+    bool isAdministrative = User.IsInRole("Admin") || User.IsInRole("NLO");
+    bool isRecruiter = User.IsInRole("Recruiter");
+
+    int pageIndex = Model.PageIndex;
+    bool hasFilters = !string.IsNullOrEmpty(search) ||
+        !string.IsNullOrEmpty(filterByProgram) ||
+        !string.IsNullOrEmpty(filterByWorkSetup) ||
+        !string.IsNullOrEmpty(filterByStatus);
+}
+
+@if (!Model.Any())
+{
+    <tr>
+        <td colspan="10" class="whitespace-nowrap px-6 py-3 text-center text-sm text-[#625f5f]">
+            @(hasFilters ? "No applications found" : "No applications found matching the criteria")
+        </td>
+    </tr>
+}
+else
+{
+    @foreach (var item in Model)
+    {
+        var applicant = item.Applicant;
+        var applicantUser = applicant.User;
+        var applicantResume = applicant.Resume;
+        var applicantEducation = applicant.EducationalDetail;
+        var applicantDetails = $"{item.ApplicantName}\n{applicantEducation.IdNumber}\n{applicantUser.Email}";
+        var applicantProgram = applicantEducation.Program;
+        var company = item.Job.Company;
+        var companyDetails = $"{company.Name}\n{company.ContactEmail}\n{company.ContactNumber}";
+        var job = item.Job;
+        var jobSetup = job.SetupType;
+        var applicationStatus = item.ApplicationStatusType;
+        var applicationDate = $"{item.CreatedDate.ToString("MM/dd/yyyy")} {item.CreatedDate.ToString("hh:mm tt")}";
+
+        <tr class="hover:bg-gray-100">
+            @if (isAdministrative || isRecruiter)
+            {
+                <td class="w-24 py-3 pl-3 text-sm text-gray-700">
+                    <div class="text-xs font-medium text-[#7A1515]">@applicantEducation.IdNumber</div>
+                </td>
+
+                <!-- Applicant details | FILTER -->
+                <td class="w-24 py-3 pr-3 text-sm text-gray-700">
+                    <div>
+                        <a href="#"
+                           class="view-details mt-2 font-semibold hover:!no-underline hover:text-[#A04747]"
+                           data-id="@item.ApplicantId"
+                           title="View applicant details">
+                            @item.ApplicantName
+                        </a>
+                        <div class="text-xs">@applicantUser.Email</div>
+                        <div class="text-xs">@applicant.Address</div>
+                    </div>
+                </td>
+
+                <!-- Applicant's program | FILTER -->
+                <td class="cursor-pointer px-2 py-3 text-xs text-gray-700" title="@applicantProgram.Name">
+                    @applicantProgram.ProgramId
+                </td>
+                <!-- Job title | FILTER -->
+                <td class="px-3 py-3 text-xs text-gray-700">
+                    <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
+                       class="font-semibold text-[#7A1515] hover:underline hover:text-[#A53D3D]">
+                        @item.Job.Title
+                    </a>
+                </td>
+                if (isAdministrative)
+                {
+                    <!-- Company details | FILTER -->
+                    <td class="px-6 py-3 text-xs text-gray-700">@Html.Raw(companyDetails.Replace("\n", "<br>"))</td>
+                }
+                <!-- Job location | FILTER -->
+                <td class="px-3 py-3 text-xs text-gray-700">@job.Location</td>
+                <!-- Setup type | FILTER -->
+                <td class="px-3 py-3 text-xs text-gray-700">@jobSetup.Name</td>
+                <!-- Application date | SORT -->
+                <td class="w-30 py-3 pl-2 text-xs text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
+                <!-- Application Status | FILTER -->
+                <td class="px-3 py-3 text-xs text-gray-700">@item.ApplicationStatusType.Name</td>
+            }
+            else
+            {
+                var recruiter = item.Job.PostedBy;
+                var recruiterDetails = $"{item.RecruiterName}\n{recruiter.User.Email}\n{recruiter.Title}";
+
+                <!-- Job title | FILTER -->
+                <td class="px-6 py-3 text-sm text-gray-700">
+                    <div>
+                        <a href="@Url.Action("GetJob", "Job", new { id = item.JobId })"
+                           class="text-sm font-semibold text-[#7A1515] hover:underline hover:text-[#A53D3D]">
+                            @item.Job.Title
+                        </a>
+                    </div>
+                </td>
+                <!-- Company details | FILTER -->
+                <td class="px-6 py-3 text-sm font-semibold text-[#7A1515]">
+                    @company.Name
+                    <div class="text-xs font-medium text-gray-700">@company.ContactEmail</div>
+                    <div class="text-xs font-medium text-gray-700">@company.ContactNumber</div>
+                </td>
+                <!-- Job location | FILTER -->
+                <td class="px-6 py-3 text-sm text-gray-700">@job.Location</td>
+                <!-- Setup type | FILTER -->
+                <td class="px-6 py-3 text-sm text-gray-700">@jobSetup.Name</td>
+                <!-- Application date | SORT -->
+                <td class="px-3 py-3 text-sm text-gray-700">@Html.Raw(applicationDate.Replace("\n", "<br>"))</td>
+                <!-- Application Status | FILTER -->
+                <td class="px-6 py-3 text-sm text-gray-700">@item.ApplicationStatusType.Name</td>
+                <!-- Recruiter details -->
+                <td class="px-6 py-3 text-sm font-semibold text-[#7A1515]">
+                    @item.RecruiterName
+                    <div class="text-xs font-medium text-gray-700">@recruiter.User.Email</div>
+                    <div class="text-xs font-medium text-gray-700">@recruiter.Title</div>
+                </td>
+            }
+
+            <td class="py-3 pl-6 text-left">
+                <!--Action Button DropDown-->
+                <div class="relative">
+                    <button data-applicationid="@item.ApplicationId"
+                            class="actionDropdownApplicationBtn cursor-pointer px-6 text-black hover:text-[#A53D3D] focus:outline-none">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </button>
+
+                    <div id="actionDropdownApplicationMenu-@item.ApplicationId"
+                         class="actionDropdownApplicationMenu z-10 ring-1 ring-opacity-5 absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white text-left shadow-lg ring-black">
+                        <div class="space-y-1 py-1">
+
+                            <!-- Application Details -->
+                            <button onclick="location.href='@Url.Action("GetApplication", "Application",
+                                                                new {
+                                                                    id = item.ApplicationId,
+                                                                    sortBy = sortBy,
+                                                                    search = search,
+                                                                    pageIndex = Model.PageIndex,
+                                                                    filterByWorkSetup = filterByWorkSetup,
+                                                                    filterByProgram = filterByProgram,
+                                                                    filterByStatus = filterByStatus,
+                                                                })'"
+                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                <i class="fas fa-info-circle mr-2"></i> Details
+                            </button>
+
+                            <button class="update-job-status text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                    data-applicationid="@item.ApplicationId"
+                                    data-statusid="@item.ApplicationStatusTypeId"
+                                    data-toggle="modal"
+                                    data-target="#updateApplicationStatusModal">
+                                <i class="fa-solid fa-rotate mr-2"></i>Update Status
+                            </button>
+
+                            <!-- Archive Job -->
+                            <button onclick=" displayDeleteModal('@item.ApplicationId' , '@item.Job.Title')"
+                                    class="text-grey-700 w-full cursor-pointer px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
+                                <i class="fas fa-archive mr-2"></i> Archive
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+}

@@ -30,290 +30,301 @@
     var sortByTitle = sortBy == "title_asc" ? "title_desc" : "title_asc";
 }
 
-<thead class="rounded-lg border bg-gray-100">
-    <tr>
-        @if (isAdministrative || isRecruiter)
+<tr>
+    @if (isAdministrative || isRecruiter)
+    {
+        <!-- Applicant details -->
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">ID NO.</th>
+        <th class="py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Applicant)</th>
+        <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <div class="dropdown relative">
+                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByProgram) ? "text-[#A04747]" : "")"
+                   href="#" id="statusTypeDropdown"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    @if (string.IsNullOrEmpty(filterByProgram))
+                    {
+                        @Html.DisplayNameFor(model => model.First().Applicant.EducationalDetail.Program)
+                    }
+                    else
+                    {
+                        <text>@filterByProgram</text>
+                    }
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                       asp-action="@aspAction"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-programFilter=""
+                       asp-route-workSetupFilter="@filterByWorkSetup"
+                       asp-route-statusFilter="@filterByStatus">All</a>
+                    @if (programs != null)
+                    {
+                        foreach (var group in programs.OrderBy(pg => pg.Department.Name).GroupBy(pg => pg.Department.Name))
+                        {
+                            <div class="space-y-2">
+                                <span class="block px-4 pt-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
+                                    @group.Key
+                                </span>
+                                @foreach (var p in group)
+                                {
+                                    <a class="dropdown-item block px-4 text-xs hover:bg-gray-100"
+                                       asp-action="@aspAction"
+                                       asp-route-sortBy="@sortBy"
+                                       asp-route-search="@search"
+                                       asp-route-programFilter="@p.ProgramId"
+                                       asp-route-workSetupFilter="@filterByWorkSetup"
+                                       asp-route-statusFilter="@filterByStatus">
+                                        @p.Name
+                                    </a>
+                                }
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
+        </th>
+
+        <!-- Job title/Position | SORT -->
+        <th class="py-3 pl-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <a asp-action="@aspAction"
+               asp-route-sortBy="@sortByTitle"
+               asp-route-search="@search"
+               asp-route-programFilter="@filterByProgram"
+               asp-route-workSetupFilter="@filterByWorkSetup"
+               asp-route-statusFilter="@filterByStatus"
+               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
+                Position
+                @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+            </a>
+        </th>
+        @if (isAdministrative)
         {
-            <!-- Applicant details -->
-            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">ID NO.</th>
-            <th class="py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Applicant)</th>
-            <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                <div class="dropdown relative">
-                    <a class="cursor-pointer" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @if (string.IsNullOrEmpty(filterByProgram))
-                        {
-                            @Html.DisplayNameFor(model => model.First().Applicant.EducationalDetail.Program)
-                        }
-                        else
-                        {
-                            <text>@filterByProgram</text>
-                        }
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </a>
-
-                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                           asp-action="@aspAction"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-search="@search"
-                           asp-route-programFilter=""
-                           asp-route-workSetupFilter="@filterByWorkSetup"
-                           asp-route-statusFilter="@filterByStatus">All</a>
-                        @if (programs != null)
-                        {
-                            foreach (var group in programs.OrderBy(pg => pg.Department.Name).GroupBy(pg => pg.Department.Name))
-                            {
-                                <div class="space-y-2">
-                                    <span class="block px-4 pt-2 text-sm font-semibold uppercase tracking-wide text-gray-600">
-                                        @group.Key
-                                    </span>
-                                    @foreach (var p in group)
-                                    {
-                                        <a class="dropdown-item block px-4 text-xs hover:bg-gray-100"
-                                           asp-action="@aspAction"
-                                           asp-route-sortBy="@sortBy"
-                                           asp-route-search="@search"
-                                           asp-route-programFilter="@p.ProgramId"
-                                           asp-route-workSetupFilter="@filterByWorkSetup"
-                                           asp-route-statusFilter="@filterByStatus">
-                                            @p.Name
-                                        </a>
-                                    }
-                                </div>
-                            }
-                        }
-                    </div>
-                </div>
-            </th>
-
-            <!-- Job title/Position | SORT -->
-            <th class="pl-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-600">
-                <a asp-action="@aspAction"
-                   asp-route-sortBy="@sortByTitle"
-                   asp-route-search="@search"
-                   asp-route-programFilter="@filterByProgram"
-                   asp-route-workSetupFilter="@filterByWorkSetup"
-                   asp-route-statusFilter="@filterByStatus"
-                   class="text-gray-500">
-                    Position
-                    @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                </a>
-            </th>
-            if (isAdministrative)
-            {
-                <!-- Company details -->
-                <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-600">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
-            }
-            <!-- Job location -->
-            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Job.Location)</th>
-            <!-- Setup type | FILTER -->
-            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                <div class="dropdown relative">
-                    <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @if (string.IsNullOrEmpty(filterByWorkSetup))
-                        {
-                            <text>Setup</text>
-                        }
-                        else
-                        {
-                            <text>@filterByWorkSetup</text>
-                        }
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                           asp-action="@aspAction"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-search="@search"
-                           asp-route-programFilter="@filterByProgram"
-                           asp-route-workSetupFilter=""
-                           asp-route-statusFilter="@filterByStatus">All</a>
-                        @if (workSetups != null)
-                        {
-                            foreach (var ws in workSetups)
-                            {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                                   asp-action="@aspAction"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search"
-                                   asp-route-programFilter="@filterByProgram"
-                                   asp-route-workSetupFilter="@ws.SetupTypeId"
-                                   asp-route-statusFilter="@filterByStatus">@ws.Name</a>
-                            }
-                        }
-                    </div>
-                </div>
-            </th>
-
-            <!-- Application date | SORT -->
-            <th class="pl-2 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
-                <a asp-action="@aspAction"
-                   asp-route-sortBy="@sortByCreatedDate"
-                   asp-route-search="@search"
-                   asp-route-programFilter="@filterByProgram"
-                   asp-route-workSetupFilter="@filterByWorkSetup"
-                   asp-route-statusFilter="@filterByStatus"
-                   class="text-gray-500">
-                    @Html.DisplayNameFor(model => model.First().CreatedDate)
-                    @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                </a>
-            </th>
-
-            if (isRecruiter)
-            {
-                <!-- Applicant Resume -->
-                <th class="pl-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Applicant.Resume)</th>
-            }
-            <!-- Application Status | FILTER -->
-            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">
-                <div class="dropdown relative">
-                    <a class="cursor-pointer text-gray-500" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @if (string.IsNullOrEmpty(filterByStatus))
-                        {
-                            <text>Status</text>
-                        }
-                        else
-                        {
-                            <text>@filterByStatus</text>
-                        }
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                           asp-action="@aspAction"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-search="@search"
-                           asp-route-programFilter="@filterByProgram"
-                           asp-route-workSetupFilter="@filterByWorkSetup"
-                           asp-route-statusFilter="">All</a>
-                        @if (statusTypes != null)
-                        {
-                            foreach (var st in statusTypes)
-                            {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                                   asp-action="@aspAction"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search"
-                                   asp-route-programFilter="@filterByProgram"
-                                   asp-route-workSetupFilter="@filterByWorkSetup"
-                                   asp-route-statusFilter="@st.ApplicationStatusTypeId">@st.Name</a>
-                            }
-                        }
-                    </div>
-                </div>
-            </th>
-        }
-        else
-        {
-            <!-- Job title | SORT -->
-            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
-                <a asp-action="@aspAction"
-                   asp-route-sortBy="@sortByTitle"
-                   asp-route-search="@search"
-                   asp-route-programFilter="@filterByProgram"
-                   asp-route-workSetupFilter="@filterByWorkSetup"
-                   asp-route-statusFilter="@filterByStatus"
-                   class="text-gray-900">
-                    POSITION
-                    @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                </a>
-            </th>
             <!-- Company details -->
-            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
-            <!-- Job location -->
-            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Job.Location)</th>
-            <!-- Setup type | FILTER -->
-            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
-                <div class="dropdown relative">
-                    <a class="cursor-pointer text-black" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @if (string.IsNullOrEmpty(filterByWorkSetup))
-                        {
-                            <text>Work Setup</text>
-                        }
-                        else
-                        {
-                            <text>@filterByWorkSetup</text>
-                        }
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                           asp-action="@aspAction"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-search="@search"
-                           asp-route-programFilter="@filterByProgram"
-                           asp-route-workSetupFilter=""
-                           asp-route-statusFilter="@filterByStatus">All</a>
-                        @if (workSetups != null)
-                        {
-                            foreach (var ws in workSetups)
-                            {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                                   asp-action="@aspAction"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search"
-                                   asp-route-programFilter="@filterByProgram"
-                                   asp-route-workSetupFilter="@ws.SetupTypeId"
-                                   asp-route-statusFilter="@filterByStatus">@ws.Name</a>
-                            }
-                        }
-                    </div>
-                </div>
-            </th>
-            <!-- Application date | SORT -->
-            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
-                <a asp-action="@aspAction"
-                   asp-route-sortBy="@sortByCreatedDate"
-                   asp-route-search="@search"
-                   asp-route-programFilter="@filterByProgram"
-                   asp-route-workSetupFilter="@filterByWorkSetup"
-                   asp-route-statusFilter="@filterByStatus"
-                   class="text-gray-900">
-                    @Html.DisplayNameFor(model => model.First().CreatedDate)
-                    @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
-                </a>
-            </th>
-            <!-- Application Status | FILTER -->
-            <th class="pl-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-900">
-                <div class="dropdown relative">
-                    <a class="cursor-pointer text-black" href="#" id="statusTypeDropdown" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        @if (string.IsNullOrEmpty(filterByStatus))
-                        {
-                            <text>Status</text>
-                        }
-                        else
-                        {
-                            <text>@filterByStatus</text>
-                        }
-                        <i class="fa-solid fa-chevron-down"></i>
-                    </a>
-                    <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-gray-700" aria-labelledby="statusTypeDropdown">
-                        <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
-                           asp-action="@aspAction"
-                           asp-route-sortBy="@sortBy"
-                           asp-route-search="@search"
-                           asp-route-programFilter="@filterByProgram"
-                           asp-route-workSetupFilter="@filterByWorkSetup"
-                           asp-route-statusFilter="">All</a>
-                        @if (statusTypes != null)
-                        {
-                            foreach (var st in statusTypes)
-                            {
-                                <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
-                                   asp-action="@aspAction"
-                                   asp-route-sortBy="@sortBy"
-                                   asp-route-search="@search"
-                                   asp-route-programFilter="@filterByProgram"
-                                   asp-route-workSetupFilter="@filterByWorkSetup"
-                                   asp-route-statusFilter="@st.ApplicationStatusTypeId">@st.Name</a>
-                            }
-                        }
-                    </div>
-                </div>
-            </th>
-            <!-- Recruiter details -->
-            <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">@Html.DisplayNameFor(model => model.First().Job.PostedBy)</th>
+            <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
         }
-        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-gray-500">Action</th>
-    </tr>
-</thead>
+        <!-- Job location -->
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.Location)</th>
+        <!-- Setup type | FILTER -->
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <div class="dropdown relative">
+                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
+                   href="#" id="statusTypeDropdown"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    @if (string.IsNullOrEmpty(filterByWorkSetup))
+                    {
+                        <text>Setup</text>
+                    }
+                    else
+                    {
+                        <text>@filterByWorkSetup</text>
+                    }
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                       asp-action="@aspAction"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-programFilter="@filterByProgram"
+                       asp-route-workSetupFilter=""
+                       asp-route-statusFilter="@filterByStatus">All</a>
+                    @if (workSetups != null)
+                    {
+                        foreach (var ws in workSetups)
+                        {
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-programFilter="@filterByProgram"
+                               asp-route-workSetupFilter="@ws.SetupTypeId"
+                               asp-route-statusFilter="@filterByStatus">@ws.Name</a>
+                        }
+                    }
+                </div>
+            </div>
+        </th>
+
+        <!-- Application date | SORT -->
+        <th class="py-3 pl-2 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <a asp-action="@aspAction"
+               asp-route-sortBy="@sortByCreatedDate"
+               asp-route-search="@search"
+               asp-route-programFilter="@filterByProgram"
+               asp-route-workSetupFilter="@filterByWorkSetup"
+               asp-route-statusFilter="@filterByStatus"
+               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
+                @Html.DisplayNameFor(model => model.First().CreatedDate)
+                @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+            </a>
+        </th>
+        <!-- Application Status | FILTER -->
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <div class="dropdown relative">
+                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
+                   href="#" id="statusTypeDropdown"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    @if (string.IsNullOrEmpty(filterByStatus))
+                    {
+                        <text>Status</text>
+                    }
+                    else
+                    {
+                        <text>@filterByStatus</text>
+                    }
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                       asp-action="@aspAction"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-programFilter="@filterByProgram"
+                       asp-route-workSetupFilter="@filterByWorkSetup"
+                       asp-route-statusFilter="">All</a>
+                    @if (statusTypes != null)
+                    {
+                        foreach (var st in statusTypes)
+                        {
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-programFilter="@filterByProgram"
+                               asp-route-workSetupFilter="@filterByWorkSetup"
+                               asp-route-statusFilter="@st.ApplicationStatusTypeId">@st.Name</a>
+                        }
+                    }
+                </div>
+            </div>
+        </th>
+    }
+    else
+    {
+        <!-- Job title | SORT -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <a asp-action="@aspAction"
+               asp-route-sortBy="@sortByTitle"
+               asp-route-search="@search"
+               asp-route-programFilter="@filterByProgram"
+               asp-route-workSetupFilter="@filterByWorkSetup"
+               asp-route-statusFilter="@filterByStatus"
+               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
+                POSITION
+                @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+            </a>
+        </th>
+        <!-- Company details -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.Company)</th>
+        <!-- Job location -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.Location)</th>
+        <!-- Setup type | FILTER -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <div class="dropdown relative">
+                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
+                   href="#" id="statusTypeDropdown"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    @if (string.IsNullOrEmpty(filterByWorkSetup))
+                    {
+                        <text>Work Setup</text>
+                    }
+                    else
+                    {
+                        <text>@filterByWorkSetup</text>
+                    }
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                       asp-action="@aspAction"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-programFilter="@filterByProgram"
+                       asp-route-workSetupFilter=""
+                       asp-route-statusFilter="@filterByStatus">All</a>
+                    @if (workSetups != null)
+                    {
+                        foreach (var ws in workSetups)
+                        {
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-programFilter="@filterByProgram"
+                               asp-route-workSetupFilter="@ws.SetupTypeId"
+                               asp-route-statusFilter="@filterByStatus">@ws.Name</a>
+                        }
+                    }
+                </div>
+            </div>
+        </th>
+        <!-- Application date | SORT -->
+        <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <a asp-action="@aspAction"
+               asp-route-sortBy="@sortByCreatedDate"
+               asp-route-search="@search"
+               asp-route-programFilter="@filterByProgram"
+               asp-route-workSetupFilter="@filterByWorkSetup"
+               asp-route-statusFilter="@filterByStatus"
+               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
+                @Html.DisplayNameFor(model => model.First().CreatedDate)
+                @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+            </a>
+        </th>
+        <!-- Application Status | FILTER -->
+        <th class="py-3 pl-6 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
+            <div class="dropdown relative">
+                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
+                   href="#" id="statusTypeDropdown"
+                   data-toggle="dropdown"
+                   aria-haspopup="true"
+                   aria-expanded="false">
+                    @if (string.IsNullOrEmpty(filterByStatus))
+                    {
+                        <text>Status</text>
+                    }
+                    else
+                    {
+                        <text>@filterByStatus</text>
+                    }
+                    <i class="fa-solid fa-chevron-down"></i>
+                </a>
+                <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
+                    <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
+                       asp-action="@aspAction"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-programFilter="@filterByProgram"
+                       asp-route-workSetupFilter="@filterByWorkSetup"
+                       asp-route-statusFilter="">All</a>
+                    @if (statusTypes != null)
+                    {
+                        foreach (var st in statusTypes)
+                        {
+                            <a class="dropdown-item block px-4 py-2 text-sm hover:bg-gray-100"
+                               asp-action="@aspAction"
+                               asp-route-sortBy="@sortBy"
+                               asp-route-search="@search"
+                               asp-route-programFilter="@filterByProgram"
+                               asp-route-workSetupFilter="@filterByWorkSetup"
+                               asp-route-statusFilter="@st.ApplicationStatusTypeId">@st.Name</a>
+                        }
+                    }
+                </div>
+            </div>
+        </th>
+        <!-- Recruiter details -->
+        <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">@Html.DisplayNameFor(model => model.First().Job.PostedBy)</th>
+    }
+    <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">Action</th>
+</tr>

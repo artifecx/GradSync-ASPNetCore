@@ -1,110 +1,17 @@
-﻿@model Data.Dtos.ApplicantViewDto
-
-<div class="mx-auto mb-3 overflow-auto rounded-lg bg-white shadow-md">
-    <!-- Contact Details Section -->
-    <div class="border-b px-6 py-4">
-        <div class="text-lg font-semibold text-gray-800">Contact Details</div>
-        <div class="text-sm">
-            <div class="text-gray-700">
-                <span class="font-medium">Full Name:</span>
-                <span class="font-normal">@Model.Name</span>
+﻿<div class="modal fade" id="applicantDetailsModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title text-[#343131]">
+                    Applicant Details
+                </h5>
+                <button type="button" class="close" data-dismiss="modal">
+                    <span>&times;</span>
+                </button>
             </div>
-            <div class="text-gray-700">
-                <span class="font-medium">Email:</span>
-                <span class="font-normal">@Model.Email</span>
-            </div>
-        </div>
-    </div>
-
-    <!-- Educational Details Section -->
-    <div class="border-b px-6 py-4">
-        <div class="text-lg font-semibold text-gray-800">Educational Details</div>
-        <div class="text-sm">
-            <div class="text-gray-700">
-                <span class="font-medium">Year Level:</span>
-                <span class="font-normal">@Model.YearLevelName</span>
-            </div>
-            <div class="text-gray-700">
-                <span class="font-medium">College:</span>
-                <span class="font-normal">@Model.CollegeName</span>
-            </div>
-            <div class="text-gray-700">
-                <span class="font-medium">Department:</span>
-                <span class="font-normal">@Model.DepartmentName</span>
-            </div>
-            <div class="text-gray-700">
-                <span class="font-medium">Program:</span>
-                <span class="font-normal">@Model.ProgramName</span>
+            <div class="modal-body mt-2 py-1 pl-4 text-[#343131]" id="applicantDetailsModalContent">
+                <!-- Content will be loaded here -->
             </div>
         </div>
-    </div>
-
-    <!-- Skills and Certifications Section -->
-    <div class="px-6 py-4">
-        <div class="flex flex-row justify-between">
-            <!-- Technical Skills -->
-            <div>
-                <div class="text-lg font-semibold text-gray-700">Technical Skills</div>
-                @if (Model.TechnicalSkills != null && Model.TechnicalSkills.Any())
-                {
-                    <ul class="list-inside list-disc text-sm text-gray-600">
-                        @foreach (var skill in Model.TechnicalSkills)
-                        {
-                            <li>@skill</li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-sm text-gray-600">No technical skills listed.</p>
-                }
-            </div>
-
-            <!-- Cultural Skills -->
-            <div>
-                <h3 class="text-lg font-semibold text-gray-700">Cultural Skills</h3>
-                @if (Model.CulturalSkills != null && Model.CulturalSkills.Any())
-                {
-                    <ul class="list-inside list-disc text-sm text-gray-600">
-                        @foreach (var skill in Model.CulturalSkills)
-                        {
-                            <li>@skill</li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-sm text-gray-600">No cultural skills listed.</p>
-                }
-            </div>
-
-            <!-- Certifications -->
-            <div>
-                <h3 class="text-lg font-semibold text-gray-700">Certifications</h3>
-                @if (Model.Certifications != null && Model.Certifications.Any())
-                {
-                    <ul class="list-inside list-disc text-sm text-gray-600">
-                        @foreach (var cert in Model.Certifications)
-                        {
-                            <li>@cert</li>
-                        }
-                    </ul>
-                }
-                else
-                {
-                    <p class="text-sm text-gray-600">No certifications listed.</p>
-                }
-            </div>
-        </div>
-    </div>
-
-    <!-- Action Button -->
-    <div class="flex justify-end bg-gray-50 px-6 py-4">
-        <button 
-            type="submit"
-            onclick="viewResume(`@Model.ApplicantId`)"
-            class="rounded-md bg-[#7A1515] px-6 py-2 font-medium text-white transition duration-200 hover:bg-[#A04747]">
-            View Resume
-        </button>
     </div>
 </div>
