@@ -85,6 +85,7 @@ namespace WebApp.Authentication
                 new Claim(ClaimTypes.Role, user.RoleId, ClaimValueTypes.String, Const.Issuer),
                 new Claim("UserId", user.UserId, ClaimValueTypes.String, Const.Issuer),
                 new Claim("Name", user.FirstName, ClaimValueTypes.String, Const.Issuer),
+                new Claim("LastName", user.LastName, ClaimValueTypes.String, Const.Issuer),
                 new Claim("Email", user.Email, ClaimValueTypes.String, Const.Issuer),
                 new Claim("Role", user.RoleId, ClaimValueTypes.String, Const.Issuer),
                 new Claim("IsSuperAdmin", isSuper.ToString(), ClaimValueTypes.Boolean, Const.Issuer),
