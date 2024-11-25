@@ -449,6 +449,7 @@ function submitCompleteRegistration() {
 
     form.validate();
     if (!form.valid()) {
+        submitButton.disabled = false;
         return;
     }
 

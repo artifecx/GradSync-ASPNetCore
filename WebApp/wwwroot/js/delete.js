@@ -9,6 +9,9 @@ function displayDeleteModal(id, name) {
 $('#confirmDeleteBtn').on('click', function () {
     var deleteUrl = $('#deleteUrl').val();
     var baseUrl = $('#baseUrl').val();
+    var button = document.getElementById('confirmDeleteBtn');
+    button.disabled = true;
+
     $.ajax({
         url: deleteUrl,
         type: 'POST',
@@ -18,6 +21,7 @@ $('#confirmDeleteBtn').on('click', function () {
                 window.location.href = baseUrl;
             } else {
                 var errorMessage = response.error || "An error occurred.";
+                button.disabled = false;
                 toastr.error(errorMessage);
             }
         }
