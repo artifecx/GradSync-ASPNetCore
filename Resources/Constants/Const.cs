@@ -3,7 +3,7 @@
     /// <summary>
     /// Class for variables with constant values
     /// </summary>
-    public class Const
+    public static class Const
     {
         /// <summary>
         ///API result success
