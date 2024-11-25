@@ -1,0 +1,71 @@
+﻿@model Services.ServiceModels.UserProfileViewModel
+
+@{
+    var fullname = $"{Model.FirstName} {Model.MiddleName} {Model.LastName} {Model.Suffix}";
+    var email = Model.Email;
+    var isRecruiter = User.IsInRole("Recruiter");
+    var isApplicant = User.IsInRole("Applicant");
+}
+<div id="profile-section" class="tab-content">
+    <div class="flex justify-between">
+        <h2 class="mb-4 text-2xl font-semibold">Profile</h2>
+        <div>
+            <button type="button" id="cancelButton" class="hidden rounded bg-gray-500 px-2 py-2 text-sm font-semibold text-white hover:bg-gray-600"
+                    onclick="cancelEdit()">
+                Cancel
+            </button>
+            <button type="button" id="saveButton" class="hidden rounded bg-[#7A1515] px-2 py-2 text-sm font-semibold text-white hover:bg-[#A53D3D]"
+                    onclick="submitChanges()">
+                Save Changes
+            </button>
+            <button type="button" onclick="enableEditMode()" id="editButton"
+                    class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                <i class="fas fa-edit pr-1"></i> Update
+            </button>
+        </div>
+    </div>
+    <!-- User Details -->
+    <div class="space-y-2">
+        <div><strong>Name:</strong><input class="ml-2 disabled:bg-white" value="@fullname" disabled /></div>
+        <div><strong>Email:</strong><input class="ml-2 disabled:bg-white" value="@email" disabled /></div>
+        @if (isApplicant)
+        {
+            <div><strong>Address:</strong><input class="ml-2 disabled:bg-white" value="@Model.Applicant.Address" disabled /></div>
+        }
+    </div>
+    <hr />
+    <!-- Applicant/Recruiter Details -->
+    <div class="space-y-2">
+        <div class="mb-4 space-y-0">
+            @if (isRecruiter)
+            {
+                <div class="text-lg font-bold text-gray-600">Company Profile</div>
+                <div class="text-xs font-medium text-gray-500">To update company details, go to company tab</div>
+            }
+            else
+            {
+                <div class="text-lg font-bold text-gray-600">Educational Profile</div>
+                <div class="text-xs font-medium text-gray-500">Contact <span class="font-semibold">nlo@gradsync.org</span> to request an update on your educational profile.</div>
+            }
+        </div>
+        <!-- Recruiter Details -->
+        @if (isRecruiter)
+        {
+            var company = Model.Recruiter.Company;
+            <div><strong>Name:</strong><input class="ml-2 disabled:bg-white" value="@company.Name" disabled /></div>
+            <div><strong>Address:</strong><input class="ml-2 disabled:bg-white" value="@company.Address" disabled /></div>
+            <div><strong>Email:</strong><input class="ml-2 disabled:bg-white" value="@company.ContactEmail" disabled /></div>
+            <div><strong>Number:</strong><input class="ml-2 disabled:bg-white" value="@company.ContactNumber" disabled /></div>
+        }
+        else
+        {
+            var applicant = Model.Applicant;
+            var educationalDetails = applicant.EducationalDetail;
+            <div><strong>Id Number:</strong><span class="ml-2" />@educationalDetails.IdNumber</div>
+            <div><strong>College:</strong><span class="ml-2" />@educationalDetails.College.Name</div>
+            <div><strong>Department:</strong><span class="ml-2" />@educationalDetails.Department.Name</div>
+            <div><strong>Program:</strong><span class="ml-2" />@educationalDetails.Program.Name</div>
+            <div><strong>Year Level:</strong><span class="ml-2" />@educationalDetails.YearLevel.Name</div>
+        }
+    </div>
+</div>
