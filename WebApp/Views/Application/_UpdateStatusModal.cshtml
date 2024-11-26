@@ -46,29 +46,3 @@
         </div>
     </div>
 </div>
-
-@section Scripts {
-    <script>
-        document.addEventListener('click', function (e) {
-            const actionBtn = e.target.closest('.actionDropdownApplicationBtn');
-            if (actionBtn) {
-                const ApplicationId = actionBtn.dataset.applicationid;
-                const menu = document.getElementById(`actionDropdownApplicationMenu-${ApplicationId}`);
-                menu.classList.toggle('hidden');
-
-                document.querySelectorAll('.actionDropdownApplicationMenu').forEach(m => {
-                    if (m.id !== `actionDropdownApplicationMenu-${ApplicationId}`) {
-                        m.classList.add('hidden');
-                    }
-                });
-                return;
-            }
-
-            if (!e.target.closest('.actionDropdownApplicationMenu') && !e.target.closest('.actionDropdownApplicationBtn')) {
-                document.querySelectorAll('.actionDropdownApplicationMenu').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-            }
-        });
-    </script>
-}
