@@ -17,7 +17,7 @@ namespace Data.Interfaces
         Task<List<Job>> GetArchivedJobsAsync(string role, string userId = null);
         Task AddJobAsync(Job job);
         Task UpdateJobAsync(Job job);
-        Task<Job> GetJobByIdAsync(string id, bool? track);
+        Task<Job> GetJobByIdAsync(string id, bool? track, string userRole = null, string userId = null);
         Task<Job> GetJobByIdAsync(string id, string isArchived);
         Task<List<EmploymentType>> GetEmploymentTypesAsync();
         Task<List<StatusType>> GetStatusTypesAsync();

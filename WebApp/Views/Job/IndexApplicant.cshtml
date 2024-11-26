@@ -106,7 +106,7 @@
             <div>
                 @if (!Model.Any())
                 {
-                    <div class="items-cent border-y-2 flex justify-center py-4  italic">
+                    <div class="items-cent border-y-2 flex justify-center py-4 italic">
                         @(!hasFilters ? Html.Raw("--- No jobs found ---") : Html.Raw("--- No jobs found matching the criteria ---"))
                     </div>
                 }
@@ -171,15 +171,11 @@
                                     </div>
 
                                     <div class="mb-2 flex items-center justify-between">
-                                        <!-- Job Match Percentage Placeholder -->
+                                        <!-- Job Match Percentage -->
                                         <div class="flex items-center space-x-1 text-sm font-semibold text-gray-700">
                                             <span class="pr-1 text-xs font-bold">Job Match:</span>
                                             <span class="rounded-full border border-red-500 px-2 py-1 text-xs text-green-600">
-                                                @{
-                                                    var match = job.JobMatches.FirstOrDefault(j => j.UserId == userId);
-                                                    var percentage = match == null ? "Unavailable" : match.MatchPercentage.ToString() + "%";
-                                                }
-                                                @percentage
+                                                @job.JobMatches.FirstOrDefault().MatchPercentage%
                                             </span> 
                                         </div>
 

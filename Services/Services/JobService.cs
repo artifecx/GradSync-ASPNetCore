@@ -343,7 +343,7 @@ namespace Services.Services
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {
             var role = filters.UserRole;
-            var userId = filters.UserRole == Role_Recruiter ? filters.UserId : null;
+            var userId = role == Role_Recruiter || role == Role_Applicant ? filters.UserId : null;
 
             var jobs = string.Equals(archived, "archived") ?
                 _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync(role, userId)) :
@@ -481,9 +481,9 @@ namespace Services.Services
         /// The task result contains the team view model.</returns>
         public async Task<JobViewModel> GetJobByIdAsync(string id) 
         {
-            var job = await _repository.GetJobByIdAsync(id, false);
             var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
             var currentUserRole = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+            var job = await _repository.GetJobByIdAsync(id, false, currentUserRole, currentUserId);
 
             if (job == null)
                 throw new JobException("Job not found.");

@@ -17,7 +17,7 @@ namespace Data.Repositories
 
         private IQueryable<Job> GetJobsWithIncludes(string role = null, string userId = null)
         {
-            return this.GetDbSet<Job>()
+            var query = this.GetDbSet<Job>()
                 .Where(j => !j.IsArchived
                     && ((role == null && userId == null) ||
                         (role == "Admin" || role == "NLO") ||
@@ -32,13 +32,16 @@ namespace Data.Repositories
                     .ThenInclude(r => r.Company)
                 .Include(j => j.PostedBy)
                     .ThenInclude(r => r.User)
-                .Include(j => j.JobApplicantMatches)
-                    .ThenInclude(a => a.User)
-                        .ThenInclude(u => u.User)
                 .Include(j => j.EmploymentType)
                 .Include(j => j.SetupType)
                 .Include(j => j.StatusType)
-                .Include(j => j.Applications);
+                .Include(j => j.Applications)
+                .Include(j => j.JobApplicantMatches
+                    .Where(jam => role == "Applicant" ? jam.UserId == userId : jam.UserId != null))
+                    .ThenInclude(a => a.User)
+                        .ThenInclude(u => u.User);
+
+            return query;
         }
 
         public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
@@ -166,9 +169,12 @@ namespace Data.Repositories
             await UnitOfWork.SaveChangesAsync();
         }
 
-        public async Task<Job> GetJobByIdAsync(string id, bool? track)
+        public async Task<Job> GetJobByIdAsync(string id, bool? track, string userRole = null, string userId = null)
         {
-            var query = track.GetValueOrDefault() ? GetJobsWithIncludes() : GetJobsWithIncludes().AsNoTracking();
+            var query = track.GetValueOrDefault() 
+                ? GetJobsWithIncludes(userRole, userId) 
+                : GetJobsWithIncludes(userRole, userId)
+                .AsNoTracking();
             return await query.FirstOrDefaultAsync(j => j.JobId == id);
         }
 
