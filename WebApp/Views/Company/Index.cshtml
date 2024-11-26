@@ -66,14 +66,7 @@
     <!-- Table -->
     <div class="h-[75vh] overflow-auto rounded-lg bg-[#F5F7F8]">
         <div class="flex w-full justify-end bg-white py-2">
-            <button onclick="location.href='@Url.Action("", "",
-                        new {
-                            sortBy = sortBy,
-                            search = search,
-                            pageIndex = Model.PageIndex,
-                            verified = verified,
-                            hasValidMOA = hasValidMOA,
-                        })'"
+            <button onclick="featureUnavailable()"
                     class="flex w-full max-w-[200px] cursor-pointer items-center justify-end text-right text-[#343131] hover:text-[#A04747] focus:outline-none">
                 @Html.Raw(ArchiveIcon)Archived Companies
             </button>

@@ -30,6 +30,7 @@ namespace WebApp.Controllers
         {
             return await HandleExceptionAsync(async () =>
             {
+                filters.UserRole = UserRole;
                 var jobs = await _jobService.GetAllJobsAsync(filters);
 
                 await InitializeValues(filters);

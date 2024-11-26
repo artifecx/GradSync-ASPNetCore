@@ -15,7 +15,7 @@ namespace Data.Repositories
             await this.GetDbSet<EmploymentType>().AsNoTracking().ToListAsync();
 
         public async Task<List<StatusType>> GetStatusTypesAsync() =>
-            await this.GetDbSet<StatusType>().AsNoTracking().ToListAsync();
+            await this.GetDbSet<StatusType>().Where(s => s.StatusTypeId != "Pending").AsNoTracking().ToListAsync();
 
         public async Task<List<SetupType>> GetWorkSetupsAsync() =>
             await this.GetDbSet<SetupType>().AsNoTracking().ToListAsync();

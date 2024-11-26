@@ -96,7 +96,7 @@ else
                                     data-jobid="@item.JobId"
                                     data-statusId="@item.StatusTypeId"
                                     class="update-job-status flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
-                                    disabled="@(User.IsInRole("Recruiter") && (item.StatusTypeId == "Pending" || item.StatusTypeId == "BlackListed"))">
+                                    disabled="@(User.IsInRole("Recruiter") && item.StatusTypeId == "BlackListed")">
                                 @Html.Raw(UpdateStatusIcon) Update Status
                             </button>
 

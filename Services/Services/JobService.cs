@@ -16,6 +16,7 @@ using static Resources.Constants.UserRoles;
 using Data.Repositories;
 using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using Data.Dtos;
+using static Resources.Constants.Enums;
 
 namespace Services.Services
 {
@@ -55,7 +56,7 @@ namespace Services.Services
 
             job.JobId = Guid.NewGuid().ToString();
             job.CreatedDate = job.UpdatedDate = DateTime.Now;
-            job.StatusTypeId = "Pending";
+            job.StatusTypeId = "Open";
             job.PostedById = recruiter.UserId;
             job.CompanyId = recruiter.CompanyId;
             job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
@@ -123,6 +124,8 @@ namespace Services.Services
             var job = await _repository.GetJobByIdAsync(model.JobId, true);
             if (job == null)
                 throw new JobException("Job not found.");
+            if (job.StatusTypeId == "BlackListed")
+                throw new JobException("Blacklisted jobs cannot be updated.");
 
             _mapper.Map(model, job);
             bool jobSkillsChanged = SetJobSkills(job, model);
@@ -132,12 +135,56 @@ namespace Services.Services
             job.SkillWeights = ((decimal)model.SkillWeights);
 
             if (!_repository.HasChanges(job) && !jobSkillsChanged && !jobProgramChanged)
-                throw new CompanyException("No changes detected.");
+                throw new JobException("No changes detected.");
 
             job.UpdatedDate = DateTime.Now;
 
             await _repository.UpdateJobAsync(job);
             await _jobMatchingApiService.UpdateMatchJobApplicantsAsync(job.JobId);
+        }
+
+        public async Task UpdateJobStatusAsync(string jobId, string statusId)
+        {
+            var job = await _repository.GetJobByIdAsync(jobId, true);
+            if (job == null)
+                throw new JobException("Job not found.");
+
+            var currentStatusId = job.StatusTypeId;
+            if (currentStatusId == statusId)
+                throw new JobException("No changes detected.");
+
+            if(currentStatusId == "BlackListed")
+                throw new JobException("Blacklisted jobs cannot be updated.");
+
+            if (currentStatusId == "Open" && (statusId == "Closed" || statusId == "BlackListed"))
+            {
+                job.AvailableSlots = 0;
+                if (job.Applications.Any())
+                {
+                    var validApplicationStatuses = new HashSet<string>
+                        {
+                            "Accepted", "Withdrawn", "Rejected"
+                        };
+
+                    foreach (var application in job.Applications)
+                    {
+                        if (!validApplicationStatuses.Contains(application.ApplicationStatusTypeId))
+                        {
+                            application.ApplicationStatusTypeId = statusId == "Closed" ? "Rejected" : "Withdrawn";
+                            application.UpdatedDate = DateTime.Now;
+                        }
+                    }
+                }
+            }
+            else
+            {
+                job.AvailableSlots = job.AvailableSlots == 0 ? 1 : job.AvailableSlots;
+            }
+
+            job.StatusTypeId = statusId;
+            job.UpdatedDate = DateTime.Now;
+
+            await _repository.UpdateJobAsync(job);
         }
 
         private bool SetJobSkills(Job job, JobViewModel model)
@@ -241,17 +288,30 @@ namespace Services.Services
         public async Task ArchiveJobAsync(string id)
         {
             var job = await _repository.GetJobByIdAsync(id, true);
-            job.IsArchived = true;
-            job.StatusTypeId = "Closed";
-            job.AvailableSlots = 0;
-            if(job.Applications.Any())
+            
+            if(job.StatusTypeId != "BlackListed" && job.StatusTypeId != "Closed")
             {
-                foreach (var application in job.Applications)
+                job.StatusTypeId = "Closed";
+                job.AvailableSlots = 0;
+                var validApplicationStatuses = new HashSet<string>
                 {
-                    application.ApplicationStatusTypeId = "Rejected";
-                    application.UpdatedDate = DateTime.Now;
+                    "Accepted", "Withdrawn", "Rejected"
+                };
+
+                if (job.Applications.Any() && job.Applications.Count > 0)
+                {
+                    foreach (var application in job.Applications)
+                    {
+                        if (!validApplicationStatuses.Contains(application.ApplicationStatusTypeId))
+                        {
+                            application.ApplicationStatusTypeId = "Rejected";
+                            application.UpdatedDate = DateTime.Now;
+                        }
+                    }
                 }
             }
+
+            job.IsArchived = true;
             job.UpdatedDate = DateTime.Now;
             await _repository.UpdateJobAsync(job);
         }
@@ -260,7 +320,11 @@ namespace Services.Services
         {
             var job = await _repository.GetJobByIdAsync(model.JobId, "true");
 
-            if (job == null) throw new JobException("Job not found!");
+            if (job == null) 
+                throw new JobException("Job not found!");
+
+            if (job.StatusTypeId == "BlackListed")
+                throw new JobException("Blacklisted jobs cannot be updated.");
 
             job.IsArchived = false;
             job.StatusTypeId = "Open";
@@ -278,28 +342,12 @@ namespace Services.Services
 
         public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
         {
+            var role = filters.UserRole;
+            var userId = filters.UserRole == Role_Recruiter ? filters.UserId : null;
+
             var jobs = string.Equals(archived, "archived") ?
-                _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync()) :
-                _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync());
-            jobs = await FilterAndSortJobs(jobs, filters, archived);
-
-            var pageIndex = filters.PageIndex;
-            var pageSize = filters.PageSize;
-            var count = jobs.Count;
-            var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
-        }
-
-        public async Task<List<JobViewModel>> GetAllJobsAsync() =>
-            _mapper.Map <List<JobViewModel>>(await _repository.GetAllJobsAsync());
-
-        public async Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(FilterServiceModel filters, string archived = null)
-        {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var jobs = string.Equals(archived, "archived") ? 
-                _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterArchivedJobsAsync(userId)) :
-                _mapper.Map<List<JobViewModel>>(await _repository.GetRecruiterJobsAsync(userId));
+                _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync(role, userId)) :
+                _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync(role, userId));
             jobs = await FilterAndSortJobs(jobs, filters, archived);
 
             var pageIndex = filters.PageIndex;

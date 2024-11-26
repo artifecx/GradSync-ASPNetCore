@@ -90,6 +90,9 @@
                 button.disabled = true;
             });
         });
+        function featureUnavailable() {
+            toastr.error('Feature unavailable.');
+        }
     </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>

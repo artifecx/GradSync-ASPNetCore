@@ -13,10 +13,8 @@ namespace Data.Interfaces
         Task<List<Job>> GetAllJobsProgramsIncludeAsync();
         Task<List<JobApplicantMatch>> GetApplicantFeaturedJobsAsync(string userId);
         Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId);
-        Task<List<Job>> GetAllJobsAsync();
-        Task<List<Job>> GetArchivedJobsAsync();
-        Task<List<Job>> GetRecruiterJobsAsync(string userId);
-        Task<List<Job>> GetRecruiterArchivedJobsAsync(string userId);
+        Task<List<Job>> GetAllJobsAsync(string role, string userId = null);
+        Task<List<Job>> GetArchivedJobsAsync(string role, string userId = null);
         Task AddJobAsync(Job job);
         Task UpdateJobAsync(Job job);
         Task<Job> GetJobByIdAsync(string id, bool? track);

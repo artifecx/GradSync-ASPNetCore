@@ -34,8 +34,10 @@ namespace WebApp.Controllers
                 if (company == null) return RedirectToAction("RegisterCompany", "Company");
 
                 ViewBag.Verified = company.IsVerified;
+                filters.UserRole = UserRole;
+                filters.UserId = UserId;
 
-                var jobs = await _jobService.GetRecruiterJobsAsync(filters);
+                var jobs = await _jobService.GetAllJobsAsync(filters);
 
                 await InitializeValues(filters);
                 await InitializeValues(filters.FilterByEmploymentType.FirstOrDefault(), filters.FilterByWorkSetup.FirstOrDefault());
@@ -52,7 +54,10 @@ namespace WebApp.Controllers
             return await HandleExceptionAsync(async () =>
             {
                 if (filters.SortBy.IsNullOrEmpty()) filters.SortBy = "updated_desc";
-                var jobs = await _jobService.GetRecruiterJobsAsync(filters, "archived");
+
+                filters.UserRole = UserRole;
+                filters.UserId = UserId;
+                var jobs = await _jobService.GetAllJobsAsync(filters, "archived");
 
                 await InitializeValues(filters);
 

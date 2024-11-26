@@ -5,7 +5,7 @@
 
     if (!isAdmin)
     {
-        statusTypes = statusTypes.Where(st => st.StatusTypeId != "BlackListed" && st.StatusTypeId != "Pending").ToList();
+        statusTypes = statusTypes.Where(st => st.StatusTypeId != "BlackListed").ToList();
     }
 }
 <div class="modal fade" id="updateJobStatusModal" tabindex="-1" role="dialog" aria-labelledby="updateJobStatusModalLabel" aria-hidden="true">
@@ -41,7 +41,7 @@
 
             <div class="modal-footer mt-2 !border-none">
                 <button type="button" class="min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelUpdateJobStatus" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747]" onclick="submitUpdateJobStatus()">Update</button>
+                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747]" id="updateJobStatusBtn">Update</button>
             </div>
         </div>
     </div>

@@ -558,3 +558,32 @@ function submitCreateJob() {
         }
     });
 }
+
+/// ------------------------------------
+/// Route: Update Job Status
+/// ------------------------------------
+const submitButton = document.getElementById('updateJobStatusBtn');
+
+submitButton.addEventListener('click', () => {
+    const jobStatusId = document.getElementById('updateJobStatus').value;
+    const jobId = document.getElementById('updateJobStatusJobId').value;
+    submitButton.disabled = true;
+
+    $.ajax({
+        url: '/jobs/update-status',
+        type: 'POST',
+        data: { jobId: jobId, statusId: jobStatusId },
+        success: function (response) {
+            if (response.success) {
+                location.reload();
+            } else {
+                submitButton.disabled = false;
+                toastr.error(response.error || "An error occurred.");
+            }
+        },
+        error: function (xhr, status, error) {
+            let errorMessage = xhr.responseJSON?.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            toastr.error(errorMessage);
+        }
+    });
+});

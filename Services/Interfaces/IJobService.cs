@@ -12,13 +12,12 @@ namespace Services.Interfaces
     {
         Task AddJobAsync(JobViewModel model);
         Task UpdateJobAsync(JobViewModel model);
+        Task UpdateJobStatusAsync(string jobId, string statusId);
         Task ArchiveJobAsync(string id);
         Task UnarchiveJobAsync(JobServiceModel model);
         Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId);
         Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId);
-        Task<List<JobViewModel>> GetAllJobsAsync();
         Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null);
-        Task<PaginatedList<JobViewModel>> GetRecruiterJobsAsync(FilterServiceModel filters, string archived = null);
         Task<JobViewModel> GetJobByIdAsync(string id);
     }
 }

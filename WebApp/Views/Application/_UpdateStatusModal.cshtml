@@ -7,13 +7,6 @@
     {
         applicationStatusType = new List<ApplicationStatusType>(); 
     }
-
-    if (!isAdmin)
-    {
-        applicationStatusType = applicationStatusType
-            .Where(st => st.ApplicationStatusTypeId != "BlackListed" && st.ApplicationStatusTypeId != "Pending")
-            .ToList();
-    }
 }
 <div class="modal fade" id="updateApplicationStatusModal" tabindex="-1" role="dialog" aria-labelledby="updateApplicationStatusModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">

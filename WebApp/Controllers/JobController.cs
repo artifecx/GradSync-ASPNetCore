@@ -155,6 +155,24 @@ namespace WebApp.Controllers
 
         [HttpPost]
         [Authorize(Policy = "AdminOrRecruiter")]
+        [Route("update-status")]
+        public async Task<IActionResult> UpdateStatus(string jobId, string statusId)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid && !string.IsNullOrEmpty(jobId) && !string.IsNullOrEmpty(statusId))
+                {
+                    await _jobService.UpdateJobStatusAsync(jobId, statusId);
+                    TempData["SuccessMessage"] = "Successfully updated the job status.";
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = "An error has occurred while updating the job status.";
+                return Json(new { success = false });
+            }, "UpdateStatus");
+        }
+
+        [HttpPost]
+        [Authorize(Policy = "AdminOrRecruiter")]
         [Route("unarchive")]
         public async Task<IActionResult> Unarchive(JobServiceModel model)
         {

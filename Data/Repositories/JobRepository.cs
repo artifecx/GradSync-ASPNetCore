@@ -15,26 +15,30 @@ namespace Data.Repositories
     {
         public JobRepository(IUnitOfWork unitOfWork) : base(unitOfWork) { }
 
-        private IQueryable<Job> GetJobsWithIncludes()
+        private IQueryable<Job> GetJobsWithIncludes(string role = null, string userId = null)
         {
             return this.GetDbSet<Job>()
-                        .Where(j => !j.IsArchived)
-                        .Include(j => j.JobSkills)
-                            .ThenInclude(j => j.Skill)
-                        .Include(j => j.YearLevel)
-                        .Include(j => j.JobPrograms)
-                            .ThenInclude(j => j.Program)
-                        .Include(j => j.PostedBy)
-                            .ThenInclude(r => r.Company)
-                        .Include(j => j.PostedBy)
-                            .ThenInclude(r => r.User)
-                        .Include(j => j.JobApplicantMatches)
-                            .ThenInclude(a => a.User)
-                                .ThenInclude(u => u.User)
-                        .Include(j => j.EmploymentType)
-                        .Include(j => j.SetupType)
-                        .Include(j => j.StatusType)
-                        .Include(j => j.Applications);
+                .Where(j => !j.IsArchived
+                    && ((role == null && userId == null) ||
+                        (role == "Admin" || role == "NLO") ||
+                        (role == "Recruiter" && j.PostedById == userId) ||
+                        (role == "Applicant" && j.StatusTypeId == "Open")))
+                .Include(j => j.JobSkills)
+                    .ThenInclude(j => j.Skill)
+                .Include(j => j.YearLevel)
+                .Include(j => j.JobPrograms)
+                    .ThenInclude(j => j.Program)
+                .Include(j => j.PostedBy)
+                    .ThenInclude(r => r.Company)
+                .Include(j => j.PostedBy)
+                    .ThenInclude(r => r.User)
+                .Include(j => j.JobApplicantMatches)
+                    .ThenInclude(a => a.User)
+                        .ThenInclude(u => u.User)
+                .Include(j => j.EmploymentType)
+                .Include(j => j.SetupType)
+                .Include(j => j.StatusType)
+                .Include(j => j.Applications);
         }
 
         public async Task<List<Application>> GetAllApplicationsNoIncludesAsync() =>
@@ -60,8 +64,7 @@ namespace Data.Repositories
                 .Where(jam => jam.UserId == userId 
                     && jam.MatchPercentage >= 70 
                     && !jam.Job.IsArchived 
-                    && (jam.Job.StatusTypeId != "Closed" 
-                    && jam.Job.StatusTypeId != "BlackListed"))
+                    && jam.Job.StatusTypeId == "Open")
                 .Select(jam => new JobApplicantMatch
                 {
                     JobId = jam.JobId,
@@ -71,7 +74,7 @@ namespace Data.Repositories
                         JobId = jam.Job.JobId,
                         Title = jam.Job.Title,
                         Location = jam.Job.Location,
-                        Salary = jam.Job.Salary == "0" ? "Unpaid" : jam.Job.Salary,
+                        Salary = jam.Job.Salary,
                         JobSkills = jam.Job.JobSkills,
                         EmploymentType = new EmploymentType
                         {
@@ -142,17 +145,14 @@ namespace Data.Repositories
             return applicant;
         }
 
-        public async Task<List<Job>> GetAllJobsAsync() =>
-            await GetJobsWithIncludes().AsNoTracking().ToListAsync();
+        public async Task<List<Job>> GetAllJobsAsync(string role, string userId = null) =>
+            await GetJobsWithIncludes(role, userId).AsNoTracking().ToListAsync();
 
-        public async Task<List<Job>> GetArchivedJobsAsync() =>
-            await this.GetDbSet<Job>().Where(j => j.IsArchived).ToListAsync();
-
-        public async Task<List<Job>> GetRecruiterJobsAsync(string userId) =>
-            await GetJobsWithIncludes().Where(j => string.Equals(j.PostedById, userId)).AsNoTracking().ToListAsync();
-
-        public async Task<List<Job>> GetRecruiterArchivedJobsAsync(string userId) =>
-            await this.GetDbSet<Job>().Where(j => j.IsArchived && string.Equals(j.PostedById, userId)).ToListAsync();
+        public async Task<List<Job>> GetArchivedJobsAsync(string role, string userId = null) =>
+            await this.GetDbSet<Job>()
+                .Where(j => j.IsArchived 
+                    && ((role == "Recruiter" && j.PostedById == userId) || (role != "Recruiter")))
+                .ToListAsync();
 
         public async Task AddJobAsync(Job job)
         {

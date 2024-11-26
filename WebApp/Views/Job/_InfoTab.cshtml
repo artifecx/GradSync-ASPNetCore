@@ -36,49 +36,49 @@
         </div>
     </div>
 
-    <div class="text-lg font-bold">@Model.Salary</div>
-        <span class="text-sm font-semibold text-gray-700">Available Slots: @Model.AvailableSlots</span>
+    <div class="text-lg font-bold">@(Model.Salary == "Php 0 - Php 0" ? "Unpaid" : Model.Salary)</div>
+    <span class="text-sm font-semibold text-gray-700">Available Slots: @Model.AvailableSlots</span>
 
-        <hr class="border-gray-300" />
-        <h3 class="mb-3 text-sm font-semibold text-gray-500">Details</h3>
+    <hr class="border-gray-300" />
+    <h3 class="mb-3 text-sm font-semibold text-gray-500">Details</h3>
 
-        <ul class="space-y-4 text-sm text-gray-700">
-            <li class="gap-2">
-                <div class="flex items-center">
-                    @Html.Raw(ScheduleIcon)
-                    <span class="pl-2 pr-1 font-semibold">Schedule:</span>
-                </div>
-                <span class="pl-8">@Model.Schedule</span>
-            </li>
-            <li class="gap-2">
-                <div class="flex items-center">
-                    @Html.Raw(YearLevelIcon)
-                    <span class="pl-1 pr-1 font-semibold">Year Level:</span>
-                </div>
-            <span class="pl-8">@Model.YearLevel.Name</span>
-            </li>
-            <li class="max-w-96 gap-2">
-                <div class="flex items-center">
-                    @Html.Raw(ProgramsIcon)
-                    <span class="pl-2 pr-1 font-semibold">Programs:</span>
-                </div>
-                <div class="pl-8">@string.Join(", ", (Model.Programs as List<Program>).Select(program => program.Name))</div>
-            </li>
-        </ul>
+    <ul class="space-y-4 text-sm text-gray-700">
+        <li class="gap-2">
+            <div class="flex items-center">
+                @Html.Raw(ScheduleIcon)
+                <span class="pl-2 pr-1 font-semibold">Schedule:</span>
+            </div>
+            <span class="pl-8">@Model.Schedule</span>
+        </li>
+        <li class="gap-2">
+            <div class="flex items-center">
+                @Html.Raw(YearLevelIcon)
+                <span class="pl-1 pr-1 font-semibold">Year Level:</span>
+            </div>
+        <span class="pl-8">@Model.YearLevel.Name</span>
+        </li>
+        <li class="max-w-96 gap-2">
+            <div class="flex items-center">
+                @Html.Raw(ProgramsIcon)
+                <span class="pl-2 pr-1 font-semibold">Programs:</span>
+            </div>
+            <div class="pl-8">@string.Join(", ", (Model.Programs as List<Program>).Select(program => program.Name))</div>
+        </li>
+    </ul>
 
-        <hr class="border-gray-300" />
-        <h3 class="mb-3 text-sm font-semibold text-gray-500">Contact Information</h3>
+    <hr class="border-gray-300" />
+    <h3 class="mb-3 text-sm font-semibold text-gray-500">Contact Information</h3>
 
-        <ul class="space-y-4 text-sm text-gray-700">
-            <li class="flex pr-2">
-                <span class="pr-2 font-semibold">Email: </span>
-                <span>@Model.Company.ContactEmail</span>
-            </li>
-            <li class="flex pr-2">
-                <span class="pr-2 font-semibold">Phone: </span>
-                <span>@Model.Company.ContactNumber</span>
-            </li>
-        </ul>
+    <ul class="space-y-4 text-sm text-gray-700">
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Email: </span>
+            <span>@Model.Company.ContactEmail</span>
+        </li>
+        <li class="flex pr-2">
+            <span class="pr-2 font-semibold">Phone: </span>
+            <span>@Model.Company.ContactNumber</span>
+        </li>
+    </ul>
 </div>
 
 @section Scripts {
