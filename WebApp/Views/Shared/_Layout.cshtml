@@ -8,13 +8,21 @@
     <title>@ViewData["Title"]</title>
     <link rel="stylesheet" href="~/css/output.css" asp-append-version="true" />
     <link rel="stylesheet" href="~/css/main.css" />
-    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="~/lib/tagify/dist/tagify.css" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/css/bootstrap-multiselect.css" rel="stylesheet" />
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="~/lib/tagify/dist/tagify.css" media="print" onload="this.media='all'"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/css/toastr.min.css" media="print" onload="this.media='all'">
     @RenderSection("Styles", required: false)
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+          media="print"
+          onload="this.media='all'" />
+    <noscript>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap"
+              rel="stylesheet"
+              type="text/css" />
+    </noscript>
 </head>
 <body>
     @{
@@ -44,7 +52,7 @@
                         {
                             <div class="flex items-center justify-between bg-[#7A1515] py-2.5 text-center font-semibold text-white">
                                 <div>
-                                    <img src="~/img/logo2.webp" style="width: 150px;" alt="login-logo" class="ml-5" />
+                                    <img src="~/img/logo2.webp" width="150" height="auto" alt="login-logo" class="ml-5" />
                                 </div>
                                 <text class="text-sm">For inquiries contact: info@gradsync.org</text>
                                 <div class="mr-5">
@@ -66,8 +74,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/toastr.js/latest/js/toastr.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/lib/tagify/dist/tagify.js"></script>
-    <script src="~/lib/signalr/signalr.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-multiselect/0.9.15/js/bootstrap-multiselect.min.js"></script>
+    <script src="~/lib/signalr/signalr.min.js"></script>
     <script>
         toastr.options = {
             positionClass: "toast-bottom-center",

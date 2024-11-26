@@ -22,7 +22,6 @@ using Services.ServiceModels;
 using Microsoft.AspNetCore.Http;
 using System.Threading.RateLimiting;
 using System.Linq;
-using Azure;
 using System.Security.Claims;
 using Microsoft.AspNetCore.ResponseCompression;
 
@@ -256,7 +255,14 @@ namespace WebApp
 
             this._app.UseHttpsRedirection();
             this._app.UseResponseCompression();
-            this._app.UseStaticFiles();
+            this._app.UseStaticFiles(new StaticFileOptions
+            {
+                OnPrepareResponse = ctx =>
+                {
+                    ctx.Context.Response.Headers["Cache-Control"] = "public,max-age=31536000";
+                    ctx.Context.Response.Headers["Expires"] = DateTime.UtcNow.AddYears(1).ToString("R");
+                }
+            });
 
             // Localization
             var options = this._app.ApplicationServices.GetService<IOptions<RequestLocalizationOptions>>();
