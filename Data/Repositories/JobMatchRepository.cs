@@ -28,7 +28,7 @@ namespace Data.Repositories
                 .Where(jam => jam.JobId == jobId)
                 .ForEachAsync(jam => this.GetDbSet<JobApplicantMatch>().Remove(jam));
 
-        public async Task<ApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id) =>
+        public async Task<JobMatchingApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id) =>
             await this.GetDbSet<Applicant>()
                 .Include(a => a.Resume)
                 .Include(a => a.ApplicantSkills)
@@ -37,7 +37,7 @@ namespace Data.Repositories
                 .Where(a => a.UserId == id 
                     && a.Resume != null 
                     && a.ApplicantSkills.Any())
-                .Select(a => new ApplicantDetailsDto
+                .Select(a => new JobMatchingApplicantDetailsDto
                 {
                     resume_text = a.Resume.ExtractedText,
                     technical_skills = a.ApplicantSkills
@@ -53,7 +53,7 @@ namespace Data.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-        public async Task<List<ApplicantDetailsDto>> GetAllApplicantDetailsAsync(HashSet<string> departmentIds) =>
+        public async Task<List<JobMatchingApplicantDetailsDto>> GetAllApplicantDetailsAsync(HashSet<string> departmentIds) =>
             await this.GetDbSet<Applicant>()
                 .Include(a => a.Resume)
                 .Include(a => a.ApplicantSkills)
@@ -63,7 +63,7 @@ namespace Data.Repositories
                 .Where(a => a.Resume != null 
                     && a.ApplicantSkills.Any() 
                     && departmentIds.Contains(a.EducationalDetail.DepartmentId))
-                .Select(a => new ApplicantDetailsDto
+                .Select(a => new JobMatchingApplicantDetailsDto
                 {
                     applicant_id = a.UserId,
                     resume_text = a.Resume.ExtractedText,
@@ -79,7 +79,7 @@ namespace Data.Repositories
                 .AsNoTracking()
                 .ToListAsync();
 
-        public async Task<JobDetailsDto> GetJobDetailsByIdAsync(string id) =>
+        public async Task<JobMatchingJobDetailsDto> GetJobDetailsByIdAsync(string id) =>
            await this.GetDbSet<Job>()
                 .Include(j => j.JobSkills)
                     .ThenInclude(js => js.Skill)
@@ -89,7 +89,7 @@ namespace Data.Repositories
                     && j.JobId == id 
                     && j.SkillWeights != null 
                     && j.JobSkills.Any())
-                .Select(j => new JobDetailsDto
+                .Select(j => new JobMatchingJobDetailsDto
                 {
                     title = j.Title,
                     description = j.Description,
@@ -110,7 +110,7 @@ namespace Data.Repositories
                 .AsNoTracking()
                 .FirstOrDefaultAsync();
 
-        public async Task<List<JobDetailsDto>> GetAllJobDetailsAsync(string departmentId) =>
+        public async Task<List<JobMatchingJobDetailsDto>> GetAllJobDetailsAsync(string departmentId) =>
             await this.GetDbSet<Job>()
                 .Include(j => j.JobSkills)
                     .ThenInclude(js => js.Skill)
@@ -120,7 +120,7 @@ namespace Data.Repositories
                     && j.SkillWeights != null 
                     && j.JobSkills.Any() 
                     && j.JobPrograms.Any(jp => jp.Program.DepartmentId == departmentId))
-                .Select(j => new JobDetailsDto
+                .Select(j => new JobMatchingJobDetailsDto
                 {
                     job_id = j.JobId,
                     title = j.Title,

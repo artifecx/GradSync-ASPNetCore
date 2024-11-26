@@ -2,7 +2,7 @@
 
 namespace Data.Dtos;
 
-public partial class JobDetailsDto
+public partial class JobMatchingJobDetailsDto
 {
     public string job_id { get; set; }
     public string title { get; set; }

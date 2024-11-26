@@ -10,9 +10,9 @@ namespace Data.Interfaces
         Task AddJobApplicantMatchesAsync(List<JobApplicantMatch> matches);
         Task DeleteJobApplicantMatchesByApplicantIdAsync(string applicantId);
         Task DeleteJobApplicantMatchesByJobIdAsync(string jobId);
-        Task<ApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id);
-        Task<List<ApplicantDetailsDto>> GetAllApplicantDetailsAsync(HashSet<string> departmentIds);
-        Task<JobDetailsDto> GetJobDetailsByIdAsync(string id);
-        Task<List<JobDetailsDto>> GetAllJobDetailsAsync(string departmentId);
+        Task<JobMatchingApplicantDetailsDto> GetApplicantDetailsByIdAsync(string id);
+        Task<List<JobMatchingApplicantDetailsDto>> GetAllApplicantDetailsAsync(HashSet<string> departmentIds);
+        Task<JobMatchingJobDetailsDto> GetJobDetailsByIdAsync(string id);
+        Task<List<JobMatchingJobDetailsDto>> GetAllJobDetailsAsync(string departmentId);
     }
 }
