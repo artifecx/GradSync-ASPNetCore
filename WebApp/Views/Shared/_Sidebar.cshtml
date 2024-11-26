@@ -9,6 +9,8 @@
     var userId = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value;
     var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimsIdentity.DefaultRoleClaimType)?.Value;
     var route = ViewContext.RouteData.Values["Controller"].ToString();
+    var userName = HttpContextAccessor.HttpContext.User.Identity.Name;
+    var userLastName = HttpContextAccessor.HttpContext.User.FindFirst("LastName")?.Value;
 }
 
 <div class="mx-2.5 mt-2.5 flex max-h-screen min-h-screen w-64 flex-col items-center gap-2.5 pb-4 @((ViewBag.LoginView == true || ViewBag.create == true) ? "hidden" : "")">
@@ -85,7 +87,7 @@
             LOG OUT
         </a>
         <div class="shrink-0 mt-auto flex w-full flex-col items-center gap-1 overflow-y-auto rounded-md p-3 font-semibold text-[#A04747] xl:rounded-xl">
-            <img src="https://ui-avatars.com/api/?name=@HttpContextAccessor.HttpContext.User.Identity.Name&background=A04747&color=fff&format=svg" alt="Profile Image" class="h-10 w-10 rounded-full">
+            <img src="https://ui-avatars.com/api/?name=@userName+@userLastName&background=A04747&color=fff&format=svg" alt="Profile Image" class="h-10 w-10 rounded-full">
             <span>@HttpContextAccessor.HttpContext.User.Identity.Name</span>
             <div class="text-sm tracking-wide text-[#625f5f]">
                 @if (isSuper)

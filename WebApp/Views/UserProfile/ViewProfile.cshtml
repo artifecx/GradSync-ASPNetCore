@@ -7,6 +7,8 @@
     var email = Model.Email;
     var isRecruiter = User.IsInRole("Recruiter");
     var isApplicant = User.IsInRole("Applicant");
+    var userName = HttpContextAccessor.HttpContext.User.Identity.Name;
+    var userLastName = HttpContextAccessor.HttpContext.User.FindFirst("LastName")?.Value;
 }
 
 <div class="flex h-full items-center justify-center">
@@ -18,7 +20,10 @@
                     <div class="relative mb-6">
                         <!-- Profile picture section -->
                         <div class="group relative mx-auto h-24 w-24">
-                            <img id="profile-picture-preview" class="h-full w-full rounded-full object-cover shadow" src="https://via.placeholder.com/150" alt="Profile Picture" />
+                            <img id="profile-picture-preview" 
+                                class="h-full w-full rounded-full object-cover shadow"
+                                 src="https://ui-avatars.com/api/?name=@userName+@userLastName&background=A04747&color=fff&format=svg"
+                                 alt="Profile Picture" />
                             <div id="edit-icon" class="opacity-0 group-hover:opacity-100 pointer-events-none absolute inset-0 flex items-center justify-center transition-opacity duration-200">
                                 <div class="rounded-full bg-white p-2 text-gray-500 shadow-md">
                                     @Html.Raw(UpdateProfilePictureIcon)
