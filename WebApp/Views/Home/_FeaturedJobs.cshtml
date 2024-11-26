@@ -34,14 +34,14 @@ else
                             </div>
 
                             <!-- Location, Employment Type, and Work Setup -->
-                            <div class="pt-2 text-xs font-normal text-gray-600">
-                                <i class="fas fa-map-marker-alt pr-1 text-sm"></i>
+                            <div class="flex items-center pt-2 text-xs font-normal text-gray-600">
+                                @Html.Raw(Resources.Constants.SvgIcons.LocationIcon)
                                 @job.Location
-                                <span class="ml-1 rounded-md border px-2 py-1 text-xs font-medium text-gray-900" 
+                                <span class="ml-2 rounded-md border px-2 py-1 text-xs font-medium text-gray-900" 
                                     style="background-color:@GetEmploymentTypeColor(job.EmploymentTypeName);">
                                     @(job.EmploymentTypeName)
                                 </span>
-                                <span class="ml-1 rounded-md border px-2 py-1 text-xs font-normal text-gray-900"
+                                <span class="ml-2 rounded-md border px-2 py-1 text-xs font-normal text-gray-900"
                                       style="border: 2px solid;">
                                     @(job.SetupTypeName)
                                 </span>
@@ -69,7 +69,7 @@ else
 
                                     @if (job.Skills.Count() > 3)
                                     {
-                                        <span class="rounded-full border px-2 py-1 text-gray-500 text-xs">...</span>
+                                        <span class="rounded-full border px-2 py-1 text-xs text-gray-500">...</span>
                                     }
                                 }
                                 else

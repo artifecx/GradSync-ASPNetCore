@@ -1,6 +1,7 @@
 ﻿@model Services.ServiceModels.OnboardingViewModel
 @using Data.Models
 @using System.Text.Json;
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Finish Registration | GradSync";
@@ -21,8 +22,8 @@
         <div class="flex items-center justify-between">
             <h1 class="text-2xl font-bold text-[#7A1515]">Finish Registration</h1>
             <a href="#" data-toggle="modal" data-target="#logoutModal"
-                class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200">
-                <i class="fa fa-sign-out mr-2"></i>
+                class="flex items-center rounded px-2 py-1 text-[#7A1515] transition duration-200 hover:text-[#991b1b] hover:bg-gray-200 hover:!no-underline">
+                @Html.Raw(SignOutThinIcon)
                 Log out
             </a>
         </div>
@@ -88,8 +89,9 @@
                                                    class="z-10 opacity-0 absolute inset-0 cursor-pointer"
                                                    accept=".pdf" />
                                             <button type="button" id="uploadResumeButton"
-                                                    class="w-full rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A53D3D]">
-                                                <i class="fa-solid fa-file-arrow-up mr-2"></i><span id="uploadResumeText">Upload</span>
+                                                    class="flex w-full items-center justify-center rounded-md bg-[#7A1515] px-3 py-2 text-center font-medium text-white hover:bg-[#A53D3D]">
+                                                @Html.Raw(UploadResumeIcon)
+                                                <span id="uploadResumeText">Upload</span>
                                             </button>
                                         </div>
                                         <span asp-validation-for="Resume" id="resumeValidation" class="text-sm text-red-500"></span>

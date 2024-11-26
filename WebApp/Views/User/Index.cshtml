@@ -1,5 +1,6 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.UserViewModel>
 @using Humanizer
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "User Management | GradSync";
@@ -33,7 +34,7 @@
             {
                 <form method="get" asp-action="@aspAction">
                     <button type="submit" class="mr-2 rounded bg-gray-300 px-2 py-1 text-white">
-                        <i class="fa-solid fa-xmark"></i>
+                        &times;
                     </button>
                 </form>
             }
@@ -47,8 +48,8 @@
             @if (User.IsInRole("Admin"))
             {
                 <button type="button"
-                        class="ml-4 rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]" data-toggle="modal" data-target="#addUserModal">
-                    <i class="fas fa-plus"></i> New User
+                        class="ml-4 flex items-center rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]" data-toggle="modal" data-target="#addUserModal">
+                    @Html.Raw(AddIcon)New User
                 </button>
             }
         </div>
@@ -66,10 +67,10 @@
                            asp-route-pageIndex="@pageIndex"
                            asp-route-role="@role"
                            asp-route-verified="@verified"
-                           class="cursor-pointer text-[#343131] hover:text-[#A04747] hover:!no-underline @(sortBy == "name_asc" ||  sortBy == "name_desc" ? "text-[#A04747]" : "")">
+                           class="flex cursor-pointer items-center text-[#343131] hover:text-[#A04747] hover:!no-underline @(sortBy == "name_asc" ||  sortBy == "name_desc" ? "text-[#A04747]" : "")">
                             Name
-                            @(sortBy == "name_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") :
-                                (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                            @(sortBy == "name_asc" ? Html.Raw(SortUpIcon) :
+                                (sortBy == "name_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
                         </a>
                     </th>
 
@@ -80,18 +81,18 @@
                            asp-route-pageIndex="@pageIndex"
                            asp-route-role="@role"
                            asp-route-verified="@verified"
-                           class="cursor-pointer text-[#343131] hover:text-[#A04747] hover:!no-underline @(sortBy == "email_asc" ||  sortBy == "email_desc" ? "text-[#A04747]" : "")">
+                           class="flex cursor-pointer items-center text-[#343131] hover:text-[#A04747] hover:!no-underline @(sortBy == "email_asc" ||  sortBy == "email_desc" ? "text-[#A04747]" : "")">
                             Email
-                            @(sortBy == "email_asc" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
-                                (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
+                            @(sortBy == "email_asc" ? Html.Raw(SortUpIcon) :
+                                (sortBy == "email_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
                         </a>
                     </th>
 
                     <!-- Role Dropdown Filter -->
                     <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-[#625f5f]">
                         <div class="relative">
-                            <button class="cursor-pointer uppercase text-[#343131] hover:text-[#A04747] @(!string.IsNullOrEmpty(role) ? "text-[#A04747]" : "")" id="roleDropdown">
-                                Role <i class="fas fa-chevron-down"></i>
+                            <button class="flex cursor-pointer items-center uppercase text-[#343131] hover:text-[#A04747] @(!string.IsNullOrEmpty(role) ? "text-[#A04747]" : "")" id="roleDropdown">
+                                Role @Html.Raw(DropdownIcon)
                             </button>
                             <div class="absolute mt-1 hidden rounded-md border bg-white" id="roleDropdownMenu">
                                 <a asp-action="@aspAction"
@@ -110,8 +111,8 @@
                     <!-- Verified Dropdown Filter -->
                     <th class="py-3 pl-6 text-left text-sm font-medium uppercase tracking-wider text-[#625f5f]">
                         <div class="relative">
-                            <button class="cursor-pointer pl-6 uppercase text-[#343131] hover:text-[#A04747] @(verified.HasValue ? "text-[#A04747]" : "")" id="verifiedDropdown">
-                                Verified <i class="fas fa-chevron-down"></i>
+                            <button class="flex cursor-pointer items-center pl-6 uppercase text-[#343131] hover:text-[#A04747] @(verified.HasValue ? "text-[#A04747]" : "")" id="verifiedDropdown">
+                                Verified @Html.Raw(DropdownIcon)
                             </button>
 
                             <div class="absolute mt-1 hidden space-y-2 rounded-md border bg-white hover:!no-underline hover:text-[#A04747]" id="verifiedDropdownMenu">
@@ -158,7 +159,7 @@
                         <tr class="hover:bg-gray-100">
                             <td class="cursor-default whitespace-nowrap px-6 py-3 text-sm text-[#343131]">
                                 <div class="flex items-center">
-                                    <img src="https://ui-avatars.com/api/?name=@item.FirstName+@item.LastName" alt="Profile Image" class="mr-3 h-8 w-8 rounded-full">
+                                    <img src="https://ui-avatars.com/api/?name=@item.FirstName+@item.LastName&format=svg" alt="Profile Image" class="mr-3 h-8 w-8 rounded-full">
                                     @Html.DisplayFor(modelItem => item.FirstName) @Html.DisplayFor(modelItem => item.LastName)
                                 </div>
                             </td>
@@ -167,22 +168,22 @@
                             <td class="py-3 pl-12 text-left text-sm">
                                 @if (item.IsVerified)
                                 {
-                                    <span class="text-green-600">
-                                        <i class="fas fa-check-circle"></i> Verified
+                                    <span class="flex items-center gap-1 text-green-600">
+                                        @Html.Raw(UserVerifiedIcon)Verified
                                     </span>
                                 }
                                 else
                                 {
-                                    <span class="text-red-600">
-                                        <i class="fas fa-times-circle"></i> Not Verified
+                                    <span class="flex items-center gap-1 text-red-600">
+                                        @Html.Raw(UserUnverifiedIcon)Not Verified
                                     </span>
                                 }
                             </td>
 
                             <td class="py-3 pl-6 text-left">
                                 <div class="relative">
-                                    <button data-userid="@item.UserId" class="actionDropdownBtn cursor-pointer px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                        <i class="fas fa-ellipsis-v"></i>
+                                    <button data-userid="@item.UserId" class="actionDropdownBtn flex cursor-pointer items-center px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                        @Html.Raw(EllipsisVIcon)
                                     </button>
 
                                     @*Action Dropdown Menu AMBOT NLNG GAJUD LATER NLNG YAN*@
@@ -197,21 +198,21 @@
                                                             ,'@item.Suffix','@item.Email'
                                                             ,'@item.RoleId','@item.IsVerified')"
                                                class="flex items-center px-4 py-2 text-sm text-[#343131] hover:bg-gray-100 hover:text-[#A04747] hover:!no-underline">
-                                                <i class="fas fa-edit mr-2 w-5"></i>
+                                                @Html.Raw(UpdateIcon)
                                                 <span>Update</span>
                                             </a>
 
                                             <!-- Reset Password -->
                                             <button onclick="displayResetPasswordModal('@item.UserId', '@item.FirstName')"
                                                     class="flex w-full items-center px-4 py-2 text-left text-sm text-blue-600 hover:bg-gray-100 hover:text-blue-800">
-                                                <i class="fas fa-key mr-2 w-5" aria-hidden="true"></i>
+                                                @Html.Raw(ResetPasswordIcon)
                                                 <span>Reset Password</span>
                                             </button>
 
                                             <!-- Delete User -->
                                             <button type="button" onclick="displayDeleteModal('@item.UserId', '@item.FirstName')"
                                                     class="flex w-full items-center px-4 py-2 text-left text-sm text-red-600 hover:bg-gray-100 hover:text-red-800">
-                                                <i class="fas fa-trash-alt mr-2 w-5" aria-hidden="true"></i>
+                                                    @Html.Raw(DeleteIcon)
                                                 <span>Delete</span>
                                             </button>
                                         </div>
@@ -230,20 +231,20 @@
             @if (Model.HasPreviousPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" 
-                        asp-action="@aspAction" 
+                    <a class="page-link flex items-center border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
+                       asp-action="@aspAction" 
                         asp-route-pageIndex="@(Model.PageIndex - 1)" 
                         asp-route-sortBy="@sortBy"
                         asp-route-search="@search">
-                         <i class="fas fa-chevron-left"></i>
+                        @Html.Raw(PaginationLeft)
                     </a>
                 </li>
             }
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" 
-                        asp-action="@aspAction" 
+                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "!text-white hover:!bg-[#A04747]" : "!text-[#7A1515] hover:!text-[#A04747]")"
+                       asp-action="@aspAction" 
                         asp-route-pageIndex="@i" 
                         asp-route-sortBy="@sortBy" 
                         asp-route-search="@search">
@@ -254,12 +255,12 @@
             @if (Model.HasNextPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" 
-                        asp-action="@aspAction" 
+                    <a class="page-link border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
+                       asp-action="@aspAction" 
                         asp-route-pageIndex="@(Model.PageIndex + 1)" 
                         asp-route-sortBy="@sortBy" 
                         asp-route-search="@search">
-                         <i class="fas fa-chevron-right"></i>
+                        @Html.Raw(PaginationRight)
                     </a>
                 </li>
             }

@@ -1,4 +1,6 @@
 ﻿@model LoginViewModel
+@using static Resources.Constants.SvgIcons
+
 @{
     ViewBag.LoginView = true;
     ViewData["Title"] = "Login | GradSync";
@@ -7,7 +9,7 @@
     await Html.RenderPartialAsync("_ForgotPasswordModal", new LoginViewModel());
 }
 <div class="relative">
-    <img src="~/img/loginBG.png" alt="loginBG" class="-z-0 absolute inset-0 h-full w-full object-cover" />
+    <img src="~/img/loginBG.webp" alt="loginBG" class="-z-0 absolute inset-0 h-full w-full object-cover" />
     <div class="bg-opacity-0 flex min-h-screen w-full items-center bg-white pt-14 text-[#7A1515]">
         <form method="post" action="/Account/Login" id="loginForm" class="relative ml-28 flex flex-col rounded-md bg-white p-8" style="max-width: 500px; width: 100%;">
             <div class="pb-0 text-left">
@@ -33,16 +35,9 @@
                            class="w-full rounded-md border border-gray-300 p-2 pr-10 text-[#343131] hover:border-[#A04747] focus:outline-none focus:ring-2 focus:ring-[#A04747] focus:border-transparent" />
                     <button type="button" onclick="togglePasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500">
                         <!-- Eye Open Icon -->
-                        <svg id="eyeOpenIcon" xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0" />
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7" />
-                        </svg>
+                        @Html.Raw(PasswordViewIcon)
                         <!-- Eye Closed Icon -->
-                        <svg id="eyeClosedIcon" xmlns="http://www.w3.org/2000/svg" class="hidden h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                  d="m9.75 14.25 4.5-4.5m-4.5 0 4.5 4.5M2.458 12C3.732 7.943 7.523 5 12 5s8.268 2.943 9.542 7c-1.274 4.057-5.065 7-9.542 7s-8.268-2.943-9.542-7" />
-                        </svg>
+                        @Html.Raw(PasswordHideIcon)
                     </button>
                 </div>
                 @if (TempData["ErrorMessageLogin"] != null)

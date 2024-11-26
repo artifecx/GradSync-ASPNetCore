@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@using static Resources.Constants.SvgIcons
 
 @{
     bool isAdmin = HttpContextAccessor.HttpContext.User.IsInRole("Admin");
@@ -7,6 +8,7 @@
     var role = HttpContextAccessor.HttpContext.User.FindFirst(System.Security.Claims.ClaimTypes.Role)?.Value;
     bool isSuper = User.HasClaim("IsSuperAdmin", "true");
     var userName = HttpContextAccessor.HttpContext.User.Identity.Name;
+    var userLastName = HttpContextAccessor.HttpContext.User.FindFirst("LastName")?.Value;
     bool isLoggedIn = HttpContextAccessor.HttpContext.User.Identity.IsAuthenticated;
 }
 
@@ -16,7 +18,7 @@
             <!-- Left Section: Logo -->
             <div class="flex-shrink-0 flex items-center">
                 <a href="@Url.Action("Index", "Home")" class="flex items-center">
-                    <img src="~/img/logo1.png" alt="Logo" class="mr-3 h-8 w-auto">
+                    <img src="~/img/logo1.webp" alt="Logo" class="mr-3 h-8 w-auto">
                 </a>
             </div>
             
@@ -45,18 +47,22 @@
                 <div class="relative ml-3">
                     <button type="button" class="flex rounded-full text-sm focus:outline-none" id="user-menu-button" aria-expanded="false" aria-haspopup="true" onclick="toggleDropdown()">
                         <span class="sr-only">Open user menu</span>
-                        <i class="fa fa-user-circle fa-2x"></i>
+                        <img src="https://ui-avatars.com/api/?name=@userName+@userLastName&background=A04747&color=fff&format=svg" alt="Profile Image" class="h-9 w-9 rounded-full">
                     </button>
                     <!-- Dropdown menu -->
-                    <div id="dropdown-menu" class="absolute right-0 mt-2 hidden w-48 origin-top-right rounded-md bg-white py-1 shadow-lg" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
-                        <a href="@Url.Action("GetAllApplications", "Application")" class="block px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
-                            <i class="fa-solid fa-briefcase mr-2"></i>Applications
+                    <div id="dropdown-menu" class="absolute right-0 mt-2 hidden w-48 origin-top-right whitespace-nowrap rounded-md bg-white py-1 shadow-lg" role="menu" aria-orientation="vertical" aria-labelledby="user-menu-button">
+                        <a href="@Url.Action("GetAllApplications", "Application")" class="flex items-center px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
+                            @Html.Raw(ApplicationIcon)Applications
                         </a>
-                        <a href="@Url.Action("GetUserProfile", "UserProfile")" class="block px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
-                            <i class="fa fa-cog mr-2"></i>Settings
+                        <a href="@Url.Action("", "")" class="flex items-center px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
+                            @Html.Raw(BookmarkIcon) <span class="pl-1">Bookmarks</span>
                         </a>
-                        <a href="#" data-toggle="modal" data-target="#logoutModal" class="block px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
-                            <i class="fa fa-sign-out mr-2"></i>Log out
+                        <hr />
+                        <a href="@Url.Action("GetUserProfile", "UserProfile")" class="flex items-center px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
+                            @Html.Raw(SettingsIcon)Settings
+                        </a>
+                        <a href="#" data-toggle="modal" data-target="#logoutModal" class="flex items-center px-4 py-2 text-sm text-[#343131] hover:text-[#A04747] hover:bg-gray-100 hover:no-underline" role="menuitem">
+                            @Html.Raw(SignOutIcon)Log out
                         </a>
                     </div>
                 </div>

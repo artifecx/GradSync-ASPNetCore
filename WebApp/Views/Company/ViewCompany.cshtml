@@ -1,4 +1,5 @@
 ﻿@model Services.ServiceModels.CompanyViewModel
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Company Details";
@@ -20,7 +21,7 @@
             {
                 <div class="mb-3 flex justify-between">
                     <button type="button" id="back-button" onclick="goBack()" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] focus:!outline-none">
-                        <i class="fas fa-arrow-left mr-2"></i> Back
+                        @Html.Raw(BackIcon) Back
                     </button>
                 </div>
             }
@@ -32,13 +33,13 @@
                     <div class="outline-4 relative h-24 w-24 rounded-full outline outline-[#D7B8B8]">
                         <img id="companyLogo"
                              class="h-24 w-24 rounded-full object-cover"
-                             src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"
+                             src="https://ui-avatars.com/api/?name=@Model.Name&background=fff&color=A04747&format=svg"
                              alt="Company Logo">
 
                         <!-- Upload Button Overlay -->
                         <button type="button" onclick="openModal()"
-                                class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#7A1515] text-white hover:bg-gray-600">
-                            <i class="fas fa-camera"></i>
+                                class="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full bg-[#7A1515] text-white hover:bg-[#A04747]">
+                            @Html.Raw(CameraIcon)
                         </button>
                     </div>
 
@@ -77,8 +78,8 @@
                             Save Changes
                         </button>
                         <button type="button" onclick="enableEditMode()" id="editButton"
-                                class="rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
-                            <i class="fas fa-edit pr-1"></i> Update
+                                class="flex items-center rounded-md bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D]">
+                            @Html.Raw(UpdateIcon) Update
                         </button>
                     </div>
                 </div>
@@ -149,20 +150,20 @@
                                     <a asp-action="@aspAction" 
                                         asp-route-sortBy="@sortByName" 
                                         asp-route-search="@search"
-                                        class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
+                                        class="flex cursor-pointer items-center text-xs text-gray-700 hover:text-[#A53D3D] hover:!no-underline">
                                         Name
-                                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw("<i class='fas fa-sort'></i>") :
-                                            (sortBy == "name_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort-up'></i>")))
+                                        @(string.IsNullOrEmpty(sortBy) ? Html.Raw(SortIcon) :
+                                            (sortBy == "name_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortUpIcon)))
                                     </a>
                                 </th>
                                 <th class="px-6 py-3 text-left text-sm font-medium uppercase tracking-wider text-gray-500">
                                     <a asp-action="@aspAction" 
                                         asp-route-sortBy="@sortByEmail" 
-                                        asp-route-search="@search" 
-                                        class="cursor-pointer text-xs text-gray-700 hover:text-[#A53D3D]">
+                                        asp-route-search="@search"
+                                       class="flex cursor-pointer items-center text-xs text-gray-700 hover:text-[#A53D3D] hover:!no-underline">
                                         Email
-                                        @(sortBy == "email" ? Html.Raw("<i class='fas fa-sort-up'></i>") :
-                                            (sortBy == "email_desc" ? Html.Raw("<i class='fas fa-sort-down'></i>") : Html.Raw("<i class='fas fa-sort'></i>")))
+                                        @(sortBy == "email" ? Html.Raw(SortUpIcon) :
+                                            (sortBy == "email_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
                                     </a>
                                 </th>
                             </tr>

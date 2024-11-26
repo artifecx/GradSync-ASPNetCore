@@ -24,6 +24,7 @@ using System.Threading.RateLimiting;
 using System.Linq;
 using Azure;
 using System.Security.Claims;
+using Microsoft.AspNetCore.ResponseCompression;
 
 namespace WebApp
 {
@@ -111,6 +112,23 @@ namespace WebApp
                             .WithMethods("GET", "POST")
                             .AllowCredentials();
                     });
+            });
+
+            services.AddResponseCompression(options =>
+            {
+                options.EnableForHttps = true;
+                options.Providers.Add<GzipCompressionProvider>();
+                options.Providers.Add<BrotliCompressionProvider>();
+            });
+
+            services.Configure<BrotliCompressionProviderOptions>(options =>
+            {
+                options.Level = System.IO.Compression.CompressionLevel.Optimal;
+            });
+
+            services.Configure<GzipCompressionProviderOptions>(options =>
+            {
+                options.Level = System.IO.Compression.CompressionLevel.Optimal;
             });
 
             //Configuration
@@ -237,6 +255,7 @@ namespace WebApp
             this._app.UseTokenProvider(_tokenProviderOptions);
 
             this._app.UseHttpsRedirection();
+            this._app.UseResponseCompression();
             this._app.UseStaticFiles();
 
             // Localization

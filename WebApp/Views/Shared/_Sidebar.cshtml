@@ -1,5 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
+@using static Resources.Constants.SvgIcons
 
 @{
     bool isAdmin = User.IsInRole("Admin") || User.IsInRole("NLO");
@@ -12,7 +13,7 @@
 
 <div class="mx-2.5 mt-2.5 flex max-h-screen min-h-screen w-64 flex-col items-center gap-2.5 pb-4 @((ViewBag.LoginView == true || ViewBag.create == true) ? "hidden" : "")">
     <div class="flex w-full flex-grow flex-col gap-1 overflow-y-auto rounded-md bg-white p-3 shadow-md xl:rounded-xl">
-        <img src="~/img/logo1.png"
+        <img src="~/img/logo1.webp"
              class="my-3 w-full cursor-pointer px-2.5"
              alt="logo"
              onclick="window.location.href = '@(isRecruiter ? Url.Action("GetAllJobsRecruiter", "Job") : Url.Action("Dashboard", "Home"))';">
@@ -20,52 +21,52 @@
         @if (isAdmin || isSuper)
         {
             <a asp-action="Dashboard" asp-controller="Home"
-               class="@(route == "Home" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-area-chart"></i>
+               class="@(route == "Home" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(DashboardIcon)
                 DASHBOARD
             </a>
         }
         @if (isSuper)
         {
             <a asp-action="GetAllUsers" asp-controller="User"
-               class="@(route == "User" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-users"></i>
+               class="@(route == "User" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(UsersIcon)
                 USERS
             </a>
         }
         @if (isAdmin && !isSuper)
         {
             <a asp-action="GetAllCompanies" asp-controller="Company"
-               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-building"></i>
+               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(CompanyIcon)
                 COMPANIES
             </a>
             <a asp-action="GetAllJobsAdmin" asp-controller="Job"
-               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-suitcase"></i>
+               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(JobIcon)
                 JOBS
             </a>
             <a asp-action="GetAllApplications" asp-controller="Application"
-               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-check-circle-o"></i>
+               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(ApplicationIcon)
                 APPLICATIONS
             </a>
         }
         @if (isRecruiter)
         {
             <a asp-action="GetCompanyRecruiter" asp-controller="Company"
-               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-building"></i>
+               class="@(route == "Company" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(CompanyIcon)
                 COMPANY
             </a>
             <a asp-action="GetAllJobsRecruiter" asp-controller="Job"
-               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-suitcase"></i>
+               class="@(route == "Job" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(JobIcon)
                 JOBS
             </a>
             <a asp-action="GetAllApplications" asp-controller="Application"
-               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-check-circle-o"></i>
+               class="@(route == "Application" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(ApplicationIcon)
                 APPLICATIONS
             </a>
         }
@@ -73,17 +74,18 @@
         @if (!isAdmin)
         {
             <a asp-action="GetUserProfile" asp-controller="UserProfile"
-               class="@(route == "UserProfile" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-                <i class="fa fa-cog"></i> SETTINGS
+               class="@(route == "UserProfile" ? "text-[#A04747]" : "") shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+                @Html.Raw(SettingsIcon)
+                SETTINGS
             </a>
         }
         <a href="#" data-toggle="modal" data-target="#logoutModal"
-           class="shrink-0 flex w-full items-center gap-5 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
-            <i class="fa fa-sign-out"></i>
+           class="shrink-0 flex w-full items-center gap-3 rounded-lg p-2 text-sm font-semibold tracking-wide text-[#625f5f] !no-underline hover:text-[#A04747]">
+            @Html.Raw(SignOutIcon)
             LOG OUT
         </a>
         <div class="shrink-0 mt-auto flex w-full flex-col items-center gap-1 overflow-y-auto rounded-md p-3 font-semibold text-[#A04747] xl:rounded-xl">
-            <img src="https://ui-avatars.com/api/?name=@HttpContextAccessor.HttpContext.User.Identity.Name" alt="Profile Image" class="h-10 w-10 rounded-full">
+            <img src="https://ui-avatars.com/api/?name=@HttpContextAccessor.HttpContext.User.Identity.Name&background=A04747&color=fff&format=svg" alt="Profile Image" class="h-10 w-10 rounded-full">
             <span>@HttpContextAccessor.HttpContext.User.Identity.Name</span>
             <div class="text-sm tracking-wide text-[#625f5f]">
                 @if (isSuper)

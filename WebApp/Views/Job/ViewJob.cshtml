@@ -4,6 +4,7 @@
 @using Humanizer;
 @using System.Text.Json;
 @using Services.Services
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = Model.Title;
@@ -30,7 +31,7 @@
         <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
             <div class="flex justify-between">
                 <button type="button" id="back-button" class="flex items-center text-xs font-semibold text-[#7A1515] hover:text-[#A04747] focus:!outline-none">
-                    <i class="fas fa-arrow-left mr-2"></i> Back
+                    @Html.Raw(BackIcon) Back
                 </button>
             </div>
 
@@ -56,32 +57,31 @@
 
                             <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                         new { id = Model.ApplicationId })'"
-                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
-                                <i class="fa-solid fa-info-circle pr-1"></i> See Details
+                                    class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                @Html.Raw(DetailsIcon) See Details
                             </button>
                         }
                         else
                         {
                             <!-- Save -->
-                            <button onclick="saveJobHandler('@Model.JobId')"
-                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
-                                <i class="fa-regular fa-bookmark"></i>
+                            <button onclick="saveJobHandler('@Model.JobId')" class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                                @Html.Raw(BookmarkHollowIcon)
                             </button>
 
                             <!-- Apply Button -->
                             <button onclick="applyJobHandler('@Model.JobId')"
-                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
-                                <i class="fa-regular fa-paper-plane pr-1"></i> Apply
+                                    class="rounded bg-[#7A1515] flex items-center px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                @Html.Raw(ApplyIcon) Apply
                             </button>
                         }
                     }
                     else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
                     {
                         <!-- Edit Button -->
-                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                        <button class="rounded bg-[#7A1515] flex items-center px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
                                 data-toggle="modal"
                                 data-target="#editJobModal">
-                            <i class="fas fa-edit pr-2"></i> Update
+                            @Html.Raw(UpdateIcon) Update
                         </button>
                     }
                 </div>

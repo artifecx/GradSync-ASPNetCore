@@ -1,5 +1,6 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.ApplicationViewModel>
 @using Data.Models
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Application List";
@@ -39,7 +40,7 @@
         <th class="py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">Match Percentage</th>
         <th class="px-2 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByProgram) ? "text-[#A04747]" : "")"
+                <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByProgram) ? "text-[#A04747]" : "")"
                    href="#" id="statusTypeDropdown"
                    data-toggle="dropdown"
                    aria-haspopup="true"
@@ -52,7 +53,7 @@
                     {
                         <text>@filterByProgram</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    @Html.Raw(DropdownIcon)
                 </a>
                 <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                     <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -97,9 +98,9 @@
                asp-route-programFilter="@filterByProgram"
                asp-route-workSetupFilter="@filterByWorkSetup"
                asp-route-statusFilter="@filterByStatus"
-               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
+               class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
                 Position
-                @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                @(sortBy == "title_asc" ? Html.Raw(SortUpIcon) : (sortBy == "title_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
             </a>
         </th>
         @if (isAdministrative)
@@ -112,7 +113,7 @@
         <!-- Setup type | FILTER -->
         <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
+                <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
                    href="#" id="statusTypeDropdown"
                    data-toggle="dropdown"
                    aria-haspopup="true"
@@ -125,7 +126,7 @@
                     {
                         <text>@filterByWorkSetup</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    @Html.Raw(DropdownIcon)
                 </a>
                 <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                     <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -160,15 +161,15 @@
                asp-route-programFilter="@filterByProgram"
                asp-route-workSetupFilter="@filterByWorkSetup"
                asp-route-statusFilter="@filterByStatus"
-               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
+               class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
                 @Html.DisplayNameFor(model => model.First().CreatedDate)
-                @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                @(sortBy == "created_asc" ? Html.Raw(SortUpIcon) : (sortBy == "created_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
             </a>
         </th>
         <!-- Application Status | FILTER -->
         <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
+                <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
                    href="#" id="statusTypeDropdown"
                    data-toggle="dropdown"
                    aria-haspopup="true"
@@ -181,7 +182,7 @@
                     {
                         <text>@filterByStatus</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    @Html.Raw(DropdownIcon)
                 </a>
                 <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                     <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -218,9 +219,9 @@
                asp-route-programFilter="@filterByProgram"
                asp-route-workSetupFilter="@filterByWorkSetup"
                asp-route-statusFilter="@filterByStatus"
-               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
+               class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "title_asc" || sortBy == "title_desc"? "text-[#A04747]" : "")">
                 POSITION
-                @(sortBy == "title_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "title_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                @(sortBy == "title_asc" ? Html.Raw(SortUpIcon) : (sortBy == "title_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
             </a>
         </th>
         <!-- Match Percentage -->
@@ -232,7 +233,7 @@
         <!-- Setup type | FILTER -->
         <th class="px-6 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
+                <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByWorkSetup) ? "text-[#A04747]" : "")"
                    href="#" id="statusTypeDropdown"
                    data-toggle="dropdown"
                    aria-haspopup="true"
@@ -245,7 +246,7 @@
                     {
                         <text>@filterByWorkSetup</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    @Html.Raw(DropdownIcon)
                 </a>
                 <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                     <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -279,15 +280,15 @@
                asp-route-programFilter="@filterByProgram"
                asp-route-workSetupFilter="@filterByWorkSetup"
                asp-route-statusFilter="@filterByStatus"
-               class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
+               class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "created_asc" || sortBy == "created_desc"? "text-[#A04747]" : "")">
                 @Html.DisplayNameFor(model => model.First().CreatedDate)
-                @(sortBy == "created_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "created_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                @(sortBy == "created_asc" ? Html.Raw(SortUpIcon) : (sortBy == "created_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
             </a>
         </th>
         <!-- Application Status | FILTER -->
         <th class="py-3 pl-6 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
             <div class="dropdown relative">
-                <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
+                <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(!string.IsNullOrEmpty(filterByStatus) ? "text-[#A04747]" : "")"
                    href="#" id="statusTypeDropdown"
                    data-toggle="dropdown"
                    aria-haspopup="true"
@@ -300,7 +301,7 @@
                     {
                         <text>@filterByStatus</text>
                     }
-                    <i class="fa-solid fa-chevron-down"></i>
+                    @Html.Raw(DropdownIcon)
                 </a>
                 <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                     <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"

@@ -2,6 +2,7 @@
 @using Data.Models
 @using Humanizer
 @using System.Text.Json;
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Job Management | GradSync";
@@ -80,7 +81,7 @@ else
                     {
                         <form method="get" asp-action="@aspAction">
                             <button type="submit" class="rounded bg-gray-300 px-2 py-1 text-white">
-                                <i class="fa-solid fa-xmark"></i>
+                                &times;
                             </button>
                         </form>
                     }
@@ -94,10 +95,10 @@ else
                     {
                         <div class="ml-3">
                             <button type="button"
-                                    class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                    class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
                                     data-toggle="modal"
                                     data-target="#createJobModal">
-                                <i class="fa fa-plus"></i>
+                                @Html.Raw(AddIcon)
                                 Add Job
                             </button>
                         </div>
@@ -119,8 +120,8 @@ else
                             filterByEmploymentType = filterByEmploymentType,
                             filterByCompany = filterByCompany
                         })'"
-                        class="w-full max-w-[200px] cursor-pointer text-right text-[#343131] hover:text-[#A04747] focus:outline-none">
-                    <i class="fa fa-archive"></i> Archived Jobs
+                        class="flex w-full max-w-[200px] cursor-pointer items-center justify-end text-right text-[#343131] hover:text-[#A04747] focus:outline-none">
+                    @Html.Raw(ArchiveIcon)Archived Jobs
                 </button>
             </div>
             <table class="min-w-full table-auto rounded-lg bg-white">
@@ -132,29 +133,38 @@ else
                 </tbody>
             </table>
         </div>
+
         <!-- Pagination -->
         <nav class="flex justify-center pt-3">
             <ul class="pagination flex items-center">
                 @if (Model.HasPreviousPage)
                 {
                     <li class="page-item">
-                        <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                        <a class="page-link flex items-center border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
                            asp-action="@aspAction"
                            asp-route-pageIndex="@(Model.PageIndex - 1)"
                            asp-route-sortBy="@sortBy"
-                           asp-route-search="@search">
-                            <i class="fas fa-chevron-left"></i>
+                           asp-route-search="@search"
+                           asp-route-filterByCompany="@filterByCompany"
+                           asp-route-filterByEmploymentType="@filterByEmploymentType"
+                           asp-route-filterByStatusType="@filterByStatusType"
+                           asp-route-filterByWorkSetup="@filterByWorkSetup">
+                            @Html.Raw(PaginationLeft)
                         </a>
                     </li>
                 }
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                        <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
+                        <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "!text-white hover:!bg-[#A04747]" : "!text-[#7A1515] hover:!text-[#A04747]")"
                            asp-action="@aspAction"
                            asp-route-pageIndex="@i"
                            asp-route-sortBy="@sortBy"
-                           asp-route-search="@search">
+                           asp-route-search="@search"
+                           asp-route-filterByCompany="@filterByCompany"
+                           asp-route-filterByEmploymentType="@filterByEmploymentType"
+                           asp-route-filterByStatusType="@filterByStatusType"
+                           asp-route-filterByWorkSetup="@filterByWorkSetup">
                             @i
                         </a>
                     </li>
@@ -162,12 +172,16 @@ else
                 @if (Model.HasNextPage)
                 {
                     <li class="page-item">
-                        <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
+                        <a class="page-link border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
                            asp-action="@aspAction"
                            asp-route-pageIndex="@(Model.PageIndex + 1)"
                            asp-route-sortBy="@sortBy"
-                           asp-route-search="@search">
-                            <i class="fas fa-chevron-right"></i>
+                           asp-route-search="@search"
+                           asp-route-filterByCompany="@filterByCompany"
+                           asp-route-filterByEmploymentType="@filterByEmploymentType"
+                           asp-route-filterByStatusType="@filterByStatusType"
+                           asp-route-filterByWorkSetup="@filterByWorkSetup">
+                            @Html.Raw(PaginationRight)
                         </a>
                     </li>
                 }

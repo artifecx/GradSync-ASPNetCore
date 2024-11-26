@@ -1,4 +1,5 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.CompanyViewModel>
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Company Management | GradSync";
@@ -34,7 +35,7 @@
                 {
                     <form method="get" asp-action="@aspAction">
                         <button type="submit" class="rounded bg-gray-300 px-2 py-1 text-white">
-                            <i class="fa-solid fa-xmark"></i>
+                            &times;
                         </button>
                     </form>
                 }
@@ -50,10 +51,10 @@
                 {
                     <div class="ml-3">
                         <button type="button"
-                                class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
                                 data-toggle="modal"
                                 data-target="#addCompanyModal">
-                            <i class="fa fa-plus"></i>
+                            @Html.Raw(AddIcon)
                             Add Company
                         </button>
                     </div>
@@ -73,8 +74,8 @@
                             verified = verified,
                             hasValidMOA = hasValidMOA,
                         })'"
-                    class="w-full max-w-[200px] cursor-pointer text-right text-[#343131] hover:text-[#A04747] focus:outline-none">
-                <i class="fa fa-archive"></i> Archived Companies
+                    class="flex w-full max-w-[200px] cursor-pointer items-center justify-end text-right text-[#343131] hover:text-[#A04747] focus:outline-none">
+                @Html.Raw(ArchiveIcon)Archived Companies
             </button>
         </div>
         <table class="min-w-full table-auto rounded-lg bg-white">
@@ -88,9 +89,9 @@
                            asp-route-pageIndex="@pageIndex"
                            asp-route-verified="@verified"
                            asp-route-hasValidMOA="@hasValidMOA"
-                           class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "name_asc" || sortBy == "name_desc"? "text-[#A04747]" : "")">
+                           class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "name_asc" || sortBy == "name_desc"? "text-[#A04747]" : "")">
                             @Html.DisplayNameFor(model => model.First().Name)
-                            @(sortBy == "name_asc" ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (sortBy == "name_desc" ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                            @(sortBy == "name_asc" ? Html.Raw(SortUpIcon) : (sortBy == "name_desc" ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
                         </a>
                     </th>
                     <!-- Email -->
@@ -107,15 +108,15 @@
                            asp-route-pageIndex="@pageIndex"
                            asp-route-verified="@verified"
                            asp-route-hasValidMOA="@hasValidMOA"
-                           class="text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "jobs_asc" || sortBy == "jobs_desc"? "text-[#A04747]" : "")">
+                           class="flex items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(sortBy == "jobs_asc" || sortBy == "jobs_desc"? "text-[#A04747]" : "")">
                             @Html.DisplayNameFor(model => model.First().ActiveJobListings)
-                            @(string.Equals(sortBy, "jobs_asc") ? Html.Raw("<i class='fa-solid fa-sort-up'></i>") : (string.Equals(sortBy, "jobs_desc") ? Html.Raw("<i class='fa-solid fa-sort-down'></i>") : Html.Raw("<i class='fa-solid fa-sort'></i>")))
+                            @(string.Equals(sortBy, "jobs_asc") ? Html.Raw(SortUpIcon) : (string.Equals(sortBy, "jobs_desc") ? Html.Raw(SortDownIcon) : Html.Raw(SortIcon)))
                         </a>
                     </th>
                     <!-- Is Verified -->
                     <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
                         <div class="dropdown relative">
-                            <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(verified.HasValue ? "text-[#A04747]" : "")" 
+                            <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(verified.HasValue ? "text-[#A04747]" : "")" 
                                 href="#" id="statusTypeDropdown" 
                                 data-toggle="dropdown" 
                                 aria-haspopup="true" 
@@ -128,7 +129,7 @@
                                 {
                                     <text>@(verified == true ? "Verified" : "Unverified")</text>
                                 }
-                                <i class="fa-solid fa-chevron-down"></i>
+                                @Html.Raw(DropdownIcon)
                             </a>
                             <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                                 <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -155,7 +156,7 @@
                     <!-- Has MOA -->
                     <th class="px-3 py-3 text-xs font-medium uppercase tracking-wider text-[#625f5f]">
                         <div class="dropdown relative">
-                            <a class="cursor-pointer text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(hasValidMOA.HasValue ? "text-[#A04747]" : "")" 
+                            <a class="flex cursor-pointer items-center text-[#625f5f] hover:!no-underline hover:text-[#A04747] @(hasValidMOA.HasValue ? "text-[#A04747]" : "")" 
                                 href="#" id="statusTypeDropdown" 
                                 data-toggle="dropdown" 
                                 aria-haspopup="true" 
@@ -168,7 +169,7 @@
                                 {
                                     <text>@(hasValidMOA == true ? "With MOA" : "No MOA")</text>
                                 }
-                                <i class="fa-solid fa-chevron-down"></i>
+                                @Html.Raw(DropdownIcon)
                             </a>
                             <div class="dropdown-menu absolute hidden max-h-[200px] space-y-2 overflow-y-auto pt-1 text-[#625f5f]" aria-labelledby="statusTypeDropdown">
                                 <a class="dropdown-item block px-4 text-sm hover:bg-gray-100"
@@ -254,8 +255,8 @@
                                 <div class="relative">
                                     <!--Action Button DropDown-->
                                     <button data-companyid="@item.CompanyId"
-                                            class="actionDropdownCompanyBtn cursor-pointer px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                        <i class="fas fa-ellipsis-v"></i>
+                                            class="actionDropdownCompanyBtn flex cursor-pointer items-center px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                        @Html.Raw(EllipsisVIcon)
                                     </button>
 
                                     <div id="actionDropdownCompanyMenu-@item.CompanyId"
@@ -271,8 +272,8 @@
                                                                     verified = verified,
                                                                     hasValidMOA = hasValidMOA,
                                                                 })'"
-                                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                                <i class="fas fa-info-circle mr-2"></i> Details
+                                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                                @Html.Raw(DetailsIcon) Details
                                             </button>
 
                                             <!-- Edit Company -->
@@ -286,14 +287,14 @@
                                                                     hasValidMOA = hasValidMOA,
                                                                     showModal = "editCompany"
                                                                 })'"
-                                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                                <i class="fas fa-edit -circle mr-2"></i> Update
+                                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                                @Html.Raw(UpdateIcon) Update
                                             </button>
 
                                             <!-- Archive Company -->
                                             <button onclick="displayDeleteModal('@item.CompanyId' , '@item.Name')"
-                                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                                <i class="fas fa-archive mr-2"></i> Archive
+                                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                                @Html.Raw(ArchiveIcon) Archive
                                             </button>
                                         </div>
                                     </div>
@@ -311,27 +312,27 @@
             @if (Model.HasPreviousPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                        asp-action="@aspAction"
-                        asp-route-pageIndex="@(Model.PageIndex - 1)"
-                        asp-route-sortBy="@sortBy"
-                        asp-route-search="@search"
-                        asp-route-verified="@verified"
-                        asp-route-hasValidMOA="@hasValidMOA">
-                        <i class="fas fa-chevron-left"></i>
+                    <a class="page-link flex items-center border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@(Model.PageIndex - 1)"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-verified="@verified"
+                       asp-route-hasValidMOA="@hasValidMOA">
+                        @Html.Raw(PaginationLeft)
                     </a>
                 </li>
             }
             @for (int i = 1; i <= Model.TotalPages; i++)
             {
                 <li class="page-item @(i == Model.PageIndex ? "active" : "")">
-                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")"
-                        asp-action="@aspAction"
-                        asp-route-pageIndex="@i"
-                        asp-route-sortBy="@sortBy"
-                        asp-route-search="@search"
-                        asp-route-verified="@verified"
-                        asp-route-hasValidMOA="@hasValidMOA">
+                    <a class="page-link border px-3 py-1 @(i == Model.PageIndex ? "!text-white hover:!bg-[#A04747]" : "!text-[#7A1515] hover:!text-[#A04747]")"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@i"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-verified="@verified"
+                       asp-route-hasValidMOA="@hasValidMOA">
                         @i
                     </a>
                 </li>
@@ -339,14 +340,14 @@
             @if (Model.HasNextPage)
             {
                 <li class="page-item">
-                    <a class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200"
-                        asp-action="@aspAction"
-                        asp-route-pageIndex="@(Model.PageIndex + 1)"
-                        asp-route-sortBy="@sortBy"
-                        asp-route-search="@search"
-                        asp-route-verified="@verified"
-                        asp-route-hasValidMOA="@hasValidMOA">
-                        <i class="fas fa-chevron-right"></i>
+                    <a class="page-link border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]"
+                       asp-action="@aspAction"
+                       asp-route-pageIndex="@(Model.PageIndex + 1)"
+                       asp-route-sortBy="@sortBy"
+                       asp-route-search="@search"
+                       asp-route-verified="@verified"
+                       asp-route-hasValidMOA="@hasValidMOA">
+                        @Html.Raw(PaginationRight)
                     </a>
                 </li>
             }

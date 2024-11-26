@@ -12,7 +12,7 @@ module.exports = {
                 hover: '#991b1b',     //  hover color
             },
             backgroundImage: {
-                'login-bg': "url('/img/loginBG.png')",
+                'login-bg': "url('/img/loginBG.webp')",
             },
             fontFamily: {
                 sans: ['Inter', 'sans-serif'],

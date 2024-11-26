@@ -1,6 +1,7 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
 @using Data.Models
 @using Humanizer
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "All Jobs";
@@ -66,8 +67,8 @@ else
                 <div class="relative">
                     <!-- Dropdown Button -->
                     <button data-jobid="@item.JobId"
-                            class="actionDropdownJobBtn cursor-pointer px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
-                        <i class="fas fa-ellipsis-v"></i>
+                            class="actionDropdownJobBtn flex cursor-pointer items-center px-6 text-[#343131] hover:text-[#A04747] focus:outline-none">
+                        @Html.Raw(EllipsisVIcon)
                     </button>
 
                     <div id="actionDropdownJobMenu-@item.JobId"
@@ -85,8 +86,8 @@ else
                                         filterByEmploymentType = filterByEmploymentType,
                                         filterByCompany = filterByCompany
                                     })'"
-                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                <i class="fas fa-info-circle mr-2"></i> Job Details
+                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                @Html.Raw(DetailsIcon) Job Details
                             </button>
 
                             <!-- Update Status -->
@@ -94,9 +95,9 @@ else
                                     data-target="#updateJobStatusModal"
                                     data-jobid="@item.JobId"
                                     data-statusId="@item.StatusTypeId"
-                                    class="update-job-status w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                    class="update-job-status flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
                                     disabled="@(User.IsInRole("Recruiter") && (item.StatusTypeId == "Pending" || item.StatusTypeId == "BlackListed"))">
-                                <i class="fa-solid fa-rotate mr-2"></i> Update Status
+                                @Html.Raw(UpdateStatusIcon) Update Status
                             </button>
 
                             <!-- Edit Job -->
@@ -112,14 +113,14 @@ else
                                         filterByCompany = filterByCompany,
                                         showModal = "editJob" 
                                     })'"
-                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                <i class="fas fa-edit -circle mr-2"></i> Edit Job Info
+                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                @Html.Raw(UpdateIcon) Edit Job Info
                             </button>
 
                             <!-- Archive Job -->
                             <button onclick="displayDeleteModal('@item.JobId' , '@item.Title')"
-                                    class="w-full cursor-pointer px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
-                                <i class="fas fa-archive mr-2"></i> Archive Job
+                                    class="flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm text-[#343131] hover:text-[#A04747] focus:outline-none">
+                                @Html.Raw(ArchiveIcon) Archive Job
                             </button>
                         </div>
                     </div>

@@ -1,6 +1,7 @@
 ﻿@model Services.ServiceModels.PaginatedList<Services.ServiceModels.JobViewModel>
 @using Data.Models;
 @using Humanizer;
+@using static Resources.Constants.SvgIcons
 
 @{
     ViewData["Title"] = "Available Jobs | GradSync";
@@ -120,8 +121,8 @@
 
                                             <!-- Bookmark Button Placeholder -->
                                             <form method="post" asp-controller="Job" asp-action="Bookmark" asp-route-id="@job.JobId" class="ml-2">
-                                                <button type="submit" class="px-2 text-gray-500 transition-colors hover:text-gray-700">
-                                                    <i class="fa-regular fa-bookmark"></i>
+                                                <button type="submit" class="flex items-center rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                                                    @Html.Raw(BookmarkHollowIcon)
                                                 </button>
                                             </form>
                                         </div>
@@ -224,8 +225,8 @@
                                 {
                                     <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
                                 }
-                                <button class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" type="submit">
-                                    <i class="fas fa-chevron-left"></i>
+                                <button class="page-link flex items-center border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]" type="submit">
+                                    @Html.Raw(PaginationLeft)
                                 </button>
                             </form>
                         </li>
@@ -247,7 +248,7 @@
                                 {
                                     <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
                                 }
-                                <button class="page-link border px-3 py-1 @(i == Model.PageIndex ? "bg-blue-500 text-white" : "text-gray-700 hover:bg-gray-200")" type="submit">
+                                <button class="page-link flex items-center border px-3 py-1 @(i == Model.PageIndex ? "!text-white hover:!bg-[#A04747]" : "!text-[#7A1515] hover:!text-[#A04747]")" type="submit">
                                     @i
                                 </button>
                             </form>
@@ -270,8 +271,8 @@
                                 {
                                     <input type="hidden" name="filterByWorkSetup" value="@wsFilter" />
                                 }
-                                <button class="page-link border border-red-300 px-3 py-1 text-gray-700 hover:bg-gray-200" type="submit">
-                                    <i class="fas fa-chevron-right"></i>
+                                <button class="page-link flex items-center border px-3 py-1 !text-[#7A1515] hover:!text-[#A04747]" type="submit">
+                                    @Html.Raw(PaginationRight)
                                 </button>
                             </form>
                         </li>
