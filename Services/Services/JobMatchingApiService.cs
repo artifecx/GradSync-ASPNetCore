@@ -92,7 +92,7 @@ namespace Services.Services
             if (jobDetails == null) return null;
 
             var applicants = await _repository.GetAllApplicantDetailsAsync(jobDetails.department_ids.ToHashSet());
-            if (applicants == null) return null;
+            if (applicants == null || !applicants.Any()) return null;
 
             var payload = new
             {
@@ -114,7 +114,7 @@ namespace Services.Services
             if (applicantDetails == null) return null;
 
             var jobs = await _repository.GetAllJobDetailsAsync(applicantDetails.department_id);
-            if (jobs == null) return null;
+            if (jobs == null || !jobs.Any()) return null;
 
             var payload = new
             {
