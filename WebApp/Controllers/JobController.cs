@@ -85,7 +85,7 @@ namespace WebApp.Controllers
             {
                 if (string.IsNullOrEmpty(id))
                 {
-                    TempData["ErrorMessage"] = "Invalid job id!";
+                    TempData["ErrorMessage"] = "The job you are trying to access is unavailable.";
                     return RedirectToAction(RedirectString());
                 }
 

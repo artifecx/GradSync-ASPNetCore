@@ -112,7 +112,13 @@ namespace Services.ServiceModels
 
         public string PostedById { get; set; }
 
-        public bool HasApplied { get; set; } = false;
+        
+        public bool CanReapply { get; set; } = false;
+        public bool HasActiveApplication { get; set; } = false;
+        public bool HasClosedApplication { get; set; } = false;
+        public bool HasWithdrawnApplication { get; set; } = false;
+
+        public string ApplicationStatus { get; set; } = null;
         public string ApplicationId { get; set; } = null;
 
         public List<JobApplicantMatch> JobMatches { get; set; }

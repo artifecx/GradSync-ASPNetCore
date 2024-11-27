@@ -31,27 +31,27 @@
                     {
                         @if (User.IsInRole("Applicant"))
                         {
-                            if (Model.ApplicationStatusTypeId != "Rejected")
+                            if (Model.ApplicationStatusTypeId != "Rejected" && Model.ApplicationStatusTypeId != "Accepted")
                             {
                                 <!-- Withdraw -->
-                                <button class="withdraw-application rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                <button class="withdraw-application flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747] disabled:bg-gray-400"
                                         data-applicationid="@Model.ApplicationId"
                                         data-position="@Model.Job.Title"
                                         data-toggle="modal"
                                         data-target="#withdrawApplicationModal">
-                                    Withdraw Application
+                                    @Html.Raw(SignOutIcon) Withdraw Application
                                 </button>
                             }
                         }
                         else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
                         {
                             <!-- Update Status -->
-                            <button class="update-application-status rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                            <button class="update-application-status flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
                                     data-applicationid="@Model.ApplicationId"
                                     data-statusid="@Model.ApplicationStatusTypeId"
                                     data-toggle="modal"
                                     data-target="#updateApplicationStatusModal">
-                                Update Status
+                                @Html.Raw(UpdateStatusIcon) Update Status
                             </button>
                         }
                     }

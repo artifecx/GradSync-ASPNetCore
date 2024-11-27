@@ -254,56 +254,34 @@ function submitEditJob() {
 /// ------------------------------------
 /// Route: Submit Application
 /// ------------------------------------
-async function applyJobHandler(jobId) {
-    const actionUrl = $('#actionUrl').val();
-
-    $.ajax({
-        url: actionUrl,
-        type: 'POST',
-        data: { jobId: jobId },
-        success: function (response) {
-            if (response.success) {
-                location.reload();
-            } else {
-                let errorMessage = response.error || "An error occurred.";
-                toastr.error(errorMessage);
-            }
-        },
-        error: function (xhr, status, error) {
-            let errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
-            toastr.error(errorMessage);
-        }
-    });
+let jobid = null;
+function applyJobHandler(jobId, jobTitle) {
+    jobid = jobId;
+    $('#sendApplicationModal').modal('show');
+    $('#applyPositionTitle').text(jobTitle);
 }
 
-/// ------------------------------------
-/// Route: Withdraw Application
-/// ------------------------------------
-async function withdrawApplicationHandler(applicationId) {
-    const actionUrl = $('#withdrawUrl').val();
-
-    if (!applicationId) {
-        toastr.error('Application ID is missing.');
-        return;
-    }
-
-    const confirmed = confirm('Are you sure you want to withdraw this application?');
-    if (!confirmed) return;
+function confirmApply() {
+    const actionUrl = $('#actionUrl').val();
+    const confirmBtn = document.getElementById('confirmApply');
+    confirmBtn.disabled = true;
 
     $.ajax({
         url: actionUrl,
         type: 'POST',
-        data: { applicationId: applicationId },
+        data: { jobId: jobid },
         success: function (response) {
             if (response.success) {
                 location.reload();
             } else {
                 let errorMessage = response.error || "An error occurred.";
                 toastr.error(errorMessage);
+                confirmBtn.disabled = false;
             }
         },
         error: function (xhr, status, error) {
             let errorMessage = xhr.responseJSON && xhr.responseJSON.error ? xhr.responseJSON.error : "An unexpected error occurred.";
+            confirmBtn.disabled = true;
             toastr.error(errorMessage);
         }
     });

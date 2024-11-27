@@ -305,6 +305,34 @@ namespace Services.Services
             model.ScheduleDays = GetDaysSchedule(job.Schedule);
             model.ScheduleHours = GetHoursSchedule(job.Schedule);
 
+            if (currentUserRole == Role_Applicant)
+            {
+                var activeApplications = new HashSet<string> { "Submitted", "Viewed", "Shortlisted" };
+                var closedApplications = new HashSet<string> { "Accepted", "Rejected" };
+
+                var userApplications = job.Applications
+                    .Where(a => a.UserId == currentUserId)
+                    .ToHashSet();
+
+                model.HasActiveApplication = userApplications
+                    .Any(a => activeApplications.Contains(a.ApplicationStatusTypeId));
+                model.HasClosedApplication = userApplications
+                    .Any(a => closedApplications.Contains(a.ApplicationStatusTypeId));
+                model.HasWithdrawnApplication = userApplications
+                    .Any(a => a.ApplicationStatusTypeId == "Withdrawn");
+                model.CanReapply = !userApplications
+                    .Any(a => a.ApplicationStatusTypeId == "Rejected");
+
+                model.ApplicationStatus = userApplications
+                    .OrderByDescending(a => a.CreatedDate)
+                    .Select(a => a.ApplicationStatusTypeId)
+                    .FirstOrDefault();
+                model.ApplicationId = userApplications
+                    .OrderByDescending(a => a.CreatedDate)
+                    .Select(a => a.ApplicationId)
+                    .FirstOrDefault();
+            }
+
             return model;
         }
 

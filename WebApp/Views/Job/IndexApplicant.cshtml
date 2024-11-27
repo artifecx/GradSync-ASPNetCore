@@ -126,12 +126,11 @@
                                                 @(job.CreatedDate == DateTime.MinValue ? "Date Not Available" : job.CreatedDate.ToUniversalTime().Humanize())
                                             </span>
 
-                                            <!-- Bookmark Button Placeholder -->
-                                            <form method="post" asp-controller="Job" asp-action="Bookmark" asp-route-id="@job.JobId" class="ml-2">
-                                                <button type="submit" class="flex items-center rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
-                                                    @Html.Raw(BookmarkHollowIcon)
-                                                </button>
-                                            </form>
+                                            <!-- Bookmark Button -->
+                                            <button onclick="event.stopPropagation(); featureUnavailable()"
+                                                class="ml-2 flex items-center rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                                                @Html.Raw(BookmarkHollowIcon)
+                                            </button>
                                         </div>
                                     </div>
 
@@ -181,24 +180,9 @@
 
                                         <!-- Details and Application Button -->
                                         <div class="flex space-x-4">
-                                            <button onclick="location.href='@Url.Action("GetJob", "Job", 
-                                                    new {
-                                                        id = job.JobId,
-                                                        sortBy = sortBy,
-                                                        search = search,
-                                                        pageIndex = Model.PageIndex,
-                                                        filterByDatePosted = filterByDatePosted,
-                                                        filterBySalary = filterBySalary,
-                                                        filterByWorkSetup = filterByWorkSetup,
-                                                        filterByEmploymentType = filterByEmploymentType,
-                                                    })'"
+                                            <button onclick="location.href='@Url.Action("GetJob", "Job", new { id = job.JobId })'"
                                                     class="rounded-md bg-gray-200 px-4 py-2 text-sm font-bold text-gray-700 transition-colors hover:bg-gray-300">
                                                 See Details
-                                            </button>
-
-                                            <button onclick="applyJobHandler('@job.JobId')"
-                                                    class="rounded-md bg-[#7A1515] px-6 py-2 text-sm font-bold text-white transition-colors hover:bg-[#991b1b]">
-                                                Send Application
                                             </button>
                                         </div>
                                     </div>
@@ -286,11 +270,8 @@
     </div>
 </div>
 
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
+
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
-    <script>
-        function applyJobHandler(jobId) {
-            toastr.success('Application submitted!');
-        }
-    </script>
 }

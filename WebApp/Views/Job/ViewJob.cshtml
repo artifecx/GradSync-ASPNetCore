@@ -9,6 +9,7 @@
 @{
     ViewData["Title"] = Model.Title;
     await Html.RenderPartialAsync("_EditJobModal", Model);
+    await Html.RenderPartialAsync("_ConfirmApplyModal", Model);
 
     var userId = ViewBag.UserId;
     string aspAction = string.Empty;
@@ -43,34 +44,44 @@
                     @if (User.IsInRole("Applicant"))
                     {
                         var currentUserId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-                        var hasApplied = Model.HasApplied;
 
-                        if (hasApplied)
+                        if (Model.HasClosedApplication)
                         {
-                            <!-- Save -->
-                            <button onclick="saveJobHandler('@Model.JobId')" class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
-                                @Html.Raw(BookmarkHollowIcon)
-                            </button>
-
+                            <a href="@Url.Action("GetApplication", "Application", new { id = Model.ApplicationId })" 
+                                class="flex items-center font-semibold italic hover:!no-underline @(Model.ApplicationStatus == "Rejected" ? "text-red-500 hover:text-red-600" : "text-green-500 hover:text-green-600")">
+                                Application @Model.ApplicationStatus
+                            </a>
+                        }
+                        else if (Model.HasActiveApplication)
+                        {
+                            <!-- View Application -->
                             <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                         new { id = Model.ApplicationId })'"
                                     class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
                                 @Html.Raw(DetailsIcon) View Application
                             </button>
+                        } 
+                        else if(Model.HasWithdrawnApplication && Model.CanReapply)
+                        {
+                            <!-- Reapply Button -->
+                            <button onclick="applyJobHandler('@Model.JobId', '@Model.Title')"
+                                    class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                @Html.Raw(ApplyIcon) Reapply
+                            </button>
                         }
                         else
                         {
-                            <!-- Save -->
-                            <button onclick="saveJobHandler('@Model.JobId')" class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
-                                @Html.Raw(BookmarkHollowIcon)
-                            </button>
-
                             <!-- Apply Button -->
-                            <button onclick="applyJobHandler('@Model.JobId')"
+                            <button onclick="applyJobHandler('@Model.JobId', '@Model.Title')"
                                     class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
                                 @Html.Raw(ApplyIcon) Apply
-                            </button> 
+                            </button>
                         }
+                        <!-- Save -->
+                        <button onclick="featureUnavailable()"
+                                class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                            @Html.Raw(BookmarkHollowIcon)
+                        </button>
                     }
                     else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
                     {

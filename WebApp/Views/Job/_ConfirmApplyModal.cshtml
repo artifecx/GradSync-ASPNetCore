@@ -1,0 +1,24 @@
+﻿<div class="modal fade" id="sendApplicationModal" tabindex="-1" role="dialog" aria-labelledby="sendApplicationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header border-0">
+                <h5 class="modal-title flex items-center text-[#343131]" id="sendApplicationModalLabel">
+                    @Html.Raw(Resources.Constants.SvgIcons.ApplyIcon)
+                    Confirm Application
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeSendApplicationModal">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+
+            <div class="modal-body mt-2 py-1 pl-4 text-[#343131]">
+                Are you sure you want to apply for the position <span class="font-semibold" id="applyPositionTitle"></span>?
+            </div>
+
+            <div class="modal-footer border-0 mt-2">
+                <button type="button" class="min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" data-dismiss="modal">Cancel</button>
+                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747] disabled:bg-gray-400" id="confirmApply" onclick="confirmApply()">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>
