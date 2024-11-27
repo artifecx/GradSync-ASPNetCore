@@ -47,32 +47,29 @@
 
                         if (hasApplied)
                         {
-                            <!-- Withdraw Application Button -->
-                            <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
-                                    id="withdrawButton"
-                                    data-action-url="@Url.Action("WithdrawApplication", "Application")"
-                                    onclick="withdrawApplicationHandler('@Model.ApplicationId')">
-                                Withdraw Application
+                            <!-- Save -->
+                            <button onclick="saveJobHandler('@Model.JobId')" class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
+                                @Html.Raw(BookmarkHollowIcon)
                             </button>
 
                             <button onclick="location.href='@Url.Action("GetApplication", "Application",
                                         new { id = Model.ApplicationId })'"
                                     class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
-                                @Html.Raw(DetailsIcon) See Details
+                                @Html.Raw(DetailsIcon) View Application
                             </button>
                         }
                         else
                         {
-                            <!-- Apply Button -->
-                            <button onclick="applyJobHandler('@Model.JobId')"
-                                    class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
-                                @Html.Raw(ApplyIcon) Apply
-                            </button>
-
                             <!-- Save -->
                             <button onclick="saveJobHandler('@Model.JobId')" class="flex items-center rounded-md px-3 py-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
                                 @Html.Raw(BookmarkHollowIcon)
                             </button>
+
+                            <!-- Apply Button -->
+                            <button onclick="applyJobHandler('@Model.JobId')"
+                                    class="flex items-center rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]">
+                                @Html.Raw(ApplyIcon) Apply
+                            </button> 
                         }
                     }
                     else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.PostedById) || isAdmin)
