@@ -13,17 +13,15 @@ using System.Security.Claims;
 using System.Threading.Tasks;
 using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
-using Data.Repositories;
-using static iText.StyledXmlParser.Jsoup.Select.Evaluator;
 using Data.Dtos;
-using static Resources.Constants.Enums;
+using Data.Specifications;
 
 namespace Services.Services
 {
     /// <summary>
     /// Service class for handling operations related to teams.
     /// </summary>
-    public class JobService : IJobService
+    public partial class JobService : IJobService
     {
         private readonly IJobRepository _repository;
         private readonly ICompanyRepository _companyRepository;
@@ -46,6 +44,7 @@ namespace Services.Services
             _httpContextAccessor = httpContextAccessor;
         }
 
+        #region CRUD Methods
         public async Task AddJobAsync(JobViewModel model)
         {
             var job = _mapper.Map<Job>(model);
@@ -59,7 +58,8 @@ namespace Services.Services
             job.StatusTypeId = "Open";
             job.PostedById = recruiter.UserId;
             job.CompanyId = recruiter.CompanyId;
-            job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
+            job.SalaryLower = model.SalaryLower.ToString();
+            job.SalaryUpper = model.SalaryUpper.ToString();
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
             job.JobSkills = new[]
             {
@@ -87,41 +87,9 @@ namespace Services.Services
             await _jobMatchingApiService.MatchAndSaveJobApplicantsAsync(job.JobId);
         }
 
-        private static string SetSalaryRange(double? lower, double? upper)
-        {
-            var salary = string.Empty;
-            if(lower.HasValue && upper.HasValue)
-            {
-                var lowerValue = lower.Value;
-                var upperValue = upper.Value;
-
-                if (lowerValue > upperValue)
-                    salary = $"Php {upperValue.ToString("N0")} - Php {lowerValue.ToString("N0")}";
-                else
-                    salary = $"Php {lowerValue.ToString("N0")} - Php {upperValue.ToString("N0")}";
-
-                return salary;
-            }
-            throw new InvalidOperationException("Invalid salary range!");
-        }
-
-        private static string SetSchedule(int? days, int? hours)
-        {
-            if(days.HasValue && hours.HasValue)
-            {
-                var daysValue = days.Value == 0 ? "Flexible" : days.Value.ToString();
-                var hoursValue = hours.Value == 0 ? "Flexible" : hours.Value.ToString();
-                var daysString = days.Value == 1 ? "day" : "days";
-                var hoursString = hours.Value == 1 ? "hour" : "hours";
-
-                return $"{daysValue} {daysString}, {hoursValue} {hoursString}";
-            }
-            throw new InvalidOperationException("Invalid schedule!");
-        }
-
         public async Task UpdateJobAsync(JobViewModel model)
         {
-            var job = await _repository.GetJobByIdAsync(model.JobId, true);
+            var job = await GetJobByIdAsync(model.JobId, true);
             if (job == null)
                 throw new JobException("Job not found.");
             if (job.StatusTypeId == "BlackListed")
@@ -130,7 +98,8 @@ namespace Services.Services
             _mapper.Map(model, job);
             bool jobSkillsChanged = SetJobSkills(job, model);
             bool jobProgramChanged = SetJobPrograms(job, model);
-            job.Salary = SetSalaryRange(model.SalaryLower, model.SalaryUpper);
+            job.SalaryLower = model.SalaryLower.ToString();
+            job.SalaryUpper = model.SalaryUpper.ToString();
             job.Schedule = SetSchedule(model.ScheduleDays, model.ScheduleHours);
             job.SkillWeights = ((decimal)model.SkillWeights);
 
@@ -145,7 +114,7 @@ namespace Services.Services
 
         public async Task UpdateJobStatusAsync(string jobId, string statusId)
         {
-            var job = await _repository.GetJobByIdAsync(jobId, true);
+            var job = await GetJobByIdAsync(jobId, true);
             if (job == null)
                 throw new JobException("Job not found.");
 
@@ -187,10 +156,293 @@ namespace Services.Services
             await _repository.UpdateJobAsync(job);
         }
 
+        public async Task ArchiveJobAsync(string id)
+        {
+            var job = await GetJobByIdAsync(id, true);
+            
+            if(job.StatusTypeId != "BlackListed" && job.StatusTypeId != "Closed")
+            {
+                job.StatusTypeId = "Closed";
+                job.AvailableSlots = 0;
+                var validApplicationStatuses = new HashSet<string>
+                {
+                    "Accepted", "Withdrawn", "Rejected"
+                };
+
+                if (job.Applications.Any() && job.Applications.Count > 0)
+                {
+                    foreach (var application in job.Applications)
+                    {
+                        if (!validApplicationStatuses.Contains(application.ApplicationStatusTypeId))
+                        {
+                            application.ApplicationStatusTypeId = "Rejected";
+                            application.UpdatedDate = DateTime.Now;
+                        }
+                    }
+                }
+            }
+
+            job.IsArchived = true;
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
+        }
+
+        public async Task UnarchiveJobAsync(JobServiceModel model)
+        {
+            var job = await GetJobByIdAsync(model.JobId, true, true);
+
+            if (job == null) 
+                throw new JobException("Job not found!");
+
+            if (job.StatusTypeId == "BlackListed")
+                throw new JobException("Blacklisted jobs cannot be updated.");
+
+            job.IsArchived = false;
+            job.StatusTypeId = "Open";
+            job.AvailableSlots = model.AvailableSlots.Value;
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
+        }
+        #endregion CRUD Methods
+
+        #region Get Methods        
+        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId) =>
+            _mapper.Map<List<FeaturedJobsViewModel>>(await _repository.GetApplicantFeaturedJobsAsync(userId));
+
+        public async Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId) =>
+            await _repository.GetApplicantDetailsAsync(applicantId);
+
+        public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
+        {
+            var role = filters.UserRole;
+            var userId = role == Role_Recruiter || role == Role_Applicant ? filters.UserId : null;
+
+            var spec = new JobsBaseSpecification();
+            spec.AddCriteria(j => string.Equals(archived, "archived") ? j.IsArchived : !j.IsArchived);
+            JobIncludes(spec, role, userId);
+            FilterAndSortJobs(spec, filters, archived);
+
+            var jobs = await _repository.GetJobsAsync(spec, false);
+            var model = _mapper.Map<List<JobViewModel>>(jobs);
+
+            var pageIndex = filters.PageIndex;
+            var pageSize = filters.PageSize;
+            var count = model.Count;
+            var items = model.Skip((pageIndex - 1) * pageSize).Take(pageSize);
+
+            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
+        }
+
+        public async Task<JobViewModel> GetJobByIdAsync(string id)
+        {
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var currentUserRole = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            var spec = new JobsBaseSpecification();
+            spec.AddCriteria(j => j.JobId == id);
+            JobIncludes(spec, currentUserRole, currentUserId);
+
+            var job = await _repository.GetJobAsync(spec, false);
+
+            if (job == null)
+                throw new JobException("Job not found.");
+
+            var model = _mapper.Map<JobViewModel>(job);
+
+            model.SalaryLower = Convert.ToDouble(job.SalaryLower);
+            model.SalaryUpper = Convert.ToDouble(job.SalaryUpper);
+            model.ScheduleDays = GetDaysSchedule(job.Schedule);
+            model.ScheduleHours = GetHoursSchedule(job.Schedule);
+
+            return model;
+        }
+
+        public async Task<Job> GetJobByIdAsync(string id, bool track, bool? archived = false)
+        {
+            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
+            var currentUserRole = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
+
+            var spec = new JobsBaseSpecification();
+            spec.AddCriteria(j => j.JobId == id);
+            if (archived.HasValue)
+                spec.AddCriteria(j => j.IsArchived == archived.Value);
+
+            JobIncludes(spec, currentUserRole, currentUserId);
+
+            var job = await _repository.GetJobAsync(spec, track);
+
+            if (job == null)
+                throw new JobException("Job not found.");
+
+            return job;
+        }
+        #endregion Get Methods
+
+        #region Helper Methods
+        private static void JobIncludes(JobsBaseSpecification spec, string currentUserRole, string currentUserId)
+        {
+            switch (currentUserRole)
+            {
+                case "Applicant":
+                    spec.AddCriteria(j => j.StatusTypeId == "Open");
+                    spec.AddInclude(j => j.JobApplicantMatches.Where(jam => jam.UserId == currentUserId));
+                    spec.AddInclude(j => j.Applications.Where(a => a.UserId == currentUserId));
+                    break;
+                default:
+                    if (currentUserRole == "Recruiter")
+                        spec.AddCriteria(j => j.PostedById == currentUserId);
+                    spec.AddInclude(j => j.JobApplicantMatches);
+                    spec.AddInclude($"{nameof(Job.JobApplicantMatches)}.{nameof(JobApplicantMatch.User)}");
+                    spec.AddInclude($"{nameof(Job.JobApplicantMatches)}.{nameof(JobApplicantMatch.User)}.{nameof(Applicant.User)}");
+                    spec.AddInclude(j => j.Applications);
+                    break;
+            }
+
+            spec.AddInclude(j => j.JobSkills);
+            spec.AddInclude($"{nameof(Job.JobSkills)}.{nameof(JobSkill.Skill)}");
+            spec.AddInclude(j => j.JobPrograms);
+            spec.AddInclude($"{nameof(Job.JobPrograms)}.{nameof(JobProgram.Program)}");
+            spec.AddInclude(j => j.YearLevel);
+            spec.AddInclude(j => j.EmploymentType);
+            spec.AddInclude(j => j.SetupType);
+            spec.AddInclude(j => j.StatusType);
+            spec.AddInclude(j => j.PostedBy);
+            spec.AddInclude($"{nameof(Job.PostedBy)}.{nameof(Recruiter.User)}");
+            spec.AddInclude(j => j.Company);
+        }
+
+        private void FilterAndSortJobs(JobsBaseSpecification spec, FilterServiceModel filters, string archived = null)
+        {
+            var search = filters.Search;
+            var filterByDatePosted = filters.FilterByDatePosted;
+            var filterByCompany = filters.FilterByCompany;
+            var filterByEmploymentType = filters.FilterByEmploymentType;
+            var filterByStatusType = filters.FilterByStatusType;
+            var filterByWorkSetup = filters.FilterByWorkSetup;
+            var filterBySalary = filters.FilterBySalary;
+            var sortBy = filters.SortBy;
+            var userRole = filters.UserRole;
+            var userId = filters.UserId;
+
+            if (!string.IsNullOrEmpty(userRole) && userRole == Role_Applicant)
+            {
+                var applicant = _repository.GetApplicantDetailsAsync(userId).Result;
+                if (applicant != null)
+                {
+                    spec.AddCriteria(j => j.JobPrograms.Any(jp => jp.Program.DepartmentId == applicant.DepartmentId));
+                }
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                if (string.IsNullOrEmpty(archived))
+                {
+
+                    spec.AddCriteria(j =>
+                        j.Title.Contains(search) ||
+                        j.Description.Contains(search) ||
+                        j.Company.Name.Contains(search) ||
+                        j.EmploymentTypeId.Contains(search) ||
+                        j.SetupTypeId.Contains(search) ||
+                        j.StatusTypeId.Contains(search)
+                    );
+                }
+                else
+                {
+                    spec.AddCriteria(
+                        j => j.Title.Contains(search) ||
+                        j.Description.Contains(search)
+                    );
+                }
+            }
+
+            if (!string.IsNullOrEmpty(filterByDatePosted))
+            {
+                DateTime today = DateTime.Today;
+                DateTime tomorrow = today.AddDays(1);
+
+                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
+                DateTime weekStart = today.AddDays(-1 * diff).Date;
+                DateTime weekEnd = weekStart.AddDays(7);
+
+                DateTime monthStart = new(today.Year, today.Month, 1);
+                DateTime monthEnd = monthStart.AddMonths(1);
+
+                spec.AddCriteria(filterByDatePosted switch
+                {
+                    "today" => j => j.CreatedDate >= today && j.CreatedDate < tomorrow,
+                    "week" => j => j.CreatedDate >= weekStart && j.CreatedDate < weekEnd,
+                    "month" => j => j.CreatedDate >= monthStart && j.CreatedDate < monthEnd,
+                    _ => null
+                });
+            }
+
+            if (!string.IsNullOrEmpty(filterByCompany))
+            {
+                spec.AddCriteria(j => j.Company.Name == filterByCompany);
+            }
+
+            if (filterByEmploymentType.Any())
+            {
+                spec.AddCriteria(j => filterByEmploymentType.Contains(j.EmploymentType.Name));
+            }
+
+            if (!string.IsNullOrEmpty(filterByStatusType))
+            {
+                spec.AddCriteria(j => j.StatusType.Name == filterByStatusType);
+            }
+
+            if (filterByWorkSetup.Any())
+            {
+                spec.AddCriteria(j => filterByWorkSetup.Contains(j.SetupType.Name));
+            }
+
+            if (int.TryParse(filterBySalary, out int salary))
+            {
+                spec.AddCriteria(j => Convert.ToInt32(j.SalaryLower) <= salary);
+            }
+
+            switch (sortBy)
+            {
+                case "created_desc":
+                    spec.ApplyOrderByDescending(j => j.CreatedDate);
+                    break;
+                case "created_asc":
+                    spec.ApplyOrderBy(j => j.CreatedDate);
+                    break;
+                case "salary_desc":
+                    spec.ApplyOrderByDescending(j => Convert.ToInt32(j.SalaryUpper));
+                    spec.ApplyThenOrderByDescending(j => Convert.ToInt32(j.SalaryLower));
+                    break;
+                case "salary_asc":
+                    spec.ApplyOrderBy(j => Convert.ToInt32(j.SalaryLower));
+                    spec.ApplyThenOrderBy(j => Convert.ToInt32(j.SalaryUpper));
+                    break;
+                case "updated_desc":
+                    spec.ApplyOrderByDescending(j => j.UpdatedDate);
+                    break;
+                case "updated_asc":
+                    spec.ApplyOrderBy(j => j.UpdatedDate);
+                    break;
+                case "match":
+                    spec.ApplyOrderByDescending(j => j.JobApplicantMatches
+                        .Where(m => m.UserId == userId)
+                        .Max(m => m.MatchPercentage));
+                    break;
+                default:
+                    if (userRole == Role_Applicant)
+                        spec.ApplyOrderByDescending(j => j.JobApplicantMatches
+                            .Where(m => m.UserId == userId)
+                            .Max(m => m.MatchPercentage));
+                    else spec.ApplyOrderByDescending(j => j.CreatedDate);
+                    break;
+            }
+        }
+
         private bool SetJobSkills(Job job, JobViewModel model)
         {
-            var jobSkillC = model.SkillsC != null && model.SkillsC.Any() 
-                ? CreateJobSkills(model.SkillsC, "Certification", job.JobId) 
+            var jobSkillC = model.SkillsC != null && model.SkillsC.Any()
+                ? CreateJobSkills(model.SkillsC, "Certification", job.JobId)
                 : new List<JobSkill>().AsEnumerable();
             var newJobSkills = CreateJobSkills(model.SkillsS, "Cultural", job.JobId)
                 .Concat(CreateJobSkills(model.SkillsT, "Technical", job.JobId))
@@ -285,273 +537,20 @@ namespace Services.Services
             return programsToAdd.Any() || programsToRemove.Any();
         }
 
-        public async Task ArchiveJobAsync(string id)
+        private static string SetSchedule(int? days, int? hours)
         {
-            var job = await _repository.GetJobByIdAsync(id, true);
-            
-            if(job.StatusTypeId != "BlackListed" && job.StatusTypeId != "Closed")
+            if (days.HasValue && hours.HasValue)
             {
-                job.StatusTypeId = "Closed";
-                job.AvailableSlots = 0;
-                var validApplicationStatuses = new HashSet<string>
-                {
-                    "Accepted", "Withdrawn", "Rejected"
-                };
+                var daysValue = days.Value == 0 ? "Flexible" : days.Value.ToString();
+                var hoursValue = hours.Value == 0 ? "Flexible" : hours.Value.ToString();
+                var daysString = days.Value == 1 ? "day" : "days";
+                var hoursString = hours.Value == 1 ? "hour" : "hours";
 
-                if (job.Applications.Any() && job.Applications.Count > 0)
-                {
-                    foreach (var application in job.Applications)
-                    {
-                        if (!validApplicationStatuses.Contains(application.ApplicationStatusTypeId))
-                        {
-                            application.ApplicationStatusTypeId = "Rejected";
-                            application.UpdatedDate = DateTime.Now;
-                        }
-                    }
-                }
+                return $"{daysValue} {daysString}, {hoursValue} {hoursString}";
             }
-
-            job.IsArchived = true;
-            job.UpdatedDate = DateTime.Now;
-            await _repository.UpdateJobAsync(job);
+            throw new InvalidOperationException("Invalid schedule!");
         }
 
-        public async Task UnarchiveJobAsync(JobServiceModel model)
-        {
-            var job = await _repository.GetJobByIdAsync(model.JobId, "true");
-
-            if (job == null) 
-                throw new JobException("Job not found!");
-
-            if (job.StatusTypeId == "BlackListed")
-                throw new JobException("Blacklisted jobs cannot be updated.");
-
-            job.IsArchived = false;
-            job.StatusTypeId = "Open";
-            job.AvailableSlots = model.AvailableSlots.Value;
-            job.UpdatedDate = DateTime.Now;
-            await _repository.UpdateJobAsync(job);
-        }
-
-        #region Get Methods        
-        public async Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId) =>
-            _mapper.Map<List<FeaturedJobsViewModel>>(await _repository.GetApplicantFeaturedJobsAsync(userId));
-
-        public async Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId) =>
-            await _repository.GetApplicantDetailsAsync(applicantId);
-
-        public async Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null)
-        {
-            var role = filters.UserRole;
-            var userId = role == Role_Recruiter || role == Role_Applicant ? filters.UserId : null;
-
-            var jobs = string.Equals(archived, "archived") ?
-                _mapper.Map<List<JobViewModel>>(await _repository.GetArchivedJobsAsync(role, userId)) :
-                _mapper.Map<List<JobViewModel>>(await _repository.GetAllJobsAsync(role, userId));
-            jobs = await FilterAndSortJobs(jobs, filters, archived);
-
-            var pageIndex = filters.PageIndex;
-            var pageSize = filters.PageSize;
-            var count = jobs.Count;
-            var items = jobs.Skip((pageIndex - 1) * pageSize).Take(pageSize);
-
-            return new PaginatedList<JobViewModel>(items, count, pageIndex, pageSize);
-        }
-
-        private async Task<List<JobViewModel>> FilterAndSortJobs(List<JobViewModel> jobs, FilterServiceModel filters, string archived = null)
-        {
-            var search = filters.Search;
-            var filterByDatePosted = filters.FilterByDatePosted;
-            var filterByCompany = filters.FilterByCompany;
-            var filterByEmploymentType = filters.FilterByEmploymentType;
-            var filterByStatusType = filters.FilterByStatusType;
-            var filterByWorkSetup = filters.FilterByWorkSetup;
-            var filterBySalary = filters.FilterBySalary;
-            var sortBy = filters.SortBy;
-            var userRole = filters.UserRole;
-            var userId = filters.UserId;
-
-            if (!string.IsNullOrEmpty(userRole) && userRole == Role_Applicant)
-            {
-                var applicant = await _repository.GetApplicantDetailsAsync(userId);
-                if(applicant != null) 
-                {
-                    jobs = jobs.Where(job => job.Programs.Exists(jp => jp.DepartmentId == applicant.DepartmentId)).ToList();
-                }
-            }
-
-            if (!string.IsNullOrEmpty(search))
-            {
-                if (string.IsNullOrEmpty(archived))
-                {
-                    jobs = jobs
-                        .Where(job =>
-                            job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.Description.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.Company.Name.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.EmploymentTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.SetupTypeId.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.StatusTypeId.Contains(search, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-                }
-                else
-                {
-                    jobs = jobs
-                        .Where(job =>
-                            job.Title.Contains(search, StringComparison.OrdinalIgnoreCase) ||
-                            job.Description.Contains(search, StringComparison.OrdinalIgnoreCase))
-                        .ToList();
-                }
-            }
-
-            if (!string.IsNullOrEmpty(filterByDatePosted))
-            {
-                DateTime today = DateTime.Today;
-                DateTime tomorrow = today.AddDays(1);
-
-                int diff = (7 + (today.DayOfWeek - DayOfWeek.Monday)) % 7;
-                DateTime weekStart = today.AddDays(-1 * diff).Date;
-                DateTime weekEnd = weekStart.AddDays(7);
-
-                DateTime monthStart = new (today.Year, today.Month, 1);
-                DateTime monthEnd = monthStart.AddMonths(1);
-
-                jobs = filterByDatePosted switch
-                {
-                    "today" => jobs.Where(job => job.CreatedDate >= today && job.CreatedDate < tomorrow).ToList(),
-                    "week" => jobs.Where(job => job.CreatedDate >= weekStart && job.CreatedDate < weekEnd).ToList(),
-                    "month" => jobs.Where(job => job.CreatedDate >= monthStart && job.CreatedDate < monthEnd).ToList(),
-                    _ => jobs
-                };
-            }
-
-            if (!string.IsNullOrEmpty(filterByCompany))
-            {
-                jobs = jobs.Where(job => job.Company.Name == filterByCompany).ToList();
-            }
-
-            if (filterByEmploymentType.Any())
-            {
-                jobs = jobs.Where(job => filterByEmploymentType.Contains(job.EmploymentType.Name)).ToList();
-            }
-
-            if (!string.IsNullOrEmpty(filterByStatusType))
-            {
-                jobs = jobs.Where(job => job.StatusType.Name == filterByStatusType).ToList();
-            }
-
-            if (filterByWorkSetup.Any())
-            {
-                jobs = jobs.Where(job => filterByWorkSetup.Contains(job.SetupType.Name)).ToList();
-            }
-
-            if (int.TryParse(filterBySalary, out int salary))
-            {
-                jobs = jobs.Where(j => GetLowerSalary(j.Salary) <= salary).ToList();
-            }
-
-            jobs = sortBy switch
-            {
-                "created_desc" => jobs.OrderByDescending(j => j.CreatedDate).ToList(),
-                "created_asc" => jobs.OrderBy(j => j.CreatedDate).ToList(),
-                "salary_desc" => jobs.OrderByDescending(j => GetUpperSalary(j.Salary)).ThenByDescending(j => GetLowerSalary(j.Salary)).ToList(),
-                "salary_asc" => jobs.OrderBy(j => GetLowerSalary(j.Salary)).ThenBy(j => GetUpperSalary(j.Salary)).ToList(),
-                "updated_desc" => jobs.OrderByDescending(j => j.UpdatedDate).ToList(),
-                "updated_asc" => jobs.OrderBy(j => j.UpdatedDate).ToList(),
-                "match" => jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
-                    .OrderByDescending(j => j.JobMatches
-                        .Where(m => m.UserId == userId)
-                        .Max(m => m.MatchPercentage)).ToList(),
-                _ => userRole == Role_Applicant
-                    ? jobs.Where(j => j.JobMatches.Exists(m => m.UserId == userId))
-                        .OrderByDescending(j => j.JobMatches
-                            .Where(m => m.UserId == userId)
-                            .Max(m => m.MatchPercentage)).ToList() 
-                    : jobs.OrderByDescending(j => j.CreatedDate).ToList(),
-            };
-
-            return jobs;
-        }
-
-        /// <summary>
-        /// Retrieves a job by its identifier asynchronously.
-        /// </summary>
-        /// <param name="id">The job identifier.</param>
-        /// <returns>A <see cref="Task{TResult}"/> representing the asynchronous operation. 
-        /// The task result contains the team view model.</returns>
-        public async Task<JobViewModel> GetJobByIdAsync(string id) 
-        {
-            var currentUserId = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.NameIdentifier).Value;
-            var currentUserRole = _httpContextAccessor.HttpContext.User.FindFirst(ClaimTypes.Role).Value;
-            var job = await _repository.GetJobByIdAsync(id, false, currentUserRole, currentUserId);
-
-            if (job == null)
-                throw new JobException("Job not found.");
-
-            var model = _mapper.Map<JobViewModel>(job);
-
-            if (currentUserRole == Role_Applicant)
-            {
-                model.HasApplied = job.Applications.Any(a => a.UserId == currentUserId);
-                model.ApplicationId = job.Applications.FirstOrDefault(a => a.UserId == currentUserId)?.ApplicationId;
-            }
-                
-            model.SalaryLower = GetLowerSalary(job.Salary);
-            model.SalaryUpper = GetUpperSalary(job.Salary);
-            model.ScheduleDays = GetDaysSchedule(job.Schedule);
-            model.ScheduleHours = GetHoursSchedule(job.Schedule);
-
-            return model;
-        }
-        #endregion Get Methods
-
-        /// <summary>
-        /// Extracts the lower salary from the salary range string.
-        /// </summary>
-        private static int GetLowerSalary(string salaryRange)
-        {
-            if (string.IsNullOrWhiteSpace(salaryRange))
-                return 0;
-
-            var parts = salaryRange.Split('-');
-            if (parts.Length == 0)
-                return 0;
-
-            var lowerPart = parts[0].Trim();
-
-            var lowerSalaryStr = lowerPart.Replace("Php", "").Replace(",", "").Trim();
-
-            if (int.TryParse(lowerSalaryStr, out int lowerSalary))
-                return lowerSalary;
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Extracts the upper salary from the salary range string.
-        /// </summary>
-        private static int GetUpperSalary(string salaryRange)
-        {
-            if (string.IsNullOrWhiteSpace(salaryRange))
-                return 0;
-
-            var parts = salaryRange.Split('-');
-            if (parts.Length < 2)
-                return 0;
-
-            var upperPart = parts[1].Trim();
-
-            var upperSalaryStr = upperPart.Replace("Php", "").Replace(",", "").Trim();
-
-            if (int.TryParse(upperSalaryStr, out int upperSalary))
-                return upperSalary;
-
-            return 0;
-        }
-
-        /// <summary>
-        /// Extracts the days from the schedule string.
-        /// </summary>
         private static int GetDaysSchedule(string schedule)
         {
             if (string.IsNullOrWhiteSpace(schedule))
@@ -574,9 +573,6 @@ namespace Services.Services
             return 0;
         }
 
-        /// <summary>
-        /// Extracts the hours from the schedule string.
-        /// </summary>
         private static int GetHoursSchedule(string schedule)
         {
             if (string.IsNullOrWhiteSpace(schedule))
@@ -598,5 +594,6 @@ namespace Services.Services
 
             return 0;
         }
+        #endregion Helper Methods
     }
 }
