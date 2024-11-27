@@ -152,13 +152,13 @@ namespace Services.Services
             {
                 var message = "Error occurred while calling the external comparison service.";
                 _logger.LogError(ex, message);
-                throw new JobMatchingException(message);
+                return results;
             }
             catch (JsonException ex)
             {
                 var message = "Error occurred while deserializing the response from the external comparison service.";
                 _logger.LogError(ex, message);
-                throw new JobMatchingException(message);
+                return results;
             }
 
             return results;
