@@ -15,6 +15,8 @@ namespace Services.Interfaces
         Task UpdateJobStatusAsync(string jobId, string statusId);
         Task ArchiveJobAsync(string id);
         Task UnarchiveJobAsync(JobServiceModel model);
+        Task IncrementJobSlots(string jobId);
+        Task DecrementJobSlots(string jobId);
         Task<List<FeaturedJobsViewModel>> GetApplicantFeaturedJobsAsync(string userId);
         Task<ApplicantViewDto> GetApplicantDetailsAsync(string applicantId);
         Task<PaginatedList<JobViewModel>> GetAllJobsAsync(FilterServiceModel filters, string archived = null);

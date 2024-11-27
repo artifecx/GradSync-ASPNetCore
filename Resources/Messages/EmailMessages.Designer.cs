@@ -59,7 +59,47 @@ namespace Resources.Messages {
                 resourceCulture = value;
             }
         }
-        
+
+        public static string Email_BodyApplicationAccepted
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_BodyApplicationAccepted", resourceCulture);
+            }
+        }
+
+        public static string Email_BodyApplicationNew
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_BodyApplicationNew", resourceCulture);
+            }
+        }
+
+        public static string Email_BodyApplicationRejected
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_BodyApplicationRejected", resourceCulture);
+            }
+        }
+
+        public static string Email_BodyApplicationShortlisted
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_BodyApplicationShortlisted", resourceCulture);
+            }
+        }
+
+        public static string Email_BodyApplicationWithdrawn
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_BodyApplicationWithdrawn", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Hello {0},
         ///
@@ -119,7 +159,47 @@ namespace Resources.Messages {
                 return ResourceManager.GetString("Email_BodyUserRequestPasswordReset", resourceCulture);
             }
         }
-        
+
+        public static string Email_SubjectApplicationAccepted
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_SubjectApplicationAccepted", resourceCulture);
+            }
+        }
+
+        public static string Email_SubjectApplicationNew
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_SubjectApplicationNew", resourceCulture);
+            }
+        }
+
+        public static string Email_SubjectApplicationRejected
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_SubjectApplicationRejected", resourceCulture);
+            }
+        }
+
+        public static string Email_SubjectApplicationShortlisted
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_SubjectApplicationShortlisted", resourceCulture);
+            }
+        }
+
+        public static string Email_SubjectApplicationWithdrawn
+        {
+            get
+            {
+                return ResourceManager.GetString("Email_SubjectApplicationWithdrawn", resourceCulture);
+            }
+        }
+
         /// <summary>
         ///   Looks up a localized string similar to Your GradSync Password Has Been Reset.
         /// </summary>

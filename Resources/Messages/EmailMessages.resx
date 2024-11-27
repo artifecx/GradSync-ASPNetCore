@@ -168,4 +168,92 @@ The GradSync Team</value>
   <data name="Email_SubjectUserRequestPasswordReset" xml:space="preserve">
     <value>Password Reset Request for Your GradSync Account</value>
   </data>
+  <data name="Email_SubjectApplicationAccepted" xml:space="preserve">
+    <value>Congratulations! Your Application for {0} Has Been Accepted</value>
+  </data>
+  <data name="Email_SubjectApplicationShortlisted" xml:space="preserve">
+    <value>Good News! Your Application for {0} Has Been Shortlisted</value>
+  </data>
+  <data name="Email_SubjectApplicationRejected" xml:space="preserve">
+    <value>Update on Your Application for {0} at {1}</value>
+  </data>
+  <data name="Email_SubjectApplicationNew" xml:space="preserve">
+    <value>New Application Received for Position: {0}</value>
+  </data>
+  <data name="Email_SubjectApplicationWithdrawn" xml:space="preserve">
+    <value>Applicant Withdrawal Notification for Position: {0}</value>
+  </data>
+  <data name="Email_BodyApplicationAccepted" xml:space="preserve">
+    <value>Hello {0},
+
+We are pleased to inform you that your application for the {1} position at {2} has been accepted by the recruiter. Congratulations!
+
+Next Steps:
+- The recruiter may reach out to you soon with further details.
+- Feel free to log in to your account and check the application to view any messages or updates.
+
+If you have any questions, please don't hesitate to contact us.
+
+Best regards,
+The GradSync Team
+info@gradsync.org | support@gradsync.org</value>
+  </data>
+  <data name="Email_BodyApplicationRejected" xml:space="preserve">
+    <value>Hello {0},
+
+Thank you for applying for the {1} position at {2}.
+
+We wanted to let you know that the recruiter has reviewed your application and has decided to proceed with other candidates at this time.
+
+We encourage you to explore other job opportunities on our platform that may suit your skills and interests.
+
+If you have any questions or need assistance, please contact us.
+
+Best regards,
+The GradSync Team
+info@gradsync.org | support@gradsync.org</value>
+  </data>
+  <data name="Email_BodyApplicationShortlisted" xml:space="preserve">
+    <value>Hello {0},
+
+Exciting news! The recruiter for the {1} position at {2} has shortlisted your application.
+
+What This Means:
+- The recruiter is interested in moving forward with your application.
+- They may contact you soon to schedule an interview or request additional information.
+
+You can check for messages from the recruiter by logging into your account and checking the application.
+
+If you have any questions, feel free to reach out to us.
+
+Best regards,
+The GradSync Team
+info@gradsync.org | support@gradsync.org</value>
+  </data>
+  <data name="Email_BodyApplicationNew" xml:space="preserve">
+    <value>Hello {0}
+
+You have received a new application for the {1} position you posted.
+
+Please log in to your recruiter dashboard to review the application.
+
+If you need assistance or have any questions, we're here to help.
+
+Best regards,
+The GradSync Team
+info@gradsync.org | support@gradsync.org</value>
+  </data>
+  <data name="Email_BodyApplicationWithdrawn" xml:space="preserve">
+    <value>Hello {0},
+
+We wanted to inform you that {1} has withdrawn their application for the {2} position.
+
+The application has been updated accordingly in your dashboard.
+
+If you have any questions or need further assistance, please contact us.
+
+Best regards,
+The GradSync Team
+info@gradsync.org | support@gradsync.org</value>
+  </data>
 </root>

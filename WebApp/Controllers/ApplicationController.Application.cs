@@ -43,6 +43,37 @@ namespace WebApp.Controllers
         }
 
         /// <summary>
+        /// Updates the status of a specified application.
+        /// </summary>
+        /// <param name="applicationId">The unique identifier of the application to update.</param>
+        /// <param name="appStatusId">The unique identifier of the new status to apply to the application.</param>
+        /// <returns>
+        /// A JSON object indicating the success of the operation:
+        /// <list type="bullet">
+        ///     <item><description><c>success</c>: A boolean indicating whether the operation was successful.</description></item>
+        ///     <item><description><c>message</c>: A string containing a success or error message.</description></item>
+        /// </list>
+        /// </returns>
+        [HttpPost]
+        [Route("update-application")]
+        [Authorize]
+        public async Task<IActionResult> UpdateApplication(string applicationId, string appStatusId)
+        {
+            return await HandleExceptionAsync(async () =>
+            {
+                if (ModelState.IsValid && !string.IsNullOrEmpty(applicationId) && !string.IsNullOrEmpty(appStatusId))
+                {
+                    await _applicationService.UpdateApplicationAsync(UserId, applicationId, appStatusId);
+
+                    TempData["SuccessMessage"] = string.Format(Success_ApplicationActionSuccess, "updated");
+                    return Json(new { success = true });
+                }
+                TempData["ErrorMessage"] = string.Format(Error_ApplicationActionError, "updating");
+                return Json(new { success = false });
+            }, Application_ActionUpdate);
+        }
+
+        /// <summary>
         /// Withdraws the specified application, updating its status accordingly.
         /// </summary>
         /// <param name="applicationId">The unique identifier of the application to be withdrawn.</param>

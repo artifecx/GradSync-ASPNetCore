@@ -27,7 +27,11 @@ namespace Data.Repositories
                 .ToListAsync();
 
         public async Task<List<ApplicationStatusType>> GetApplicationStatusTypesAsync() =>
-            await this.GetDbSet<ApplicationStatusType>().AsNoTracking().ToListAsync();
+            await this.GetDbSet<ApplicationStatusType>()
+                .Where(s => s.ApplicationStatusTypeId != "Viewed" 
+                    && s.ApplicationStatusTypeId != "Submitted")
+                .AsNoTracking()
+                .ToListAsync();
 
         public async Task<List<Role>> GetUserRolesAsync() =>
             await this.GetDbSet<Role>().AsNoTracking().ToListAsync();

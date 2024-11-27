@@ -1,11 +1,11 @@
 ﻿@using Data.Models
 @{
-    bool isAdmin = User.IsInRole("Admin") || User.IsInRole("NLO");
+    bool isRecruiter = User.IsInRole("Recruiter");
     var applicationStatusType = ViewBag.AppStatusTypes as List<ApplicationStatusType>;
 
-    if (applicationStatusType == null || !applicationStatusType.Any())
+    if (isRecruiter)
     {
-        applicationStatusType = new List<ApplicationStatusType>(); 
+        applicationStatusType = applicationStatusType.Where(st => st.ApplicationStatusTypeId != "Withdrawn").ToList();
     }
 }
 <div class="modal fade" id="updateApplicationStatusModal" tabindex="-1" role="dialog" aria-labelledby="updateApplicationStatusModalLabel" aria-hidden="true">
@@ -15,7 +15,7 @@
                 <h5 class="modal-title text-[#343131]" id="updateApplicationStatusModalLabel">
                     Update Status
                 </h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeUpdateJobStatusModal">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close" id="closeUpdateApplicationStatusModal">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -26,22 +26,22 @@
                     <div class="space-y-6">
                         <div class="flex-1">
                             <label class="block text-sm font-medium text-gray-700">Status Type</label>
-                            <select class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="updateJobStatus" name="statusTypeId">
+                            <select class="block w-full rounded-lg border border-gray-300 p-2 text-sm" id="updateApplicationStatus" name="statusTypeId">
                                 @foreach (var status in applicationStatusType)
                                 {
                                     <option value="@status.ApplicationStatusTypeId">@status.Name</option>
                                 }
                             </select>
-                            <span id="updateJobStatusValidation" class="text-sm text-red-500"></span>
+                            <span id="updateApplicationStatusValidation" class="text-sm text-red-500"></span>
                         </div>
                     </div>
-                    <input id="updateJobStatusJobId" name="jobId" type="hidden" />
+                    <input id="updateApplicationStatusAppId" name="appId" type="hidden" />
                 </form>
             </div>
 
-            <div class="modal-footer mt-2 !border-none">
+            <div class="modal-footer border-0 mt-2">
                 <button type="button" class="min-w-[128px] rounded-md bg-[#6c757d] px-3 py-2 font-medium text-white hover:bg-[#939BA2]" id="cancelUpdateApplicationStatus" data-dismiss="modal">Cancel</button>
-                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747]" onclick="submitUpdateApplicationStatus">Update</button>
+                <button type="submit" class="min-w-[128px] rounded-md bg-[#7A1515] px-3 py-2 font-medium text-white hover:bg-[#A04747] disabled:bg-gray-400" id="submitUpdateApplicationStatus">Update</button>
             </div>
         </div>
     </div>

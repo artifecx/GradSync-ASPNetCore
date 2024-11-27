@@ -151,30 +151,50 @@ else
                         <div class="space-y-1 whitespace-nowrap py-1">
                             <!-- Application Details -->
                             <button onclick="location.href='@Url.Action("GetApplication", "Application",
-                                                                new {
-                                                                    id = item.ApplicationId,
-                                                                    sortBy = sortBy,
-                                                                    search = search,
-                                                                    pageIndex = Model.PageIndex,
-                                                                    filterByWorkSetup = filterByWorkSetup,
-                                                                    filterByProgram = filterByProgram,
-                                                                    filterByStatus = filterByStatus,
-                                                                })'"
+                                        new {
+                                            id = item.ApplicationId,
+                                            sortBy = sortBy,
+                                            search = search,
+                                            pageIndex = Model.PageIndex,
+                                            filterByWorkSetup = filterByWorkSetup,
+                                            filterByProgram = filterByProgram,
+                                            filterByStatus = filterByStatus,
+                                        })'"
                                     class="text-grey-700 flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
                                 @Html.Raw(DetailsIcon)Details
                             </button>
 
-                            <!-- Update Job Status -->
-                            <button class="update-job-status text-grey-700 flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
-                                    data-applicationid="@item.ApplicationId"
-                                    data-statusid="@item.ApplicationStatusTypeId"
-                                    data-toggle="modal"
-                                    data-target="#updateApplicationStatusModal">
-                                @Html.Raw(UpdateStatusIcon)Update Status
-                            </button>
+                            @if(item.ApplicationStatusTypeId != "Withdrawn")
+                            {
+                                if (!User.IsInRole("Applicant"))
+                                {
+                                    <!-- Update Job Status -->
+                                    <button class="update-application-status text-grey-700 flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                            data-applicationid="@item.ApplicationId"
+                                            data-statusid="@item.ApplicationStatusTypeId"
+                                            data-toggle="modal"
+                                            data-target="#updateApplicationStatusModal">
+                                        @Html.Raw(UpdateStatusIcon)Update Status
+                                    </button>
+                                }
+                                else
+                                {
+                                    if(item.ApplicationStatusTypeId != "Rejected")
+                                    {
+                                        <!-- Withdraw Job Status -->
+                                        <button class="withdraw-application text-grey-700 flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none disabled:cursor-not-allowed disabled:text-gray-400"
+                                                data-applicationid="@item.ApplicationId"
+                                                data-position="@item.Job.Title"
+                                                data-toggle="modal"
+                                                data-target="#withdrawApplicationModal">
+                                            @Html.Raw(SignOutIcon)Withdraw
+                                        </button>
+                                    }
+                                }
+                            }
 
                             <!-- Archive Job -->
-                            <button onclick=" displayDeleteModal('@item.ApplicationId' , '@item.Job.Title')"
+                            <button onclick="featureUnavailable()"
                                     class="text-grey-700 flex w-full cursor-pointer items-center px-4 py-2 text-left text-sm hover:text-[#A53D3D] focus:outline-none">
                                 @Html.Raw(ArchiveIcon)Archive
                             </button>

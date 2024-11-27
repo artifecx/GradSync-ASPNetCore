@@ -8,6 +8,7 @@
 @{
     ViewData["Title"] = "Application List";
     await Html.RenderPartialAsync("_UpdateStatusModal");
+    await Html.RenderPartialAsync("_ConfirmWithdrawModal");
 
     string search = ViewData["Search"] as string;
     string sortBy = ViewData["SortBy"] as string;
@@ -135,33 +136,11 @@
 </div>
 
 @await Html.PartialAsync("_ApplicantDetailsModal")
+<div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/application.js"></script>
-    <script>
-        document.addEventListener('click', function (e) {
-            const actionBtn = e.target.closest('.actionDropdownApplicationBtn');
-            if (actionBtn) {
-                const ApplicationId = actionBtn.dataset.applicationid;
-                const menu = document.getElementById(`actionDropdownApplicationMenu-${ApplicationId}`);
-                menu.classList.toggle('hidden');
-
-                document.querySelectorAll('.actionDropdownApplicationMenu').forEach(m => {
-                    if (m.id !== `actionDropdownApplicationMenu-${ApplicationId}`) {
-                        m.classList.add('hidden');
-                    }
-                });
-                return;
-            }
-
-            if (!e.target.closest('.actionDropdownApplicationMenu') && !e.target.closest('.actionDropdownApplicationBtn')) {
-                document.querySelectorAll('.actionDropdownApplicationMenu').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-            }
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             const viewDetailsLinks = document.querySelectorAll('a.view-details');

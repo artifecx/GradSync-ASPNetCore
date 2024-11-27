@@ -6,7 +6,11 @@
 
 @{
     ViewData["Title"] = $"{Model.Job.Title} Application | GradSync";
+    await Html.RenderPartialAsync("_UpdateStatusModal");
+    await Html.RenderPartialAsync("_ConfirmWithdrawModal");
+
     var userId = ViewBag.UserId;
+    bool isClosed = Model.ApplicationStatusTypeId == "Rejected" || Model.ApplicationStatusTypeId == "Withdrawn" || Model.ApplicationStatusTypeId == "Accepted";
 }
 
 <div class="flex flex-col bg-gray-100 @(User.IsInRole("Applicant") ? "my-20  max-w-7xl max-h-screen mx-auto" : "size-full")">
@@ -23,24 +27,33 @@
 
                 <!-- Action Buttons -->
                 <div class="flex justify-between space-x-4 p-2">
-                    @if (User.IsInRole("Applicant"))
+                    @if (Model.ApplicationStatusTypeId != "Withdrawn")
                     {
-                        <!-- Withdraw -->
-                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
-                                id="withdrawButton"
-                                data-action-url="@Url.Action("WithdrawApplication", "Application")"
-                                onclick="withdrawApplicationHandler('@Model.ApplicationId')">
-                            Withdraw Application
-                        </button>
-                    }
-                    else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
-                    {
-                        <!-- Update Status -->
-                        <button class="rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
-                                data-toggle="modal"
-                                data-target="#">
-                            Update Status
-                        </button>
+                        @if (User.IsInRole("Applicant"))
+                        {
+                            if (Model.ApplicationStatusTypeId != "Rejected")
+                            {
+                                <!-- Withdraw -->
+                                <button class="withdraw-application rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                        data-applicationid="@Model.ApplicationId"
+                                        data-position="@Model.Job.Title"
+                                        data-toggle="modal"
+                                        data-target="#withdrawApplicationModal">
+                                    Withdraw Application
+                                </button>
+                            }
+                        }
+                        else if (User.IsInRole("Recruiter") && string.Equals(userId, Model.Job.PostedById))
+                        {
+                            <!-- Update Status -->
+                            <button class="update-application-status rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A04747]"
+                                    data-applicationid="@Model.ApplicationId"
+                                    data-statusid="@Model.ApplicationStatusTypeId"
+                                    data-toggle="modal"
+                                    data-target="#updateApplicationStatusModal">
+                                Update Status
+                            </button>
+                        }
                     }
                 </div>
             </div>
@@ -77,7 +90,9 @@
                 <form id="sendForm">
                     <div class="flex items-center border-t border-gray-200 p-4">
                         <input id="messageInput" type="text" class="flex-grow rounded-lg border border-gray-300 p-2 text-sm focus:outline-none focus:ring-2" placeholder="Type your message..." @(User.IsInRole("NLO") ? "hidden" : "")>
-                        <button id="sendButton" class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed" disabled @(User.IsInRole("NLO") ? "hidden" : "")>
+                        <button id="sendButton" 
+                            class="ml-4 rounded bg-[#7A1515] px-4 py-2 font-semibold text-white hover:bg-[#A53D3D] disabled:bg-gray-400 disabled:cursor-not-allowed"
+                            disabled @(User.IsInRole("NLO") || isClosed ? "hidden" : "")>
                             Send
                         </button>
                         <input type="hidden" id="threadId" value="@Model.ApplicationId" />
@@ -100,11 +115,11 @@
 
 <!-- TempData for Notifications -->
 <div id="tempDataContainer" data-success="@TempData["SuccessMessage"]" data-error="@TempData["ErrorMessage"]"></div>
-<input type="hidden" id="actionUrl" value="@Url.Action("WithdrawApplication", "Application")" />
 
 @section Scripts {
     <script src="~/js/toastrNotification.js"></script>
     <script src="~/js/messaging.js"></script>
+    <script src="~/js/application.js"></script>
     <script>
         const urlParams = new URLSearchParams(window.location.search);
 

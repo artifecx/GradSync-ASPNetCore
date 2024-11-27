@@ -15,6 +15,7 @@ using static Services.Exceptions.CompanyExceptions;
 using static Resources.Constants.UserRoles;
 using Data.Dtos;
 using Data.Specifications;
+using static Resources.Constants.Enums;
 
 namespace Services.Services
 {
@@ -202,6 +203,56 @@ namespace Services.Services
             job.AvailableSlots = model.AvailableSlots.Value;
             job.UpdatedDate = DateTime.Now;
             await _repository.UpdateJobAsync(job);
+        }
+
+        public async Task IncrementJobSlots(string jobId)
+        {
+            var job = await GetJobByIdAsync(jobId, true);
+            if (job == null)
+                throw new JobException("Job not found!");
+
+            job.AvailableSlots += 1;
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
+        }
+
+        public async Task DecrementJobSlots(string jobId)
+        {
+            var job = await GetJobByIdAsync(jobId, true);
+            if (job == null)
+                throw new JobException("Job not found!");
+
+            if (job.AvailableSlots - 1 < 0)
+                throw new JobException("No available slots!");
+            if (job.AvailableSlots - 1 == 0)
+                await CloseJob(job);
+
+            job.AvailableSlots -= 1;
+            job.UpdatedDate = DateTime.Now;
+            await _repository.UpdateJobAsync(job);
+        }
+
+        private static async Task CloseJob(Job job)
+        {
+            job.StatusTypeId = "Closed";
+            var validApplicationStatuses = new HashSet<string>
+                {
+                    "Accepted", "Withdrawn", "Rejected"
+                };
+
+            if (job.Applications.Any() && job.Applications.Count > 0)
+            {
+                foreach (var application in job.Applications)
+                {
+                    if (!validApplicationStatuses.Contains(application.ApplicationStatusTypeId))
+                    {
+                        application.ApplicationStatusTypeId = "Rejected";
+                        application.UpdatedDate = DateTime.Now;
+                    }
+                }
+            }
+
+            await Task.CompletedTask;
         }
         #endregion CRUD Methods
 

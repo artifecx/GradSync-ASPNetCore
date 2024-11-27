@@ -15,6 +15,7 @@ using static Resources.Constants.ExpirationTimes;
 using static Resources.Constants.UserRoles;
 using static Resources.Constants.Types;
 using static Resources.Messages.ErrorMessages;
+using static Resources.Messages.EmailMessages;
 using static Services.Exceptions.JobApplicationExceptions;
 using Microsoft.Extensions.Logging;
 
@@ -76,6 +77,7 @@ namespace Services.Services
             }
 
             await UpdateApplicationCacheAsync(userId, application.ApplicationId);
+            await ComposeAndSendEmail(application.ApplicationId, "New", Role_Recruiter);
         }
 
         /// <summary>
@@ -88,9 +90,7 @@ namespace Services.Services
         public async Task UpdateApplicationAsync(string userId, string applicationId, string applicationStatusTypeId)
         {
             if (string.IsNullOrEmpty(applicationId))
-            {
                 throw new JobApplicationException("Application ID is null or empty.");
-            }
 
             var application = await GetOrCacheApplicationByIdAsync(applicationId);
 
@@ -98,6 +98,10 @@ namespace Services.Services
                 throw new JobApplicationException(Error_ApplicationNotFound);
             if (application.ApplicationStatusTypeId == applicationStatusTypeId)
                 throw new JobApplicationException(Error_ApplicationStatusUnchanged);
+
+            var currentStatusId = application.ApplicationStatusTypeId;
+            bool incrementSlots = currentStatusId == AppStatus_Accepted;
+            bool decrementSlots = applicationStatusTypeId == AppStatus_Accepted;
 
             application.ApplicationStatusTypeId = applicationStatusTypeId;
             application.UpdatedDate = DateTime.Now;
@@ -109,9 +113,27 @@ namespace Services.Services
             {
                 var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
                 await repository.UpdateApplicationAsync(application);
+
+                if(incrementSlots || decrementSlots)
+                {
+                    var service = scope.ServiceProvider.GetRequiredService<IJobService>();
+                    if (incrementSlots)
+                        await service.IncrementJobSlots(application.JobId);
+                    if (decrementSlots)
+                        await service.DecrementJobSlots(application.JobId);
+                }
             }
 
             await UpdateApplicationCacheAsync(userId, applicationId);
+
+            currentStatusId = application.ApplicationStatusTypeId;
+            if(currentStatusId != AppStatus_Viewed)
+            {
+                var applicantStatuses = new HashSet<string> { AppStatus_Accepted, AppStatus_Rejected, AppStatus_Shortlisted };
+                var recipientRole = applicantStatuses.Contains(currentStatusId) ? Role_Applicant : Role_Recruiter;
+
+                await ComposeAndSendEmail(applicationId, application.ApplicationStatusTypeId, recipientRole);
+            }
         }
 
         /// <summary>
@@ -314,7 +336,7 @@ namespace Services.Services
         private async Task<bool> HasExistingApplicationAsync(string userId, string jobId)
         {
             var applications = await GetOrCacheAllApplicationsByUserAsync(userId);
-            return applications != null && applications.Exists(a => a.JobId == jobId);
+            return applications != null && applications.Exists(a => a.JobId == jobId && a.ApplicationStatusTypeId != AppStatus_Withdrawn);
         }
 
         /// <summary>
@@ -388,5 +410,68 @@ namespace Services.Services
             await Task.CompletedTask;
         }
         #endregion
+
+        private async Task ComposeAndSendEmail(string appId, string type, string recipientRole)
+        {
+            var app = new Application();
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var repository = scope.ServiceProvider.GetRequiredService<IApplicationRepository>();
+                app = await repository.GetApplicationByIdAsync(appId);
+            }
+            if (app == null) return;
+
+            var applicantEmail = app.User?.User?.Email;
+            var applicantName = app.User?.User?.FirstName;
+
+            var recruiterEmail = app.Job?.PostedBy?.User?.Email;
+            var recruiterName = app.Job?.PostedBy?.User?.FirstName;
+
+            var jobTitle = app.Job?.Title;
+            var companyName = app.Job?.Company?.Name;
+
+            bool isRecruiter = recipientRole == Role_Recruiter;
+            string subject = "";
+            string body = "";
+            switch (type)
+            {
+                case "Accepted":
+                    if (isRecruiter) break;
+                    subject = string.Format(Email_SubjectApplicationAccepted, jobTitle);
+                    body = string.Format(Email_BodyApplicationAccepted, applicantName, jobTitle, companyName);
+                    break;
+                case "Rejected":
+                    if (isRecruiter) break;
+                    subject = string.Format(Email_SubjectApplicationRejected, jobTitle, companyName);
+                    body = string.Format(Email_BodyApplicationRejected, applicantName, jobTitle, companyName);  
+                    break;
+                case "Shortlisted":
+                    if (isRecruiter) break;
+                    subject = string.Format(Email_SubjectApplicationShortlisted, jobTitle);
+                    body = string.Format(Email_BodyApplicationShortlisted, applicantName, jobTitle, companyName);   
+                    break;
+                case "New":
+                    if (!isRecruiter) break;
+                    subject = string.Format(Email_SubjectApplicationNew, jobTitle);
+                    body = string.Format(Email_BodyApplicationNew, recruiterName, jobTitle);
+                    break;
+                case "Withdrawn":
+                    if (!isRecruiter) break;
+                    subject = string.Format(Email_SubjectApplicationWithdrawn, jobTitle);
+                    body = string.Format(Email_BodyApplicationWithdrawn, recruiterName, applicantName, jobTitle);
+                    break;
+            }
+
+            SendEmail(isRecruiter ? recruiterEmail : applicantEmail, subject, body);
+        }
+
+        private void SendEmail(string email, string subject, string body)
+        {
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var service = scope.ServiceProvider.GetRequiredService<IEmailService>();
+                service.SendEmail(email, subject, body);
+            }
+        }
     }
 }
