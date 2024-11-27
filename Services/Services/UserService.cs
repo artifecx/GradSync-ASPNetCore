@@ -140,7 +140,6 @@ namespace Services.Services
         {
             var userModel = _mapper.Map<AccountServiceModel>(model);
             userModel.Password = "defpass"; //Default password
-            userModel.AsRecruiter = model.RoleId == Role_Recruiter;
 
             if (model.RoleId == Role_NLO || model.RoleId == Role_Admin)
             {

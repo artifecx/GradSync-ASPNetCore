@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Services.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace Services.ServiceModels
 {
@@ -9,6 +10,7 @@ namespace Services.ServiceModels
         [Required(ErrorMessage = "Email is required")]
         [EmailAddress(ErrorMessage = "Invalid email address")]
         [StringLength(100, ErrorMessage = "Maximum length of an email is 100")]
+        [RegularExpression(@"^[^@\s]+@cit\.edu$", ErrorMessage = "Please use your institutional email @cit.edu")]
         public string Email { get; set; }
 
         [Required(ErrorMessage = "First name is required")]
@@ -36,7 +38,7 @@ namespace Services.ServiceModels
         [Compare("Password", ErrorMessage = "Password and confirmation password must match.")]
         public string ConfirmPassword { get; set; }
 
-        public bool AsRecruiter { get; set; }
+        /// public bool AsRecruiter { get; set; }
 
         /// Honeypot, do not use
         public string Username { get; set; }

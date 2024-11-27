@@ -102,17 +102,14 @@ namespace Services.Services
             user.FromSignUp = true;
             user.UserId = Guid.NewGuid().ToString();
             user.Password = PasswordManager.EncryptPassword(model.Password);
-            user.RoleId = model.AsRecruiter ? Role_Recruiter : Role_Applicant;
+            user.RoleId = Role_Applicant;
             user.JoinDate = DateTime.Now;
 
             string token = GenerateToken(user);
 
             _repository.AddUser(user);
 
-            if (model.AsRecruiter)
-                AddRecruiter(user);
-            else
-                AddApplicant(user);
+            AddApplicant(user);
 
             SendVerificationEmail(token, user.FirstName, user.Email);
         }

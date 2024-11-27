@@ -3,9 +3,9 @@
 
 <div class="modal fade" id="registerUserModal" tabindex="-1" role="dialog" aria-labelledby="registerUserModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
-        <div class="modal-content">
+        <div class="modal-content p-2">
             <!-- Modal Header -->
-            <div class="modal-header">
+            <div class="modal-header border-0">
                 <h5 class="modal-title text-2xl font-bold text-[#7A1515]" id="registerUserModalLabel">Create Account</h5>
                 <button type="button" class="close text-gray-500 hover:text-gray-700" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
@@ -25,7 +25,6 @@
                         <input type="text" id="email" asp-for="Email" placeholder="juan.cruz@cit.edu"
                                class="w-full rounded-md border border-gray-300 p-2 hover:border-[#A04747] focus:outline-none focus:ring-2 focus:ring-[#A04747]" />
                         <span asp-validation-for="Email" class="mt-1 block text-sm text-red-500"></span>
-                        <p class="text-xs font-normal text-[#A04747]">Please use your institution/company email address.</p>
                     </div>
 
                     <div class="mb-4 flex space-x-4">
@@ -72,11 +71,9 @@
                     </div>
                 </div>
 
-                <div class="modal-footer flex w-full items-center justify-between">
-                    <div class="flex w-full items-center">
-                        <input type="checkbox"  id="roleCheckbox" asp-for="AsRecruiter" value="true"
-                               class="h-5 w-5 cursor-pointer rounded transition-all duration-300 focus:ring-0" />
-                        <label for="roleCheckbox" class="ml-2 cursor-pointer pt-2 font-semibold text-[#343131]">Apply as recruiter</label>
+                <div class="modal-footer border-0 flex w-full items-center justify-between">
+                    <div class="flex w-full items-center text-sm italic">
+                        Contact <a href="mailto:nlo@cit.edu" class="px-1 font-medium text-[#7A1515] hover:!no-underline hover:text-[#A04747]">nlo@cit.edu</a> to become a recruiter.
                     </div>
 
                     <button type="submit" id="registerButton" disabled
