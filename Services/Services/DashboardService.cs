@@ -97,22 +97,8 @@ namespace Services.Services
                 .ToDictionary(g => g.Key, g => g.Count());
             model.JobSalaryDistribution = jobs
                 .AsParallel()
-                .GroupBy(j => GetSalaryRangeFromRangeString(j.Salary))
+                .GroupBy(j => GetSalaryRange(Convert.ToInt32(j.SalaryLower)))
                 .ToDictionary(g => g.Key, g => g.Count());
-        }
-
-        private static string GetSalaryRangeFromRangeString(string salaryRange)
-        {
-            int lowerBound = ParseSalary(salaryRange);
-            return GetSalaryRange(lowerBound);
-        }
-
-        private static int ParseSalary(string salaryRange)
-        {
-            var parts = salaryRange.Split('-');
-            string lowerBoundStr = parts[0].Replace("Php", "").Replace(",", "").Trim();
-            int lowerBound = int.Parse(lowerBoundStr);
-            return lowerBound;
         }
 
         private static string GetSalaryRange(int salary)

@@ -27,7 +27,9 @@ public partial class Job
 
     public int AvailableSlots { get; set; }
 
-    public string Salary { get; set; }
+    public string SalaryLower { get; set; }
+
+    public string SalaryUpper { get; set; }
 
     public string Schedule { get; set; }
 

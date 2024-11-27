@@ -384,7 +384,9 @@ public partial class GradSyncDbContext : DbContext
 
             entity.HasIndex(e => e.PostedById, "IX_Job_PostedById");
 
-            entity.HasIndex(e => e.Salary, "IX_Job_Salary");
+            entity.HasIndex(e => e.SalaryLower, "IX_Job_SalaryLower");
+
+            entity.HasIndex(e => e.SalaryUpper, "IX_Job_SalaryUpper");
 
             entity.HasIndex(e => e.Schedule, "IX_Job_Schedule");
 
@@ -415,7 +417,10 @@ public partial class GradSyncDbContext : DbContext
             entity.Property(e => e.PostedById)
                 .IsRequired()
                 .HasMaxLength(255);
-            entity.Property(e => e.Salary)
+            entity.Property(e => e.SalaryLower)
+                .IsRequired()
+                .HasMaxLength(255);
+            entity.Property(e => e.SalaryUpper)
                 .IsRequired()
                 .HasMaxLength(255);
             entity.Property(e => e.Schedule)
