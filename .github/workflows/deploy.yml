@@ -24,7 +24,7 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Publish
-        run: dotnet publish --configuration Release --output ./publish
+        run: dotnet publish --configuration Release --framework net8.0 --self-contained false --output ./publish
 
       - name: Deploy to IIS folder
         shell: powershell
