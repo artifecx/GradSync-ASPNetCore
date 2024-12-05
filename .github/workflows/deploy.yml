@@ -2,7 +2,7 @@ name: Build and Deploy to IIS
 
 on:
   push:
-    branches: [Gemaldita-Core]
+    branches: [main]
 
 jobs:
   build-and-deploy:
@@ -12,31 +12,34 @@ jobs:
       - name: Check out code
         uses: actions/checkout@v3
 
-      # - name: Setup .NET SDK
-      #  uses: actions/setup-dotnet@v3
-      #  with:
-      #    dotnet-version: '8.0.x'
-
       - name: Restore Dependencies
         run: dotnet restore
 
       - name: Build
         run: dotnet build --configuration Release
+        
+      - name: Decode and write appsettings.json
+        shell: powershell
+        run: |
+            $decoded = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String("${{ secrets.APPSETTINGS_JSON_BASE64 }}"))
+            $decoded | Out-File "WebApp/appsettings.json" -Encoding UTF8
+        
+      - name: MSBuild Publish
+        shell: cmd
+        run: dotnet msbuild WebApp/WebApp.csproj /p:Configuration=Release /p:DeployOnBuild=true /p:PublishProfile=FolderProfile
 
-      - name: Publish
-        run: dotnet publish --configuration Release --output ./publish
+      - name: Stop IIS
+        run: iisreset /stop
 
-      # Copy published files to the IIS site folder
       - name: Deploy to IIS folder
         shell: powershell
         run: |
-            robocopy .\publish "C:\inetpub\wwwroot\WebApp" /MIR
+            robocopy WebApp\obj\Release\net8.0\PubTmp\Out "C:\inetpub\wwwroot\WebApp" /MIR
             if ($LASTEXITCODE -le 3) {
               exit 0
             } else {
               exit $LASTEXITCODE
             }
 
-      # Restart IIS to ensure changes take effect
-      - name: Restart IIS
-        run: iisreset
+      - name: Start IIS
+        run: iisreset /start
