@@ -42,7 +42,7 @@
                 </div>
                 @if (TempData["ErrorMessageLogin"] != null)
                 {
-                    <span class="mt-1 block text-sm text-[#7A1515]">@(TempData["ErrorMessageLogin"])</span>
+                    <span class="mt-1 flex flex-col text-sm font-medium text-red-500">@(Html.Raw(TempData["ErrorMessageLogin"]))</span>
                 }
             </div>
 

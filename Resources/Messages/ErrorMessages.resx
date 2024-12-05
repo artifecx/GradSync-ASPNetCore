@@ -121,7 +121,13 @@
     <value>User already exists!</value>
   </data>
   <data name="Error_UserNotVerified" xml:space="preserve">
-    <value>Check your email (and spam folder) for the verification link. If expired, a new link will be sent shortly. For help, contact support@gradsync.org.</value>
+    <value>&lt;span class="text-[#343131] font-light"&gt;
+Please check your CIT email inbox, junk folder, and 
+&lt;a href="https://security.microsoft.com/quarantine" target="_blank" class="font-medium hover:text-[#A04747]"&gt;quarantine page&lt;/a&gt; for the verification link. 
+&lt;/span&gt;
+&lt;span class="my-2 text-[#343131] font-light"&gt;
+For assistance, please contact &lt;a href="mailto:support@gradsync.org" class="font-medium hover:text-[#A04747]"&gt;support@gradsync.org&lt;/a&gt;
+&lt;/span&gt;</value>
   </data>
   <data name="Error_UserRegistrationDefault" xml:space="preserve">
     <value>An has error occurred while registering user.</value>

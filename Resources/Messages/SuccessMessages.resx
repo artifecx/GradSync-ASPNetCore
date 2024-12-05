@@ -121,10 +121,10 @@
     <value>Successfully registered! Check your email for verification.</value>
   </data>
   <data name="Success_UserVerificationSuccess" xml:space="preserve">
-    <value>User successfully verified!</value>
+    <value>&lt;span class="text-green-500"&gt;User successfully verified!&lt;/span&gt;</value>
   </data>
   <data name="Success_UserPasswordResetSuccess" xml:space="preserve">
-    <value>An email containing your temporary password will be sent shortly.</value>
+    <value>&lt;span class="text-[#343131] font-light"&gt;An email containing your temporary password will be sent shortly.&lt;/span&gt;</value>
   </data>
   <data name="Success_UserPasswordRequestSuccess" xml:space="preserve">
     <value>If your email is in our system, an email with instructions will be sent to you shortly.</value>

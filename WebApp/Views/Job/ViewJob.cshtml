@@ -27,7 +27,7 @@
     var SkillsCertification = ViewBag.SkillsCertification as List<Skill>;
 }
 
-<div class="flex flex-col bg-gray-100 @(User.IsInRole("Applicant") ? "my-20 max-w-7xl max-h-screen min-h-screen mx-auto" : "size-full")">
+<div class="flex flex-col  @(User.IsInRole("Applicant") ? "pt-20 pb-4 max-w-7xl max-h-screen min-h-screen mx-auto overflow-hidden" : "size-full bg-gray-100")">
     <div class="mb-2 w-full justify-between">
         <div class="w-full rounded-lg bg-white p-6 px-12 shadow-sm">
             <div class="flex justify-between">
@@ -119,21 +119,69 @@
             <h2 class="mb-2 pl-4 text-2xl font-bold text-gray-500">Job Details</h2>
 
             <!-- Main Content -->
-            <div class="h-full gap-6 px-4 pb-4">
+            <div class="gap-6 px-4 pb-4">
+                <!-- Job Matches -->
+                @if (!User.IsInRole("Applicant"))
+                {
+                    <div class="mb-3 cursor-default rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                        <div class="rounded-xl border bg-white p-4">
+                            <h3 class="mb-4 text-xl font-bold">Job Matches</h3>
+                            @await Html.PartialAsync("_JobMatchesTable", Model.JobMatches)
+                        </div>
+                    </div>
+                }
+
                 <!-- Skills Required -->
                 <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
-                    <div class="rounded-xl border bg-white p-4">
+                    <div class="cursor-default rounded-xl border bg-white p-4">
                         <h3 class="mb-4 text-xl font-bold">Skills Required</h3>
                         <!--Skills-->
-                        <div class="mb-1 flex flex-wrap space-x-3">
+                        <div class="mb-1 flex flex-wrap space-x-3 overflow-auto">
                             @if (Model.Skills.Any())
                             {
-                                @foreach (var skill in Model.Skills)
-                                {
-                                    <div class="mb-1 flex flex-wrap py-1">
-                                    <span class="outline-offset-1 rounded-full px-2 py-1 text-xs font-semibold outline outline-[#7A1515]">@skill.Name.ToUpper()</span>
+                                var skills = Model.Skills.OrderBy(s => s.Name).ToList();
+                                <div class="flex flex-wrap">
+                                    <div class="mb-4 w-full space-y-4">
+                                        <span class="text-lg font-medium">Cultural Skills</span>
+                                        <div class="flex flex-wrap">
+                                            @foreach (var skill in skills.Where(s => s.Type == "Common Skill").ToList())
+                                            {
+                                                <div class="mb-2 mr-2 overflow-hidden whitespace-nowrap rounded-full bg-gray-200 py-1 shadow-sm">
+                                                    <span class="px-3 py-2 text-xs font-semibold shadow-md">@skill.Name</span>
+                                                </div>
+                                                skills.Remove(skill);
+                                            }
+                                        </div>
                                     </div>
-                                }
+
+                                    <div class="mb-4 w-full space-y-4">
+                                        <span class="text-lg font-medium">Technical Skills</span>
+                                        <div class="flex flex-wrap">
+                                            @foreach (var skill in skills.Where(s => s.Type == "Specialized Skill").ToList())
+                                            {
+                                                <div class="mb-2 mr-2 overflow-hidden whitespace-nowrap rounded-full bg-gray-200 py-1 shadow-sm">
+                                                    <span class="px-3 py-2 text-xs font-semibold shadow-md">@skill.Name</span>
+                                                </div>
+                                                skills.Remove(skill);
+                                            }
+                                        </div>
+                                    </div>
+
+                                    @if (skills.Any())
+                                    {
+                                        <div class="mb-4 w-full space-y-4">
+                                            <span class="text-lg font-medium">Certifications</span>
+                                            <div class="flex flex-wrap">
+                                                @foreach (var skill in skills)
+                                                {
+                                                    <div class="mb-2 mr-2 overflow-hidden whitespace-nowrap rounded-full bg-gray-200 py-1 shadow-sm">
+                                                        <span class="px-3 py-2 text-xs font-semibold shadow-md">@skill.Name</span>
+                                                    </div>
+                                                }
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
                             }
                             else
                             {
@@ -143,23 +191,13 @@
                     </div>
                 </div>
 
-                <div class="mb-3 rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
-                    <!-- About the Job -->
-                    <div class="rounded-xl border bg-white p-4">
+                <!-- Description -->
+                <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
+                    <div class="cursor-default rounded-xl border bg-white p-4">
                         <h3 class="mb-4 text-xl font-bold">About the Job</h3>
                         <p class="whitespace-pre-wrap text-base text-gray-600">@Model.Description</p>
                     </div>
                 </div>
-
-                @if (!User.IsInRole("Applicant"))
-                {
-                    <div class="rounded-xl bg-gray-100 p-1 shadow-md transition-shadow duration-300 hover:shadow-lg">
-                        <div class="rounded-xl border bg-white p-4">
-                            <h3 class="mb-4 text-xl font-bold">Job Matches</h3>
-                            @await Html.PartialAsync("_JobMatchesTable", Model.JobMatches)
-                        </div>
-                    </div>
-                }
             </div>
         </div>
         <!-- Infotab Sidebar -->
