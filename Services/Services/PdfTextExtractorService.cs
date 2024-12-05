@@ -4,6 +4,7 @@ using Services.Interfaces;
 using System;
 using System.IO;
 using System.Text;
+using static Services.Exceptions.JobExceptions;
 
 namespace Services.Services
 {
@@ -11,31 +12,24 @@ namespace Services.Services
     {
         public string ExtractTextFromPdf(Stream pdfStream)
         {
-            try
+            pdfStream.Seek(0, SeekOrigin.Begin);
+            using (var pdfReader = new PdfReader(pdfStream))
+            using (var pdfDocument = new PdfDocument(pdfReader))
             {
-                pdfStream.Seek(0, SeekOrigin.Begin);
-                using (var pdfReader = new PdfReader(pdfStream))
-                using (var pdfDocument = new PdfDocument(pdfReader))
+                StringBuilder bld = new StringBuilder();
+                for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
                 {
-                    StringBuilder bld = new StringBuilder();
-                    for (int i = 1; i <= pdfDocument.GetNumberOfPages(); i++)
-                    {
-                        var page = pdfDocument.GetPage(i);
-                        bld.Append(PdfTextExtractor.GetTextFromPage(page));
-                    }
-                    string extractedText = bld.ToString();
-
-                    if (string.IsNullOrWhiteSpace(extractedText))
-                    {
-                        throw new Exception("Cannot retrieve any text from the PDF, upload another file.");
-                    }
-
-                    return extractedText;
+                    var page = pdfDocument.GetPage(i);
+                    bld.Append(PdfTextExtractor.GetTextFromPage(page));
                 }
-            }
-            catch (Exception ex)
-            {
-                throw new Exception($"Error extracting text from PDF: {ex.Message}");
+                string extractedText = bld.ToString();
+
+                if (string.IsNullOrWhiteSpace(extractedText))
+                {
+                    throw new JobException("Cannot retrieve any text from the PDF, upload another file.");
+                }
+
+                return extractedText;
             }
         }
     }

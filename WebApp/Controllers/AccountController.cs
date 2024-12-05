@@ -96,7 +96,7 @@ namespace WebApp.Controllers
         /// <returns> Created response view </returns>
         [HttpPost]
         [AllowAnonymous]
-        [EnableRateLimiting("LoginPolicy")]
+        //[EnableRateLimiting("LoginPolicy")]
         public async Task<IActionResult> Login(LoginViewModel model, string returnUrl)
         {
             return await HandleExceptionAsync(async () =>
@@ -158,6 +158,7 @@ namespace WebApp.Controllers
                 {
                     _accountService.RegisterUser(model);
                     TempData["SuccessMessage"] = Success_UserRegistrationSuccess;
+                    TempData["ErrorMessageLogin"] = Error_UserNotVerified;
                     return Json(new { success = true });
                 }
                 TempData["ErrorMessage"] = Error_UserRegistrationDefault;

@@ -125,9 +125,11 @@
 
 Thank you for joining GradSync! To complete your registration, please verify your email by clicking the link below:
 
-Verify Account: {1}
+&lt;a href="{1}" target="_blank"&gt;Verify Account&lt;/a&gt;
 
-This link will expire in 1 hour. If it doesn’t work, copy and paste the URL into your browser.
+This link will expire in 1 hour. If it doesn’t work, copy and paste the URL below into your browser.
+
+{1}
 
 If you didn’t sign up for GradSync, you can ignore this email.
 
@@ -156,9 +158,11 @@ The GradSync Team</value>
 
 We received a request to reset your GradSync password. To continue, please click the link below:
 
-Reset Password: {1}
+&lt;a href="{1}" target="_blank"&gt;Reset Password&lt;/a&gt;
 
-This link will expire in 1 hour. If it doesn’t work, copy and paste the URL into your browser.
+This link will expire in 1 hour. If it doesn’t work, copy and paste the URL below into your browser.
+
+{1}
 
 If you didn’t request this reset, you can safely ignore this email.
 
