@@ -1,1 +1,15 @@
-﻿* { font-family: "Inter", sans-serif; }
+﻿* {
+    font-family: "Inter", sans-serif;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+    *::-webkit-scrollbar {
+        display: none;
+    }
+
+.featured-jobs {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    margin-top: 20px;   
+}
